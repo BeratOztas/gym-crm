@@ -1,0 +1,29 @@
+[
+  {
+    "id": null,
+    "trainingName": "Yoga Session 1",
+    "trainingType": "YOGA",
+    "trainingDate": "2024-07-20",
+    "trainingDuration": 60,
+    "traineeId": 1,
+    "trainerId": 1
+  },
+  {
+    "id": null,
+    "trainingName": "Fitness Bootcamp",
+    "trainingType": "FITNESS",
+    "trainingDate": "2024-07-21",
+    "trainingDuration": 90,
+    "traineeId": 2,
+    "trainerId": 2
+  },
+  {
+    "id": null,
+    "trainingName": "Zumba Fun",
+    "trainingType": "ZUMBA",
+    "trainingDate": "2024-07-22",
+    "trainingDuration": 45,
+    "traineeId": 3,
+    "trainerId": 3
+  }
+]

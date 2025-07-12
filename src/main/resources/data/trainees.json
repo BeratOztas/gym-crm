@@ -1,0 +1,32 @@
+[
+  {
+    "id": null,
+    "firstName": "Berat",
+    "lastName": "Oztas",
+    "username": null,
+    "password": null,
+    "isActive": true,
+    "dateOfBirth": "2000-01-15",
+    "address": "Çankaya, Ankara"
+  },
+  {
+    "id": null,
+    "firstName": "Oguzhan",
+    "lastName": "Uysal",
+    "username": null,
+    "password": null,
+    "isActive": true,
+    "dateOfBirth": "1992-05-20",
+    "address": "Konak, Izmır"
+  },
+  {
+    "id": null,
+    "firstName": "Mahmut",
+    "lastName": "Tuncer",
+    "username": null,
+    "password": null,
+    "isActive": true,
+    "dateOfBirth": "1988-11-03",
+    "address": "Istanbul, Turkey"
+  }
+]

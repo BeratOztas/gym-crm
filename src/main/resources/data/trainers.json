@@ -1,0 +1,38 @@
+[
+  {
+    "id": null,
+    "firstName": "Aslı",
+    "lastName": "Gungor",
+    "username": null,
+    "password": null,
+    "isActive": true,
+    "specialization": "YOGA"
+  },
+  {
+    "id": null,
+    "firstName": "Mehmet",
+    "lastName": "Simsek",
+    "username": null,
+    "password": null,
+    "isActive": true,
+    "specialization": "FITNESS"
+  },
+  {
+    "id": null,
+    "firstName": "Joe",
+    "lastName": "Rogan",
+    "username": null,
+    "password": null,
+    "isActive": true,
+    "specialization": "ZUMBA"
+  },
+  {
+    "id": null,
+    "firstName": "Merve",
+    "lastName": "Yildiz",
+    "username": null,
+    "password": null,
+    "isActive": true,
+    "specialization": "STRETCHING"
+  }
+]
