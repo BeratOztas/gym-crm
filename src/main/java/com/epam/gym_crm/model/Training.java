@@ -60,12 +60,13 @@ public class Training {
 		this.trainingDate = trainingDate;
 	}
 
-	public Integer getDuration() {
+
+	public Integer getTrainingDuration() {
 		return trainingDuration;
 	}
 
-	public void setDuration(Integer duration) {
-		this.trainingDuration = duration;
+	public void setTrainingDuration(Integer trainingDuration) {
+		this.trainingDuration = trainingDuration;
 	}
 
 	public Trainee getTrainee() {
