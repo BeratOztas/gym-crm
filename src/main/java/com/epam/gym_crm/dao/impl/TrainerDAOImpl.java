@@ -57,7 +57,8 @@ public class TrainerDAOImpl implements ITrainerDAO {
 
 	@Override
 	public Trainer update(Trainer trainer) {
-		return getTrainerMap().put(trainer.getId(), trainer);
+		getTrainerMap().put(trainer.getId(), trainer);
+		 return trainer;
 	}
 
 	@Override
