@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.epam.gym_crm.dao.ITrainerDAO;
@@ -22,6 +23,7 @@ public class TrainerDAOImpl implements ITrainerDAO {
 
 	private Storage storage;
 
+	@Autowired
 	public void setStorage(Storage storage) {
 		this.storage=storage;
 		logger.info("TrainerDAOImpl initialized.");
@@ -33,7 +35,8 @@ public class TrainerDAOImpl implements ITrainerDAO {
 
 	@Override
 	public Trainer create(Trainer trainer) {
-		return getTrainerMap().put(trainer.getId(), trainer);
+		 getTrainerMap().put(trainer.getId(), trainer);
+		 return trainer;
 	}
 
 	@Override
