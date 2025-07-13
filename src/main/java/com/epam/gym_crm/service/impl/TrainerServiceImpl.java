@@ -31,7 +31,8 @@ public class TrainerServiceImpl implements ITrainerService {
 	private ITrainerDAO trainerDAO;
 	
 	private IdGenerator idGenerator;
-	
+
+	@Autowired
 	public void setIdGenerator(IdGenerator idGenerator) {
 		this.idGenerator=idGenerator;
 	}
