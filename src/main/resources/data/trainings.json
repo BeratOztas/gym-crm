@@ -1,6 +1,6 @@
 [
   {
-    "id": null,
+    "id": 1,
     "trainingName": "Yoga Session 1",
     "trainingType": "YOGA",
     "trainingDate": "2024-07-20",
@@ -9,7 +9,7 @@
     "trainerId": 1
   },
   {
-    "id": null,
+    "id": 2,
     "trainingName": "Fitness Bootcamp",
     "trainingType": "FITNESS",
     "trainingDate": "2024-07-21",
@@ -18,7 +18,7 @@
     "trainerId": 2
   },
   {
-    "id": null,
+    "id": 3,
     "trainingName": "Zumba Fun",
     "trainingType": "ZUMBA",
     "trainingDate": "2024-07-22",
