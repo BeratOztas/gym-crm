@@ -21,6 +21,8 @@ import com.epam.gym_crm.utils.EntityType;
 import com.epam.gym_crm.utils.JsonConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.annotation.PostConstruct;
+
 @Component
 public class InitialDataLoader {
 
@@ -55,7 +57,8 @@ public class InitialDataLoader {
 
 		logger.info("InitialDataLoader bean initialized.");
 	}
-
+	
+	@PostConstruct
 	public void init() {
 		logger.info("Starting initial data loading from JSON files...");
 
@@ -63,7 +66,7 @@ public class InitialDataLoader {
 		loadDataFromJson(trainerFilePath, Trainer.class, trainerStorageMap, EntityType.TRAINER);
 		loadTrainingDataFromJson(trainingFilePath);
 
-		logger.info("Initial data loading completed.");
+		logger.info("Initial data loading completed successfully..");
 	}
 
 	private <T> void loadDataFromJson(String filePath, Class<T> entityTypeClass, Map<Long, T> targetMap,
