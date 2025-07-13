@@ -3,20 +3,34 @@ package com.epam.gym_crm.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
+
 public class Training {
 
 	private Long id;
+	@NotBlank(message = "Training name cannot be blank") 
+	@Size(min = 3, max = 100, message = "Training name must be between 3 and 100 characters") 
 	private String trainingName;
+	@NotNull(message = "Training type cannot be null")
 	private TrainingType trainingType;
+	@NotNull(message = "Training date cannot be null") 
 	private LocalDate trainingDate;
+	@NotNull(message = "Training duration cannot be null") 
+    @Min(value = 1, message = "Training duration must be at least 1 minute")
 	private Integer trainingDuration;
-	
+
+	@NotNull(message = "Trainee cannot be null for a training")
 	private Trainee trainee;
+	@NotNull(message = "Trainer cannot be null for a training")
 	private Trainer trainer;
-	
+
 	public Training() {
 	}
-	
+
 	public Training(Long id, String trainingName, TrainingType trainingType, LocalDate trainingDate, Integer duration,
 			Trainee trainee, Trainer trainer) {
 		this.id = id;
@@ -60,7 +74,6 @@ public class Training {
 		this.trainingDate = trainingDate;
 	}
 
-
 	public Integer getTrainingDuration() {
 		return trainingDuration;
 	}
@@ -92,25 +105,20 @@ public class Training {
 
 	@Override
 	public boolean equals(Object obj) {
-		 if (this == obj) return true;
-	        if (obj == null || getClass() != obj.getClass()) return false;
-	        Training training = (Training) obj;
-	        return Objects.equals(id, training.id);
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Training training = (Training) obj;
+		return Objects.equals(id, training.id);
 	}
 
 	@Override
 	public String toString() {
-		return "Training{" +
-	               "id=" + id +
-	               ", traineeId=" + (trainee != null ? trainee.getId() : "null") +
-	               ", trainerId=" + (trainer != null ? trainer.getId() : "null") +
-	               ", trainingName='" + trainingName + '\'' +
-	               ", trainingType=" + trainingType.name() + 
-	               ", trainingDate=" + trainingDate +
-	               ", trainingDuration=" + trainingDuration +
-	               '}';
+		return "Training{" + "id=" + id + ", traineeId=" + (trainee != null ? trainee.getId() : "null") + ", trainerId="
+				+ (trainer != null ? trainer.getId() : "null") + ", trainingName='" + trainingName + '\''
+				+ ", trainingType=" + trainingType.name() + ", trainingDate=" + trainingDate + ", trainingDuration="
+				+ trainingDuration + '}';
 	}
-	
-	
-	
+
 }

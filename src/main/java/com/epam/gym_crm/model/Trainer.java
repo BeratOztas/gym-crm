@@ -2,7 +2,10 @@ package com.epam.gym_crm.model;
 
 import java.util.Objects;
 
+import jakarta.validation.constraints.NotNull;
+
 public class Trainer extends User {
+	@NotNull(message = "Specialization cannot be null")
 	private TrainingType specialization;
 
 	public Trainer() {
