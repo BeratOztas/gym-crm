@@ -1,21 +1,12 @@
 package com.epam.gym_crm.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.epam.gym_crm.dao.ITrainerDAO;
 import com.epam.gym_crm.exception.BaseException;
@@ -24,6 +15,11 @@ import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.TrainingType;
 import com.epam.gym_crm.service.init.IdGenerator;
 import com.epam.gym_crm.utils.EntityType;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class TrainerServiceImplTest {
 
@@ -59,13 +55,9 @@ class TrainerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when trainer ID is invalid")
-    void testFindTrainerByInvalidId() {
-    	BaseException ex = assertThrows(BaseException.class, () -> trainerService.findTrainerById(-1L));
-        String generalInvalidArgMessage = MessageType.INVALID_ARGUMENT.getMessage();
-        assertTrue(ex.getMessage().startsWith(generalInvalidArgMessage + " : ")); 
-        assertTrue(ex.getMessage().contains("ID must be a positive value")); 
-        assertTrue(ex.getMessage().contains("-1")); 
+    @DisplayName("Should throw exception when creating null trainer")
+    void testCreateTrainerWithNullInput() {
+        assertThrows(BaseException.class, () -> trainerService.create(null));
     }
 
     @Test
@@ -76,6 +68,25 @@ class TrainerServiceImplTest {
 
         Trainer result = trainerService.findTrainerById(1L);
         assertEquals("Mehmet", result.getUser().getFirstName());
+    }
+
+    @Test
+    @DisplayName("Should throw exception when trainer ID is invalid")
+    void testFindTrainerByInvalidId() {
+        BaseException ex = assertThrows(BaseException.class, () -> trainerService.findTrainerById(-1L));
+        String generalInvalidArgMessage = MessageType.INVALID_ARGUMENT.getMessage();
+        assertTrue(ex.getMessage().startsWith(generalInvalidArgMessage + " : "));
+        assertTrue(ex.getMessage().contains("ID must be a positive value"));
+        assertTrue(ex.getMessage().contains("-1"));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when trainer not found by ID")
+    void testFindTrainerByIdNotFound() {
+        when(trainerDAO.findById(999L)).thenReturn(Optional.empty());
+
+        BaseException e = assertThrows(BaseException.class, () -> trainerService.findTrainerById(999L));
+        assertTrue(e.getMessage().contains("Trainer not found"));
     }
 
     @Test
@@ -95,10 +106,27 @@ class TrainerServiceImplTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when updating non-existing trainer")
+    void testUpdateNonExistingTrainer() {
+        Trainer update = new Trainer(999L, "No", "Body", null, null, false, TrainingType.YOGA);
+
+        when(trainerDAO.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(BaseException.class, () -> trainerService.updateTrainer(update));
+    }
+
+    @Test
     @DisplayName("Should delete trainer successfully")
     void testDeleteTrainer() {
         when(trainerDAO.delete(1L)).thenReturn(true);
         assertTrue(trainerService.deleteTrainer(1L));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when trainer deletion fails")
+    void testDeleteNonExistingTrainer() {
+        when(trainerDAO.delete(999L)).thenReturn(false);
+        assertThrows(BaseException.class, () -> trainerService.deleteTrainer(999L));
     }
 
     @Test
