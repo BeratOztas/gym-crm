@@ -6,7 +6,6 @@ import java.util.Objects;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 
 public class Training {
@@ -115,10 +114,15 @@ public class Training {
 
 	@Override
 	public String toString() {
-		return "Training{" + "id=" + id + ", traineeId=" + (trainee != null ? trainee.getId() : "null") + ", trainerId="
-				+ (trainer != null ? trainer.getId() : "null") + ", trainingName='" + trainingName + '\''
-				+ ", trainingType=" + trainingType.name() + ", trainingDate=" + trainingDate + ", trainingDuration="
-				+ trainingDuration + '}';
+		 return "Training{" +
+	               "id=" + id +
+	               ", traineeId=" + (trainee != null && trainee.getUser() != null ? trainee.getUser().getId() : "null") +
+	               ", trainerId=" + (trainer != null && trainer.getUser() != null ? trainer.getUser().getId() : "null") +
+	               ", trainingName='" + trainingName + '\'' +
+	               ", trainingType=" + (trainingType != null ? trainingType.name() : "null") + 
+	               ", trainingDate=" + trainingDate +
+	               ", trainingDuration=" + trainingDuration +
+	               '}';
 	}
 
 }

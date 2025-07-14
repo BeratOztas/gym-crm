@@ -92,7 +92,7 @@ public class TrainingDAOImpl implements ITrainingDAO {
 	@Override
 	public List<Training> findByTraineeId(Long traineeId) {
 		return getTrainingMap().values().stream()
-				.filter(t-> traineeId !=null && traineeId.equals(t.getTrainee().getId()))
+				.filter(t-> traineeId !=null && traineeId.equals(t.getTrainee().getUser().getId()))
 				.collect(Collectors.toList());
 	}
 
@@ -100,7 +100,7 @@ public class TrainingDAOImpl implements ITrainingDAO {
 	public List<Training> findByTrainerId(Long trainerId) {
 		return getTrainingMap().values()
 				.stream()
-				.filter(t -> trainerId !=null && trainerId.equals(t.getTrainer().getId()))
+				.filter(t -> trainerId !=null && trainerId.equals(t.getTrainer().getUser().getId()))
 				.collect(Collectors.toList());
 	}
 

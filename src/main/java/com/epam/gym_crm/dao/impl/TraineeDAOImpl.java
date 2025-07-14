@@ -42,7 +42,7 @@ public class TraineeDAOImpl implements ITraineeDAO {
 		return getTraineeMap()
 				.values()
 				.stream()
-				.filter(trainee -> username.equals(trainee.getUsername())).findFirst();
+				.filter(trainee -> username.equals(trainee.getUser().getUsername())).findFirst();
 	}
 
 	@Override
@@ -52,13 +52,13 @@ public class TraineeDAOImpl implements ITraineeDAO {
 
 	@Override
 	public Trainee create(Trainee trainee) {
-		getTraineeMap().put(trainee.getId(), trainee);
+		getTraineeMap().put(trainee.getUser().getId(), trainee);
 		return trainee;
 	}
 
 	@Override
 	public Trainee update(Trainee trainee) {
-		getTraineeMap().put(trainee.getId(), trainee);
+		getTraineeMap().put(trainee.getUser().getId(), trainee);
 		return trainee;
 	}
 

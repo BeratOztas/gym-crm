@@ -53,8 +53,8 @@ class TrainerServiceImplTest {
 
         Trainer result = trainerService.create(newTrainer);
 
-        assertEquals("Merve.Yılmaz", result.getUsername());
-        assertEquals(1L, result.getId());
+        assertEquals("Merve.Yılmaz", result.getUser().getUsername());
+        assertEquals(1L, result.getUser().getId());
         assertEquals(TrainingType.YOGA, result.getSpecialization());
     }
 
@@ -75,7 +75,7 @@ class TrainerServiceImplTest {
         when(trainerDAO.findById(1L)).thenReturn(Optional.of(trainer));
 
         Trainer result = trainerService.findTrainerById(1L);
-        assertEquals("Mehmet", result.getFirstName());
+        assertEquals("Mehmet", result.getUser().getFirstName());
     }
 
     @Test
@@ -89,9 +89,9 @@ class TrainerServiceImplTest {
 
         Trainer updated = trainerService.updateTrainer(update);
 
-        assertEquals("AliUpdated", updated.getFirstName());
+        assertEquals("AliUpdated", updated.getUser().getFirstName());
         assertEquals(TrainingType.YOGA, updated.getSpecialization());
-        assertFalse(updated.isActive());
+        assertFalse(updated.getUser().isActive());
     }
 
     @Test

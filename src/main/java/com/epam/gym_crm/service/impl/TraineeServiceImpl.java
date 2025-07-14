@@ -11,15 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.epam.gym_crm.dao.ITraineeDAO;
-import com.epam.gym_crm.model.Trainee;
-import com.epam.gym_crm.service.ITraineeService;
-import com.epam.gym_crm.service.init.IdGenerator;
-import com.epam.gym_crm.utils.EntityType;
-
 // Exception imports
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.model.Trainee;
+import com.epam.gym_crm.model.User;
+import com.epam.gym_crm.service.ITraineeService;
+import com.epam.gym_crm.service.init.IdGenerator;
+import com.epam.gym_crm.utils.EntityType;
 
 @Service
 public class TraineeServiceImpl implements ITraineeService {
@@ -92,17 +92,18 @@ public class TraineeServiceImpl implements ITraineeService {
 
 	@Override
 	public Trainee create(Trainee trainee) {
+		User userProfile =trainee.getUser();
 		
 		Long traineeId = idGenerator.getNextId(EntityType.TRAINEE);
-		trainee.setId(traineeId);
+		userProfile.setId(traineeId);
 
-		String baseUsername = trainee.getFirstName() + "." + trainee.getLastName();
+		String baseUsername = userProfile.getFirstName() + "." + userProfile.getLastName();
 		String finalUsername = generateUniqueUsername(baseUsername); // This method already checks for duplicates
-		trainee.setUsername(finalUsername);
+		userProfile.setUsername(finalUsername);
 
 		String password = generateRandomPassword();
-		trainee.setPassword(password);
-		trainee.setActive(true);
+		userProfile.setPassword(password);
+		userProfile.setActive(true);
 
 		Trainee createdTrainee = traineeDAO.create(trainee);
 		// If DAO returns null, it indicates a failure at the DAO layer
@@ -111,36 +112,39 @@ public class TraineeServiceImpl implements ITraineeService {
 			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, 
                                      "Failed to create trainee with username: " + finalUsername + " at DAO layer."));
 		}
-		logger.info("Trainee created with ID={}, username={}", createdTrainee.getId(), createdTrainee.getUsername());
+		User createdTraineeUser =createdTrainee.getUser();
+		logger.info("Trainee created with ID={}, username={}", createdTraineeUser.getId(), createdTraineeUser.getUsername());
 		return createdTrainee;
 	}
 
 	@Override
 	public Trainee updateTrainee(Trainee trainee) {
-		if (trainee.getId() == null || trainee.getId() <= 0) {
+		User userProfile =trainee.getUser();
+		if (userProfile.getId() == null || userProfile.getId() <= 0) {
 			logger.error("Trainee object or ID for update cannot be null or non-positive.");
 			// Throw BaseException for invalid argument
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, 
-                                     "Trainee object and a valid ID must be provided for update. Provided ID: " + trainee.getId()));
+                                     "Trainee object and a valid ID must be provided for update. Provided ID: " + userProfile.getId()));
 		}
 
-		Optional<Trainee> existingTraineeOpt = traineeDAO.findById(trainee.getId());
+		Optional<Trainee> existingTraineeOpt = traineeDAO.findById(userProfile.getId());
 		
 		Trainee existingTrainee = existingTraineeOpt.orElseThrow(() -> {
-			logger.warn("Trainee with ID {} not found for update.", trainee.getId());
+			logger.warn("Trainee with ID {} not found for update.", userProfile.getId());
 			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, 
-                                      "Trainee with ID " + trainee.getId() + " not found for update."));
+                                      "Trainee with ID " + userProfile.getId() + " not found for update."));
 		});
 
+		User existingTraineeUser =existingTrainee.getUser();
 		
-		if (trainee.getFirstName() != null) {
-			existingTrainee.setFirstName(trainee.getFirstName());
+		if (userProfile.getFirstName() != null) {
+			existingTraineeUser.setFirstName(userProfile.getFirstName());
 		}
-		if (trainee.getLastName() != null) {
-			existingTrainee.setLastName(trainee.getLastName());
+		if (userProfile.getLastName() != null) {
+			existingTraineeUser.setLastName(userProfile.getLastName());
 		}
 		// Assuming isActive can be updated to false, so no null check
-		existingTrainee.setActive(trainee.isActive()); 
+		existingTraineeUser.setActive(userProfile.isActive()); 
 
 		if (trainee.getDateOfBirth() != null) {
 			existingTrainee.setDateOfBirth(trainee.getDateOfBirth());
@@ -150,13 +154,14 @@ public class TraineeServiceImpl implements ITraineeService {
 		}
 
 		Trainee updated = traineeDAO.update(existingTrainee);
-		// If DAO returns null, it indicates a failure at the DAO layer
 		if (updated == null) {
-			logger.error("Trainee update failed at DAO layer for trainee ID: {}", trainee.getId());
+			logger.error("Trainee update failed at DAO layer for trainee ID: {}", userProfile.getId());
 			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, 
-                                     "Failed to update trainee with ID: " + trainee.getId() + " at DAO layer."));
+					"Failed to update trainee with ID: " + userProfile.getId() + " at DAO layer."));
 		}
-		logger.info("Trainee updated: ID={}, username={}", updated.getId(), updated.getUsername());
+		User updatedUser =updated.getUser();
+		// If DAO returns null, it indicates a failure at the DAO layer
+		logger.info("Trainee updated: ID={}, username={}", updatedUser.getId(), updatedUser.getUsername());
 		return updated;
 	}
 

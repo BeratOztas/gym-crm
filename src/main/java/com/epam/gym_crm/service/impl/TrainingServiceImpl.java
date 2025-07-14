@@ -19,6 +19,7 @@ import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.Training;
 import com.epam.gym_crm.model.TrainingType;
+import com.epam.gym_crm.model.User;
 import com.epam.gym_crm.service.ITrainingService;
 import com.epam.gym_crm.service.init.IdGenerator;
 import com.epam.gym_crm.utils.EntityType;
@@ -71,23 +72,25 @@ public class TrainingServiceImpl implements ITrainingService {
 			logger.error("Training object for creation cannot be null.");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Training object cannot be null."));
 		}
-		if (training.getTrainee() == null || training.getTrainee().getId() == null) {
+		User traineeUser =training.getTrainee().getUser();
+		User trainerUser =training.getTrainer().getUser();
+		if (training.getTrainee() == null || traineeUser.getId() == null) {
 			logger.error("Trainee object with ID must be provided for Training creation.");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainee with a valid ID must be provided for Training creation."));
 		}
-		if (training.getTrainer() == null || training.getTrainer().getId() == null) {
+		if (training.getTrainer() == null || trainerUser.getId() == null) {
 			logger.error("Trainer object with ID must be provided for Training creation.");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainer with a valid ID must be provided for Training creation."));
 		}
-		Optional<Trainee> existingTrainee = traineeDAO.findById(training.getTrainee().getId());
+		Optional<Trainee> existingTrainee = traineeDAO.findById(traineeUser.getId());
 		if (existingTrainee.isEmpty()) {
-			logger.error("Trainee with ID {} not found for training creation.", training.getTrainee().getId());
-			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee with ID " + training.getTrainee().getId() + " not found."));
+			logger.error("Trainee with ID {} not found for training creation.", traineeUser.getId());
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee with ID " + traineeUser.getId() + " not found."));
 		}
-		Optional<Trainer> existingTrainer = trainerDAO.findById(training.getTrainer().getId());
+		Optional<Trainer> existingTrainer = trainerDAO.findById(trainerUser.getId());
 		if (existingTrainer.isEmpty()) {
-			logger.error("Trainer with ID {} not found for training creation.", training.getTrainer().getId());
-			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer with ID " + training.getTrainer().getId() + " not found."));
+			logger.error("Trainer with ID {} not found for training creation.", trainerUser.getId());
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer with ID " + trainerUser.getId() + " not found."));
 		}
 		training.setTrainee(existingTrainee.get());
 		training.setTrainer(existingTrainer.get());
@@ -98,12 +101,14 @@ public class TrainingServiceImpl implements ITrainingService {
 			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Failed to create training due to DAO error."));
 		}
 		logger.info("Training created with ID={}, name='{}' for Trainee ID {} and Trainer ID {}",
-				createdTraining.getId(), createdTraining.getTrainingName(), createdTraining.getTrainee().getId(), createdTraining.getTrainer().getId());
+				createdTraining.getId(), createdTraining.getTrainingName(), createdTraining.getTrainee().getUser().getId(), createdTraining.getTrainer().getUser().getId());
 		return createdTraining;
 	}
 
 	@Override
 	public Training update(Training training) {
+		User traineeUser =training.getTrainee().getUser();
+		User trainerUser =training.getTrainer().getUser();
 		if (training == null || training.getId() == null || training.getId() <= 0) {
 			logger.error("Training object or ID for update cannot be null or non-positive.");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Training object and a valid ID must be provided for update."));
@@ -126,19 +131,19 @@ public class TrainingServiceImpl implements ITrainingService {
 		if (training.getTrainingDuration() > 0) {
 			existingTraining.setTrainingDuration(training.getTrainingDuration());
 		}
-		if (training.getTrainee() != null && training.getTrainee().getId() != null) {
-			Optional<Trainee> newTrainee = traineeDAO.findById(training.getTrainee().getId());
+		if (training.getTrainee() != null && traineeUser.getId() != null) {
+			Optional<Trainee> newTrainee = traineeDAO.findById(traineeUser.getId());
 			if (newTrainee.isEmpty()) {
-				logger.error("New Trainee with ID {} not found for training update.", training.getTrainee().getId());
-				throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "New Trainee with ID " + training.getTrainee().getId() + " not found for update."));
+				logger.error("New Trainee with ID {} not found for training update.", traineeUser.getId());
+				throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "New Trainee with ID " + traineeUser.getId() + " not found for update."));
 			}
 			existingTraining.setTrainee(newTrainee.get());
 		}
-		if (training.getTrainer() != null && training.getTrainer().getId() != null) {
-			Optional<Trainer> newTrainer = trainerDAO.findById(training.getTrainer().getId());
+		if (training.getTrainer() != null && trainerUser.getId() != null) {
+			Optional<Trainer> newTrainer = trainerDAO.findById(trainerUser.getId());
 			if (newTrainer.isEmpty()) {
-				logger.error("New Trainer with ID {} not found for training update.", training.getTrainer().getId());
-				throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "New Trainer with ID " + training.getTrainer().getId() + " not found for update."));
+				logger.error("New Trainer with ID {} not found for training update.", trainerUser.getId());
+				throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "New Trainer with ID " + trainerUser.getId() + " not found for update."));
 			}
 			existingTraining.setTrainer(newTrainer.get());
 		}

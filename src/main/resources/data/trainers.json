@@ -1,38 +1,46 @@
 [
   {
-    "id": 1,
-    "firstName": "Asli",
-    "lastName": "Kalem",
-    "username": "Asli.Kalem",
-    "password": null,
-    "active": true,
+    "user": {  
+      "id": 1,
+      "firstName": "Asli",
+      "lastName": "Kalem",
+      "username": "Asli.Kalem",
+      "password": null,
+      "active": true
+    },
     "specialization": "YOGA"
   },
   {
-    "id": 2,
-    "firstName": "Mehmet",
-    "lastName": "Simsek",
-    "username": "Mehmet.Simsek",
-    "password": null,
-    "active": true,
+    "user": {
+      "id": 2,
+      "firstName": "Mehmet",
+      "lastName": "Simsek",
+      "username": "Mehmet.Simsek",
+      "password": null,
+      "active": true
+    },
     "specialization": "FITNESS"
   },
   {
-    "id": 3,
-    "firstName": "Joe",
-    "lastName": "Rogan",
-    "username": "Joe.Rogan",
-    "password": null,
-    "active": true,
+    "user": {
+      "id": 3,
+      "firstName": "Joe",
+      "lastName": "Rogan",
+      "username": "Joe.Rogan",
+      "password": null,
+      "active": true
+    },
     "specialization": "ZUMBA"
   },
   {
-    "id": 4,
-    "firstName": "Merve",
-    "lastName": "Yildiz",
-    "username": "Merve.Yildiz",
-    "password": null,
-    "active": true,
+    "user": {
+      "id": 4,
+      "firstName": "Merve",
+      "lastName": "Yildiz",
+      "username": "Merve.Yildiz",
+      "password": null,
+      "active": true
+    },
     "specialization": "STRETCHING"
   }
 ]

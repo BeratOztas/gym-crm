@@ -11,6 +11,7 @@ import java.util.Optional;
 import com.epam.gym_crm.dao.ITraineeDAO;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.model.Trainee;
+import com.epam.gym_crm.model.User;
 import com.epam.gym_crm.service.init.IdGenerator;
 import com.epam.gym_crm.utils.EntityType;
 
@@ -43,12 +44,12 @@ class TraineeServiceImplTest {
         when(traineeDAO.findByUsername("Ali.Yılmaz")).thenReturn(Optional.empty());
         when(traineeDAO.create(any(Trainee.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Trainee created = traineeService.create(ali);
+        User createdTraineeUser = traineeService.create(ali).getUser();
 
-        assertNotNull(created.getId());
-        assertNotNull(created.getUsername());
-        assertNotNull(created.getPassword());
-        assertTrue(created.isActive());
+        assertNotNull(createdTraineeUser.getId());
+        assertNotNull(createdTraineeUser.getUsername());
+        assertNotNull(createdTraineeUser.getPassword());
+        assertTrue(createdTraineeUser.isActive());
 
         verify(traineeDAO).create(any(Trainee.class));
     }
@@ -61,7 +62,7 @@ class TraineeServiceImplTest {
         when(traineeDAO.findById(1L)).thenReturn(Optional.of(ayse));
 
         Trainee result = traineeService.findTraineeById(1L);
-        assertEquals("Ayşe", result.getFirstName());
+        assertEquals("Ayşe", result.getUser().getFirstName());
     }
 
     @Test
@@ -80,7 +81,7 @@ class TraineeServiceImplTest {
         when(traineeDAO.findByUsername("Mehmet.Kaya")).thenReturn(Optional.of(mehmet));
 
         Trainee result = traineeService.findTraineeByUsername("Mehmet.Kaya");
-        assertEquals("Mehmet", result.getFirstName());
+        assertEquals("Mehmet", result.getUser().getFirstName());
     }
 
     @Test
@@ -103,7 +104,7 @@ class TraineeServiceImplTest {
 
         Trainee result = traineeService.updateTrainee(updatedTrainee);
 
-        assertEquals("Güncel", result.getLastName());
+        assertEquals("Güncel", result.getUser().getLastName());
         assertEquals("İzmir", result.getAddress());
     }
 

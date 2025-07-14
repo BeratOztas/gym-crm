@@ -15,6 +15,7 @@ import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.model.Trainer;
+import com.epam.gym_crm.model.User;
 import com.epam.gym_crm.service.ITrainerService;
 import com.epam.gym_crm.service.init.IdGenerator;
 import com.epam.gym_crm.utils.EntityType;
@@ -87,16 +88,17 @@ public class TrainerServiceImpl implements ITrainerService {
 
 	@Override
 	public Trainer create(Trainer trainer) {
+		User userProfile =trainer.getUser();
 		Long trainerId = idGenerator.getNextId(EntityType.TRAINER);
-		trainer.setId(trainerId);
+		userProfile.setId(trainerId);
 
-		String baseUsername = trainer.getFirstName() + "." + trainer.getLastName();
+		String baseUsername = userProfile.getFirstName() + "." + userProfile.getLastName();
 		String finalUsername = generateUniqueUsername(baseUsername);
-		trainer.setUsername(finalUsername);
+		userProfile.setUsername(finalUsername);
 
 		String password = generateRandomPassword();
-		trainer.setPassword(password);
-		trainer.setActive(true);
+		userProfile.setPassword(password);
+		userProfile.setActive(true);
 
 		Trainer createdTrainer = trainerDAO.create(trainer);
 		if (createdTrainer == null) {
@@ -104,45 +106,48 @@ public class TrainerServiceImpl implements ITrainerService {
 			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
 				"Failed to create trainer with username: " + finalUsername));
 		}
-
-		logger.info("Trainer created with ID={}, username={}", createdTrainer.getId(), createdTrainer.getUsername());
+		User createdTrainerUser =createdTrainer.getUser();
+		logger.info("Trainer created with ID={}, username={}", createdTrainerUser.getId(), createdTrainerUser.getUsername());
 		return createdTrainer;
 	}
 
 	@Override
 	public Trainer updateTrainer(Trainer trainer) {
-		if (trainer.getId() == null || trainer.getId() <= 0) {
+		User userProfile =trainer.getUser();
+		if (userProfile.getId() == null || userProfile.getId() <= 0) {
 			logger.error("Trainer ID for update cannot be null or non-positive.");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-				"Trainer ID must be a positive value. Provided: " + trainer.getId()));
+				"Trainer ID must be a positive value. Provided: " + userProfile.getId()));
 		}
 
-		Optional<Trainer> existingTrainerOpt = trainerDAO.findById(trainer.getId());
+		Optional<Trainer> existingTrainerOpt = trainerDAO.findById(userProfile.getId());
 		Trainer existingTrainer = existingTrainerOpt.orElseThrow(() -> {
-			logger.warn("Trainer with ID {} not found for update.", trainer.getId());
+			logger.warn("Trainer with ID {} not found for update.", userProfile.getId());
 			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-				"Trainer with ID " + trainer.getId() + " not found for update."));
+				"Trainer with ID " + userProfile.getId() + " not found for update."));
 		});
+		
+		User existingTrainerUser =existingTrainer.getUser();
 
-		if (trainer.getFirstName() != null) {
-			existingTrainer.setFirstName(trainer.getFirstName());
+		if (userProfile.getFirstName() != null) {
+			existingTrainerUser.setFirstName(userProfile.getFirstName());
 		}
-		if (trainer.getLastName() != null) {
-			existingTrainer.setLastName(trainer.getLastName());
+		if (userProfile.getLastName() != null) {
+			existingTrainerUser.setLastName(userProfile.getLastName());
 		}
 		if (trainer.getSpecialization() != null) {
 			existingTrainer.setSpecialization(trainer.getSpecialization());
 		}
-		existingTrainer.setActive(trainer.isActive());
+		existingTrainerUser.setActive(userProfile.isActive());
 
 		Trainer updated = trainerDAO.update(existingTrainer);
 		if (updated == null) {
-			logger.error("Trainer update failed at DAO layer for trainer ID: {}", trainer.getId());
+			logger.error("Trainer update failed at DAO layer for trainer ID: {}", userProfile.getId());
 			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
-				"Failed to update trainer with ID: " + trainer.getId()));
+				"Failed to update trainer with ID: " + userProfile.getId()));
 		}
-
-		logger.info("Trainer updated: ID={}, username={}", updated.getId(), updated.getUsername());
+		User updatedUser =updated.getUser();
+		logger.info("Trainer updated: ID={}, username={}", updatedUser.getId(), updatedUser.getUsername());
 		return updated;
 	}
 

@@ -1,5 +1,9 @@
 package com.epam.gym_crm.service.init;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -8,10 +12,6 @@ import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.utils.EntityType;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class IdGenerator {

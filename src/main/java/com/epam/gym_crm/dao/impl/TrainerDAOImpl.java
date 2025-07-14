@@ -34,7 +34,7 @@ public class TrainerDAOImpl implements ITrainerDAO {
 
 	@Override
 	public Trainer create(Trainer trainer) {
-		 getTrainerMap().put(trainer.getId(), trainer);
+		 getTrainerMap().put(trainer.getUser().getId(), trainer);
 		 return trainer;
 	}
 
@@ -47,7 +47,7 @@ public class TrainerDAOImpl implements ITrainerDAO {
 	public Optional<Trainer> findByUsername(String username) {
 		return getTrainerMap()
 				.values().stream()
-				.filter(trainer -> username.equals(trainer.getUsername())).findFirst();
+				.filter(trainer -> username.equals(trainer.getUser().getUsername())).findFirst();
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class TrainerDAOImpl implements ITrainerDAO {
 
 	@Override
 	public Trainer update(Trainer trainer) {
-		getTrainerMap().put(trainer.getId(), trainer);
+		getTrainerMap().put(trainer.getUser().getId(), trainer);
 		 return trainer;
 	}
 

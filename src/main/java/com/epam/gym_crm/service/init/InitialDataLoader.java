@@ -81,9 +81,9 @@ public class InitialDataLoader {
 				Long id = idGenerator.getNextId(entityTypeEnum);
 
 				if (entity instanceof Trainee) {
-					((Trainee) entity).setId(id);
+					((Trainee) entity).getUser().setId(id);
 				} else if (entity instanceof Trainer) {
-					((Trainer) entity).setId(id);
+					((Trainer) entity).getUser().setId(id);
 				} else {
 					logger.warn("Unsupported entity type {} encountered during loading. Skipping ID assignment.",
 							entityTypeClass.getSimpleName());
