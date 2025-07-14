@@ -46,14 +46,14 @@ public class TrainerServiceImpl implements ITrainerService {
 		if (id == null || id <= 0) {
 			logger.error("Trainer ID for lookup cannot be null or non-positive: {}", id);
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-				"Trainer ID must be a positive value. Provided: " + id));
+					"Trainer ID must be a positive value. Provided: " + id));
 		}
 
 		Optional<Trainer> optTrainer = trainerDAO.findById(id);
 		Trainer found = optTrainer.orElseThrow(() -> {
 			logger.warn("Trainer not found with ID={}", id);
-			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-				"Trainer not found with ID: " + id));
+			return new BaseException(
+					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer not found with ID: " + id));
 		});
 
 		logger.info("Finding Trainer by ID={} -> Found: {}", id, true);
@@ -64,15 +64,15 @@ public class TrainerServiceImpl implements ITrainerService {
 	public Trainer findTrainerByUsername(String username) {
 		if (username == null || username.isBlank()) {
 			logger.error("Trainer username for lookup cannot be null or empty.");
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-				"Trainer username must not be null or empty."));
+			throw new BaseException(
+					new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainer username must not be null or empty."));
 		}
 
 		Optional<Trainer> optTrainer = trainerDAO.findByUsername(username);
 		Trainer found = optTrainer.orElseThrow(() -> {
 			logger.warn("Trainer not found with username:{}", username);
-			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-				"Trainer not found with username: " + username));
+			return new BaseException(
+					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer not found with username: " + username));
 		});
 
 		logger.info("Finding Trainer by username='{}' -> Found: {}", username, true);
@@ -88,7 +88,11 @@ public class TrainerServiceImpl implements ITrainerService {
 
 	@Override
 	public Trainer create(Trainer trainer) {
-		User userProfile =trainer.getUser();
+		if (trainer == null) {
+			logger.error("Trainer must not be null");
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer must not be null"));
+		}
+		User userProfile = trainer.getUser();
 		Long trainerId = idGenerator.getNextId(EntityType.TRAINER);
 		userProfile.setId(trainerId);
 
@@ -104,30 +108,35 @@ public class TrainerServiceImpl implements ITrainerService {
 		if (createdTrainer == null) {
 			logger.error("Trainer creation failed at DAO layer for trainer with username: {}", finalUsername);
 			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
-				"Failed to create trainer with username: " + finalUsername));
+					"Failed to create trainer with username: " + finalUsername));
 		}
-		User createdTrainerUser =createdTrainer.getUser();
-		logger.info("Trainer created with ID={}, username={}", createdTrainerUser.getId(), createdTrainerUser.getUsername());
+		User createdTrainerUser = createdTrainer.getUser();
+		logger.info("Trainer created with ID={}, username={}", createdTrainerUser.getId(),
+				createdTrainerUser.getUsername());
 		return createdTrainer;
 	}
 
 	@Override
 	public Trainer updateTrainer(Trainer trainer) {
-		User userProfile =trainer.getUser();
+		if (trainer == null) {
+			logger.error("Trainer must not be null");
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer must not be null"));
+		}
+		User userProfile = trainer.getUser();
 		if (userProfile.getId() == null || userProfile.getId() <= 0) {
 			logger.error("Trainer ID for update cannot be null or non-positive.");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-				"Trainer ID must be a positive value. Provided: " + userProfile.getId()));
+					"Trainer ID must be a positive value. Provided: " + userProfile.getId()));
 		}
 
 		Optional<Trainer> existingTrainerOpt = trainerDAO.findById(userProfile.getId());
 		Trainer existingTrainer = existingTrainerOpt.orElseThrow(() -> {
 			logger.warn("Trainer with ID {} not found for update.", userProfile.getId());
 			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-				"Trainer with ID " + userProfile.getId() + " not found for update."));
+					"Trainer with ID " + userProfile.getId() + " not found for update."));
 		});
-		
-		User existingTrainerUser =existingTrainer.getUser();
+
+		User existingTrainerUser = existingTrainer.getUser();
 
 		if (userProfile.getFirstName() != null) {
 			existingTrainerUser.setFirstName(userProfile.getFirstName());
@@ -144,9 +153,9 @@ public class TrainerServiceImpl implements ITrainerService {
 		if (updated == null) {
 			logger.error("Trainer update failed at DAO layer for trainer ID: {}", userProfile.getId());
 			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
-				"Failed to update trainer with ID: " + userProfile.getId()));
+					"Failed to update trainer with ID: " + userProfile.getId()));
 		}
-		User updatedUser =updated.getUser();
+		User updatedUser = updated.getUser();
 		logger.info("Trainer updated: ID={}, username={}", updatedUser.getId(), updatedUser.getUsername());
 		return updated;
 	}
@@ -156,14 +165,14 @@ public class TrainerServiceImpl implements ITrainerService {
 		if (id == null || id <= 0) {
 			logger.error("Trainer ID for deletion cannot be null or non-positive: {}", id);
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-				"Trainer ID for deletion must be a positive value. Provided: " + id));
+					"Trainer ID for deletion must be a positive value. Provided: " + id));
 		}
 
 		boolean deleted = trainerDAO.delete(id);
 		if (!deleted) {
 			logger.warn("No trainer found to delete with ID={}", id);
-			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-				"No trainer found to delete with ID: " + id));
+			throw new BaseException(
+					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "No trainer found to delete with ID: " + id));
 		}
 
 		logger.info("Trainer deleted: ID={}", id);
