@@ -132,6 +132,11 @@ class TraineeServiceImplTest {
 
         assertThrows(BaseException.class, () -> traineeService.deleteTrainee(999L));
     }
+    
+    @Test
+    void shouldThrowExceptionWhenCreatingNullTrainee() {
+        assertThrows(BaseException.class, () -> traineeService.create(null));
+    }
 
     @Test
     void shouldGetAllTrainees() {
