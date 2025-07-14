@@ -107,12 +107,12 @@ public class TrainingServiceImpl implements ITrainingService {
 
 	@Override
 	public Training update(Training training) {
-		User traineeUser =training.getTrainee().getUser();
-		User trainerUser =training.getTrainer().getUser();
 		if (training == null || training.getId() == null || training.getId() <= 0) {
 			logger.error("Training object or ID for update cannot be null or non-positive.");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Training object and a valid ID must be provided for update."));
 		}
+		User traineeUser =training.getTrainee().getUser();
+		User trainerUser =training.getTrainer().getUser();
 		Optional<Training> existingTrainingOpt = trainingDAO.findById(training.getId());
 		if (existingTrainingOpt.isEmpty()) {
 			logger.warn("Training with ID {} not found for update.", training.getId());
