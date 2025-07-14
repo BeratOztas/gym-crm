@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.epam.gym_crm.exception.BaseException;
+import com.epam.gym_crm.exception.ErrorMessage;
+import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.Training;
@@ -52,7 +55,8 @@ public class Storage {
         Map<Long, ?> map = allStorageMaps.get(entityType);
         if (map == null) {
             logger.error("No storage map found for entity type: {}", entityType);
-            throw new IllegalArgumentException("No storage map found for entity type: " + entityType);
+            throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, 
+                    "No storage map found for entity type: " + entityType));
         }
         return (Map<Long, T>) map;
     }
