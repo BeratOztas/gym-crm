@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 
 import com.epam.gym_crm.model.Trainee;
@@ -18,8 +19,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 @Configuration
 @ComponentScan(basePackages = "com.epam.gym_crm")
 @PropertySource("classpath:application.properties")
+@EnableAspectJAutoProxy
 public class AppConfig {
-
 	
 	@Bean(name = "traineeStorageMap")
 	public Map<Long, Trainee> traineeStorageMap(){
