@@ -7,12 +7,14 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
+import com.epam.gym_crm.exception.BaseException;
+import com.epam.gym_crm.exception.ErrorMessage;
+import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.Training;
@@ -43,7 +45,6 @@ public class InitialDataLoader {
 	@Value("${storage.training.file}")
 	private String trainingFilePath;
 
-	
 	public InitialDataLoader(@Qualifier("traineeStorageMap") Map<Long, Trainee> traineeStorageMap,
 			@Qualifier("trainerStorageMap") Map<Long, Trainer> trainerStorageMap,
 			@Qualifier("trainingStorageMap") Map<Long, Training> trainingStorageMap, IdGenerator idGenerator,
@@ -57,7 +58,7 @@ public class InitialDataLoader {
 
 		logger.info("InitialDataLoader bean initialized.");
 	}
-	
+
 	@PostConstruct
 	public void init() {
 		logger.info("Starting initial data loading from JSON files...");
@@ -101,12 +102,13 @@ public class InitialDataLoader {
 		} catch (Exception e) {
 			logger.error("Failed to load {} data from {}: {}", entityTypeEnum.getNamespace(), filePath, e.getMessage(),
 					e);
-			// Base Exception Import
-			throw new RuntimeException(
-					"Error loading initial " + entityTypeEnum.getNamespace() + " data: " + e.getMessage(), e);
+			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
+					"Critical startup error during data loading: " + e.getMessage()));
 		}
 	}
+
 	
+
 	private void loadTrainingDataFromJson(String filePath) {
 		logger.debug("Loading Training data from: {}", filePath);
 		try (InputStream is = resourceLoader.getResource(filePath).getInputStream()) {
@@ -118,10 +120,10 @@ public class InitialDataLoader {
 					Long id = idGenerator.getNextId(EntityType.TRAINING);
 					Training training = new Training();
 					training.setId(id);
-					
+
 					training.setTrainingName((String) rawTrainingData.get(JsonConstants.JSON_FIELD_TRAINING_NAME));
-					training.setTrainingType(
-							TrainingType.valueOf(((String) rawTrainingData.get(JsonConstants.JSON_FIELD_TRAINING_TYPE)).toUpperCase()));
+					training.setTrainingType(TrainingType.valueOf(
+							((String) rawTrainingData.get(JsonConstants.JSON_FIELD_TRAINING_TYPE)).toUpperCase()));
 
 					String dateString = (String) rawTrainingData.get(JsonConstants.JSON_FIELD_TRAINING_DATE);
 					if (dateString != null) {
@@ -157,16 +159,18 @@ public class InitialDataLoader {
 								rawTrainingData.get(JsonConstants.JSON_FIELD_TRAINING_NAME), id, traineeId, trainerId);
 					}
 				} catch (Exception e) {
-					// Base Exception Implement
+					
 					logger.error("Error processing a training entry from JSON. Raw data: {}. Error: {}",
 							rawTrainingData, e.getMessage(), e);
+					throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
+							"Error reading initial Training data from " + filePath + ": " + e.getMessage()));
 				}
 			}
 			logger.info("Successfully loaded {} Training entities from {}.", trainingStorageMap.size(), filePath);
 		} catch (Exception e) {
 			logger.error("Failed to load Training data from {}: {}", filePath, e.getMessage(), e);
-			// Base Exception Implement
-			throw new RuntimeException("Error loading initial Training data: " + e.getMessage(), e);
+			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
+					"An unexpected error occurred while loading initial Training data: " + e.getMessage()));
 		}
 	}
 }
