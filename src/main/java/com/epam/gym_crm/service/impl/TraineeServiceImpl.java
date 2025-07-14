@@ -16,6 +16,11 @@ import com.epam.gym_crm.service.ITraineeService;
 import com.epam.gym_crm.service.init.IdGenerator;
 import com.epam.gym_crm.utils.EntityType;
 
+// Exception imports
+import com.epam.gym_crm.exception.BaseException;
+import com.epam.gym_crm.exception.ErrorMessage;
+import com.epam.gym_crm.exception.MessageType;
+
 @Service
 public class TraineeServiceImpl implements ITraineeService {
 
@@ -34,40 +39,48 @@ public class TraineeServiceImpl implements ITraineeService {
 	@Autowired
 	public void setIdGenerator(IdGenerator idGenerator) {
 		this.idGenerator = idGenerator;
-		logger.info("IdGenerator, TraineeServiceImpl'e setter enjeksiyonu ile dahil edildi.");
+		
+		logger.info("IdGenerator successfully injected into TraineeServiceImpl via setter injection.");
 	}
 
 	@Override
 	public Trainee findTraineeById(Long id) {
-
 		if (id == null || id <= 0) {
 			logger.error("Trainee ID for lookup cannot be null or non-positive: {}", id);
-			// throw new BaseException("Trainee ID for lookup must be a positive value.");
+			// Throw BaseException for invalid argument
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, 
+                                     "Trainee ID for lookup must be a positive value. Provided ID: " + id));
 		}
 
 		Optional<Trainee> optTrainee = traineeDAO.findById(id);
-		if (optTrainee.isEmpty()) {
+		
+		Trainee foundTrainee = optTrainee.orElseThrow(() -> {
 			logger.warn("Trainee not found with ID={}", id);
-			// throw new BaseException("Trainee not found with ID: " + id);
-		}
-		logger.info("Finding Trainee by ID={} -> Found: {}", id, optTrainee.isPresent());
-		return optTrainee.get();
+			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, 
+                                      "Trainee not found with ID: " + id));
+		});
+		logger.info("Finding Trainee by ID={} -> Found: {}", id, true); // Always true if not thrown
+		return foundTrainee;
 	}
 
 	@Override
 	public Trainee findTraineeByUsername(String username) {
 		if (username == null || username.isBlank()) {
 			logger.error("Trainee username for lookup cannot be null or empty.");
-			throw new IllegalArgumentException("Trainee username for lookup must not be null or empty.");
+			// Throw BaseException for invalid argument
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, 
+                                     "Trainee username for lookup must not be null or empty."));
 		}
 
 		Optional<Trainee> optTrainee = traineeDAO.findByUsername(username);
-		if (optTrainee.isEmpty()) {
+		
+		Trainee foundTrainee = optTrainee.orElseThrow(() -> {
 			logger.warn("Trainee not found with username:{}", username);
-			// throw new BaseException("Trainee not found with username: " + username);
-		}
-		logger.info("Finding Trainee by username='{}' -> Found: {}", username, optTrainee.isPresent());
-		return optTrainee.get();
+			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, 
+                                      "Trainee not found with username: " + username));
+		});
+		logger.info("Finding Trainee by username='{}' -> Found: {}", username, true); // Always true if not thrown
+		return foundTrainee;
 	}
 
 	@Override
@@ -79,12 +92,12 @@ public class TraineeServiceImpl implements ITraineeService {
 
 	@Override
 	public Trainee create(Trainee trainee) {
-
+		
 		Long traineeId = idGenerator.getNextId(EntityType.TRAINEE);
 		trainee.setId(traineeId);
 
 		String baseUsername = trainee.getFirstName() + "." + trainee.getLastName();
-		String finalUsername = generateUniqueUsername(baseUsername);
+		String finalUsername = generateUniqueUsername(baseUsername); // This method already checks for duplicates
 		trainee.setUsername(finalUsername);
 
 		String password = generateRandomPassword();
@@ -92,10 +105,11 @@ public class TraineeServiceImpl implements ITraineeService {
 		trainee.setActive(true);
 
 		Trainee createdTrainee = traineeDAO.create(trainee);
+		// If DAO returns null, it indicates a failure at the DAO layer
 		if (createdTrainee == null) {
 			logger.error("Trainee creation failed at DAO layer for trainee with username: {}", finalUsername);
-			// throw new BaseException("Failed to create trainee)
-			;
+			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, 
+                                     "Failed to create trainee with username: " + finalUsername + " at DAO layer."));
 		}
 		logger.info("Trainee created with ID={}, username={}", createdTrainee.getId(), createdTrainee.getUsername());
 		return createdTrainee;
@@ -103,29 +117,30 @@ public class TraineeServiceImpl implements ITraineeService {
 
 	@Override
 	public Trainee updateTrainee(Trainee trainee) {
-
 		if (trainee.getId() == null || trainee.getId() <= 0) {
 			logger.error("Trainee object or ID for update cannot be null or non-positive.");
-			// throw new BaseException("Trainee object and a valid ID must be provided for
-			// update.");
+			// Throw BaseException for invalid argument
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, 
+                                     "Trainee object and a valid ID must be provided for update. Provided ID: " + trainee.getId()));
 		}
 
 		Optional<Trainee> existingTraineeOpt = traineeDAO.findById(trainee.getId());
-		if (existingTraineeOpt.isEmpty()) {
+		
+		Trainee existingTrainee = existingTraineeOpt.orElseThrow(() -> {
 			logger.warn("Trainee with ID {} not found for update.", trainee.getId());
-			// throw new BaseException("Trainee with ID " + trainee.getId() + " not found
-			// for update.");
-		}
+			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, 
+                                      "Trainee with ID " + trainee.getId() + " not found for update."));
+		});
 
-		Trainee existingTrainee = existingTraineeOpt.get();
-
+		
 		if (trainee.getFirstName() != null) {
 			existingTrainee.setFirstName(trainee.getFirstName());
 		}
 		if (trainee.getLastName() != null) {
 			existingTrainee.setLastName(trainee.getLastName());
 		}
-		existingTrainee.setActive(trainee.isActive());
+		// Assuming isActive can be updated to false, so no null check
+		existingTrainee.setActive(trainee.isActive()); 
 
 		if (trainee.getDateOfBirth() != null) {
 			existingTrainee.setDateOfBirth(trainee.getDateOfBirth());
@@ -135,10 +150,11 @@ public class TraineeServiceImpl implements ITraineeService {
 		}
 
 		Trainee updated = traineeDAO.update(existingTrainee);
+		// If DAO returns null, it indicates a failure at the DAO layer
 		if (updated == null) {
 			logger.error("Trainee update failed at DAO layer for trainee ID: {}", trainee.getId());
-			// throw new BaseException("Failed to update trainee due to a DAO layer
-			// issue.");
+			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, 
+                                     "Failed to update trainee with ID: " + trainee.getId() + " at DAO layer."));
 		}
 		logger.info("Trainee updated: ID={}, username={}", updated.getId(), updated.getUsername());
 		return updated;
@@ -148,7 +164,9 @@ public class TraineeServiceImpl implements ITraineeService {
 	public boolean deleteTrainee(Long id) {
 		if (id == null || id <= 0) {
 			logger.error("Trainee ID for deletion cannot be null or non-positive: {}", id);
-			// throw new BaseException("Trainee ID for deletion must be a positive value.");
+			// Throw BaseException for invalid argument
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, 
+                                     "Trainee ID for deletion must be a positive value. Provided ID: " + id));
 		}
 
 		boolean deleted = traineeDAO.delete(id);
@@ -156,7 +174,9 @@ public class TraineeServiceImpl implements ITraineeService {
 			logger.info("Trainee deleted: ID={}", id);
 		} else {
 			logger.warn("No trainee found to delete with ID={}", id);
-			// throw new BaseException("No trainee found to delete with ID: " + id);
+			// Throw BaseException if trainee not found for deletion
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, 
+                                     "No trainee found to delete with ID: " + id));
 		}
 		return deleted;
 	}
@@ -164,6 +184,7 @@ public class TraineeServiceImpl implements ITraineeService {
 	private String generateUniqueUsername(String baseUsername) {
 		String username = baseUsername;
 		int counter = 1;
+	
 		while (traineeDAO.findByUsername(username).isPresent()) {
 			username = baseUsername + counter;
 			counter++;
