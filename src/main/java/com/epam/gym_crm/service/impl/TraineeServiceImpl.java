@@ -92,6 +92,10 @@ public class TraineeServiceImpl implements ITraineeService {
 
 	@Override
 	public Trainee create(Trainee trainee) {
+		if(trainee ==null) {
+			logger.error("Trainee can not be null");
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainee can not be null"));
+		}
 		User userProfile =trainee.getUser();
 		
 		Long traineeId = idGenerator.getNextId(EntityType.TRAINEE);
