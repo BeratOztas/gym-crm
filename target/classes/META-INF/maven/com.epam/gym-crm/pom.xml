@@ -30,14 +30,31 @@
     <version>2.0.13</version>
 </dependency>
 
+<dependency>
+    <groupId>jakarta.persistence</groupId>
+    <artifactId>jakarta.persistence-api</artifactId>
+    <version>3.1.0</version>
+</dependency>
+<dependency>
+    <groupId>org.hibernate.orm</groupId>
+    <artifactId>hibernate-core</artifactId>
+    <version>6.5.2.Final</version> </dependency>
 <!-- Simple implementation for SLF4J (console logging) -->
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-simple</artifactId>
     <version>2.0.13</version>
 </dependency>
-
-
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.18.38</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.data</groupId>
+    <artifactId>spring-data-jpa</artifactId>
+    <version>3.2.5</version>
+     </dependency>
         <!-- Validation -->
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -53,7 +70,16 @@
             <artifactId>hibernate-validator</artifactId>
             <version>8.0.1.Final</version>
         </dependency>
-        
+        <dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>42.7.7</version>
+</dependency>
+        <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-jdbc</artifactId>
+    <version>7.0.0-M7</version>
+</dependency>
 <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
