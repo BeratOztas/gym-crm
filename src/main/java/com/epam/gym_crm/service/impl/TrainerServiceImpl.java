@@ -144,9 +144,9 @@ public class TrainerServiceImpl implements ITrainerService {
 		if (userProfile.getLastName() != null) {
 			existingTrainerUser.setLastName(userProfile.getLastName());
 		}
-		if (trainer.getSpecialization() != null) {
-			existingTrainer.setSpecialization(trainer.getSpecialization());
-		}
+//		if (trainer.getSpecialization() != null) {
+//			existingTrainer.setSpecialization(trainer.getSpecialization());
+//		}
 		existingTrainerUser.setActive(userProfile.isActive());
 
 		Trainer updated = trainerDAO.update(existingTrainer);

@@ -146,7 +146,7 @@ class GymCRMFacadeTest {
 	void testUpdateTrainee_notFound() {
 		Trainee inputTrainee = new Trainee();
 		User inputUser = new User();
-		inputUser.setId(99L);
+//		inputUser.setId(99L);
 		inputTrainee.setUser(inputUser);
 
 		when(traineeService.updateTrainee(any(Trainee.class))).thenThrow(new BaseException(

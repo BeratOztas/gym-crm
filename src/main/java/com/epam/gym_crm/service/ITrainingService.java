@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.epam.gym_crm.model.Training;
-import com.epam.gym_crm.model.TrainingType;
 
 public interface ITrainingService {
 
@@ -20,7 +19,7 @@ public interface ITrainingService {
     
 	List<Training> findByTrainingName(String trainingName);
 
-	List<Training> findByTrainingType(TrainingType trainingType);
+//	List<Training> findByTrainingType(TrainingType trainingType);
 
 	List<Training> findByTrainingDate(LocalDate trainingDate);
 

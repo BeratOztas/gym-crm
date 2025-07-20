@@ -18,7 +18,6 @@ import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.Training;
-import com.epam.gym_crm.model.TrainingType;
 import com.epam.gym_crm.model.User;
 import com.epam.gym_crm.service.ITrainingService;
 import com.epam.gym_crm.service.init.IdGenerator;
@@ -122,9 +121,9 @@ public class TrainingServiceImpl implements ITrainingService {
 		if (training.getTrainingName() != null && !training.getTrainingName().isBlank()) {
 			existingTraining.setTrainingName(training.getTrainingName());
 		}
-		if (training.getTrainingType() != null) {
-			existingTraining.setTrainingType(training.getTrainingType());
-		}
+//		if (training.getTrainingType() != null) {
+//			existingTraining.setTrainingType(training.getTrainingType());
+//		}
 		if (training.getTrainingDate() != null) {
 			existingTraining.setTrainingDate(training.getTrainingDate());
 		}
@@ -182,16 +181,7 @@ public class TrainingServiceImpl implements ITrainingService {
 		return trainings;
 	}
 
-	@Override
-	public List<Training> findByTrainingType(TrainingType trainingType) {
-		if (trainingType == null) {
-			logger.error("Training type for lookup cannot be null.");
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Training type must not be null."));
-		}
-		List<Training> trainings = trainingDAO.findByTrainingType(trainingType);
-		logger.info("Found {} trainings with type '{}'.", trainings.size(), trainingType);
-		return trainings;
-	}
+	
 
 	@Override
 	public List<Training> findByTrainingDate(LocalDate trainingDate) {

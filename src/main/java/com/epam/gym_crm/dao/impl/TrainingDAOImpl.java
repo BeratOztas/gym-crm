@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 
 import com.epam.gym_crm.dao.ITrainingDAO;
 import com.epam.gym_crm.model.Training;
-import com.epam.gym_crm.model.TrainingType;
 import com.epam.gym_crm.storage.Storage;
 import com.epam.gym_crm.utils.EntityType;
 
@@ -72,14 +71,14 @@ public class TrainingDAOImpl implements ITrainingDAO {
 				.collect(Collectors.toList());
 	}
 
-	@Override
-	public List<Training> findByTrainingType(TrainingType trainingType) {
-		return getTrainingMap()
-				.values()
-				.stream()
-				.filter(t -> trainingType!=null && trainingType.equals(t.getTrainingType()))
-				.collect(Collectors.toList());
-	}
+//	@Override
+//	public List<Training> findByTrainingType(TrainingType trainingType) {
+//		return getTrainingMap()
+//				.values()
+//				.stream()
+//				.filter(t -> trainingType!=null && trainingType.equals(t.getTrainingType()))
+//				.collect(Collectors.toList());
+//	}
 
 	@Override
 	public List<Training> findByTrainingDate(LocalDate trainingDate) {

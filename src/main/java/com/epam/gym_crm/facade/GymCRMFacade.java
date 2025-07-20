@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.Training;
-import com.epam.gym_crm.model.TrainingType;
 import com.epam.gym_crm.service.ITraineeService;
 import com.epam.gym_crm.service.ITrainerService;
 import com.epam.gym_crm.service.ITrainingService;
@@ -129,10 +128,10 @@ public class GymCRMFacade {
 		return trainingService.findByTrainingName(trainingName);
 	}
 
-	public List<Training> getTrainingsByTrainingType(TrainingType trainingType) {
-		logger.info("Facade: Fetching trainings by type={}", trainingType);
-		return trainingService.findByTrainingType(trainingType);
-	}
+//	public List<Training> getTrainingsByTrainingType(TrainingType trainingType) {
+//		logger.info("Facade: Fetching trainings by type={}", trainingType);
+//		return trainingService.findByTrainingType(trainingType);
+//	}
 
 	public List<Training> getTrainingsByTrainingDate(LocalDate trainingDate) {
 		logger.info("Facade: Fetching trainings by date={}", trainingDate);
