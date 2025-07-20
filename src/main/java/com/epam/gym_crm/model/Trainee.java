@@ -1,82 +1,55 @@
 package com.epam.gym_crm.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "trainee")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Trainee  {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	
-	@NotNull(message = "Date of birth cannot be null")
 	@Past(message = "Date of birth must be in the past")
+	@Column(name = "date_of_birth")
 	private LocalDate dateOfBirth;
-	@NotBlank(message = "Address cannot be blank")
-	@Size(min = 5, max = 255, message = "Address must be between 5 and 255 characters")
+	
+	@Column(name = "address")
 	private String address;
-	
+
+	@OneToOne(optional = false)
+	@JoinColumn(name = "user_id",nullable = false,unique = true)
 	private User user;
-
-	public Trainee() {
-		this.user = new User();
-	}
-
-	public Trainee(Long id, String firstName, String lastName, String username, String password, boolean isActive,
-			LocalDate dateOfBirth, String address) {
-		
-		this.user=new User(id, firstName, lastName, username, password, isActive);
-		this.dateOfBirth = dateOfBirth;
-		this.address = address;
-	}
 	
-	public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-	public LocalDate getDateOfBirth() {
-		return dateOfBirth;
-	}
-
-	public void setDateOfBirth(LocalDate dateOfBirth) {
-		this.dateOfBirth = dateOfBirth;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), dateOfBirth, address);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		if (!super.equals(obj))
-			return false;
-		Trainee trainee = (Trainee) obj;
-		return Objects.equals(dateOfBirth, trainee.dateOfBirth) && Objects.equals(address, trainee.address);
-	}
-
-	@Override
-	public String toString() {
-		return "Trainee{" + super.toString() + // Import User to String
-				", dateOfBirth=" + dateOfBirth + ", address='" + address + '\'' + '}';
-	}
+	@ManyToMany
+	@JoinTable(name = "trainee_trainer",
+	joinColumns = @JoinColumn(name ="trainee_id"),
+	inverseJoinColumns = @JoinColumn(name ="trainer_id"))
+	private Set<Trainer> trainers =new HashSet<>();
+	
+	@OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<Training> trainings = new HashSet<>();
 
 }
