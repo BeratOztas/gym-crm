@@ -1,32 +1,30 @@
 package com.epam.gym_crm.facade;
 
-import com.epam.gym_crm.dto.request.TraineeCreateRequest;
-import com.epam.gym_crm.dto.request.TraineeUpdateRequest;
-import com.epam.gym_crm.dto.request.TraineeUpdateTrainersRequest;
-import com.epam.gym_crm.dto.request.UserActivationRequest;
-import com.epam.gym_crm.dto.request.TrainerCreateRequest;
-import com.epam.gym_crm.dto.request.TrainerUpdateRequest;
-import com.epam.gym_crm.dto.request.TrainingCreateRequest;
-import com.epam.gym_crm.dto.request.TrainingUpdateRequest;
-import com.epam.gym_crm.dto.request.TraineeTrainingListRequest;
-import com.epam.gym_crm.dto.request.TrainerTrainingListRequest;
-
-import com.epam.gym_crm.dto.response.TraineeResponse;
-import com.epam.gym_crm.dto.response.TrainerResponse;
-import com.epam.gym_crm.dto.response.TrainingResponse;
-
-import com.epam.gym_crm.service.ITraineeService;
-import com.epam.gym_crm.service.ITrainerService;
-import com.epam.gym_crm.service.ITrainingService;
-
-import jakarta.validation.Valid;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
+import com.epam.gym_crm.dto.request.TraineeCreateRequest;
+import com.epam.gym_crm.dto.request.TraineeTrainingListRequest;
+import com.epam.gym_crm.dto.request.TraineeUpdateRequest;
+import com.epam.gym_crm.dto.request.TraineeUpdateTrainersRequest;
+import com.epam.gym_crm.dto.request.TrainerCreateRequest;
+import com.epam.gym_crm.dto.request.TrainerTrainingListRequest;
+import com.epam.gym_crm.dto.request.TrainerUpdateRequest;
+import com.epam.gym_crm.dto.request.TrainingCreateRequest;
+import com.epam.gym_crm.dto.request.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.request.UserActivationRequest;
+import com.epam.gym_crm.dto.response.TraineeResponse;
+import com.epam.gym_crm.dto.response.TrainerResponse;
+import com.epam.gym_crm.dto.response.TrainingResponse;
+import com.epam.gym_crm.service.ITraineeService;
+import com.epam.gym_crm.service.ITrainerService;
+import com.epam.gym_crm.service.ITrainingService;
+
+import jakarta.validation.Valid;
 
 @Component
 @Validated
@@ -74,7 +72,6 @@ public class GymCRMFacade {
 
     public TraineeResponse updateTraineeTrainers(@Valid TraineeUpdateTrainersRequest request) {
         logger.info("Facade: Updating trainers list for trainee: {}", request.getTraineeUsername());
-        // Metot adı service interface'de 'updateTraineeTrainersList' olduğu için burada da onu çağırıyoruz.
         return traineeService.updateTraineeTrainersList(request);
     }
 
