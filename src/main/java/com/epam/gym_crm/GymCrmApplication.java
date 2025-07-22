@@ -15,15 +15,15 @@ public class GymCrmApplication {
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 		try {
-			logger.info("--- Gym CRM Application Started Successfully ---");
-			
+			logger.info("--- Gym CRM Uygulaması Başlatıldı ---");
+
 			EntityManagerFactory emf = context.getBean(EntityManagerFactory.class);
+			
+			logger.info("Veritabanı bağlantısı başarılı: {}", emf.isOpen());
 
-	        System.out.println("✅ Bağlantı başarılı: " + emf.isOpen());
-
-	        emf.close();
 		} finally {
 			context.close();
+			logger.info("--- Gym CRM Uygulaması Kapatıldı ---");
 		}
 	}
 
