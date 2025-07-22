@@ -1,213 +1,387 @@
 package com.epam.gym_crm.service.impl;
 
-import java.security.SecureRandom;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.epam.gym_crm.dao.ITraineeDAO;
+import com.epam.gym_crm.auth.AuthManager;
+import com.epam.gym_crm.dto.request.TraineeCreateRequest;
+import com.epam.gym_crm.dto.request.TraineeUpdateRequest;
+import com.epam.gym_crm.dto.request.TraineeUpdateTrainersRequest;
+import com.epam.gym_crm.dto.request.UserActivationRequest;
+import com.epam.gym_crm.dto.response.TraineeResponse;
 // Exception imports
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.model.Trainee;
+import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.User;
+import com.epam.gym_crm.repository.TraineeRepository;
+import com.epam.gym_crm.repository.TrainerRepository;
+import com.epam.gym_crm.repository.UserRepository;
+import com.epam.gym_crm.service.IAuthenticationService;
 import com.epam.gym_crm.service.ITraineeService;
-import com.epam.gym_crm.service.init.IdGenerator;
-import com.epam.gym_crm.utils.EntityType;
 
 @Service
 public class TraineeServiceImpl implements ITraineeService {
 
 	private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImpl.class);
 
-	private static final int PASSWORD_LENGTH = 10;
-	private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	private final TraineeRepository traineeRepository;
+	private final TrainerRepository trainerRepository;
+	private final IAuthenticationService authenticationService;
+	private final UserRepository userRepository;
+	private final AuthManager authManager;
 
-	private final Random random = new SecureRandom();
-
-	@Autowired
-	private ITraineeDAO traineeDAO;
-
-	private IdGenerator idGenerator;
-
-	@Autowired
-	public void setIdGenerator(IdGenerator idGenerator) {
-		this.idGenerator = idGenerator;
-		
-		logger.info("IdGenerator successfully injected into TraineeServiceImpl via setter injection.");
+	public TraineeServiceImpl(TraineeRepository traineeRepository, IAuthenticationService authenticationService,
+			AuthManager authManager, UserRepository userRepository, TrainerRepository trainerRepository) {
+		this.traineeRepository = traineeRepository;
+		this.trainerRepository = trainerRepository;
+		this.authenticationService = authenticationService;
+		this.authManager = authManager;
+		this.userRepository = userRepository;
 	}
 
 	@Override
-	public Trainee findTraineeById(Long id) {
+	@Transactional(readOnly = true)
+	public TraineeResponse findTraineeById(Long id) {
+
+		User currentUser = authManager.getCurrentUser();
+		logger.info("User '{}' attempting to find Trainee profile by ID '{}'.", currentUser.getUsername(), id);
+
 		if (id == null || id <= 0) {
 			logger.error("Trainee ID for lookup cannot be null or non-positive: {}", id);
 			// Throw BaseException for invalid argument
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, 
-                                     "Trainee ID for lookup must be a positive value. Provided ID: " + id));
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+					"Trainee ID for lookup must be a positive value. Provided ID: " + id));
 		}
 
-		Optional<Trainee> optTrainee = traineeDAO.findById(id);
-		
+		Optional<Trainee> optTrainee = traineeRepository.findById(id);
+
 		Trainee foundTrainee = optTrainee.orElseThrow(() -> {
 			logger.warn("Trainee not found with ID={}", id);
-			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, 
-                                      "Trainee not found with ID: " + id));
+			return new BaseException(
+					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee not found with ID: " + id));
 		});
-		logger.info("Finding Trainee by ID={} -> Found: {}", id, true); // Always true if not thrown
-		return foundTrainee;
+		logger.info("Finding Trainee by ID={} -> Found: {}", id, true);
+		return new TraineeResponse(foundTrainee);
 	}
 
 	@Override
-	public Trainee findTraineeByUsername(String username) {
+	@Transactional(readOnly = true)
+	public TraineeResponse findTraineeByUsername(String username) {
+
+		User currentUser = authManager.getCurrentUser();
+		logger.info("User '{}' attempting to find Trainee profile for username '{}'.", currentUser.getUsername(),
+				username);
+
 		if (username == null || username.isBlank()) {
 			logger.error("Trainee username for lookup cannot be null or empty.");
 			// Throw BaseException for invalid argument
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, 
-                                     "Trainee username for lookup must not be null or empty."));
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+					"Trainee username for lookup must not be null or empty."));
 		}
 
-		Optional<Trainee> optTrainee = traineeDAO.findByUsername(username);
-		
+		Optional<Trainee> optTrainee = traineeRepository.findByUserUsername(username);
+
 		Trainee foundTrainee = optTrainee.orElseThrow(() -> {
 			logger.warn("Trainee not found with username:{}", username);
-			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, 
-                                      "Trainee not found with username: " + username));
+			return new BaseException(
+					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee not found with username: " + username));
 		});
+
 		logger.info("Finding Trainee by username='{}' -> Found: {}", username, true); // Always true if not thrown
-		return foundTrainee;
+
+		return new TraineeResponse(foundTrainee);
 	}
 
 	@Override
-	public List<Trainee> getAllTrainees() {
-		List<Trainee> trainees = traineeDAO.findAll();
+	@Transactional(readOnly = true)
+	public List<TraineeResponse> getAllTrainees() {
+		User currentUser = authManager.getCurrentUser();
+		logger.info("User '{}' attempting to retrieve all Trainees.", currentUser.getUsername());
+
+		List<Trainee> trainees = traineeRepository.findAll();
 		logger.info("Retrieving all trainees -> Count: {}", trainees.size());
-		return trainees;
+		List<TraineeResponse> returnList = trainees.stream().map(TraineeResponse::new).collect(Collectors.toList());
+
+		logger.info("Converted {} Trainee entities to TraineeResponse DTOs.", returnList.size());
+		return returnList;
 	}
 
 	@Override
-	public Trainee create(Trainee trainee) {
-		if(trainee ==null) {
+	@Transactional()
+	public TraineeResponse createTrainee(TraineeCreateRequest request) {
+		if (request == null) {
 			logger.error("Trainee can not be null");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainee can not be null"));
 		}
-		User userProfile =trainee.getUser();
-		
-		Long traineeId = idGenerator.getNextId(EntityType.TRAINEE);
-		userProfile.setId(traineeId);
 
-		String baseUsername = userProfile.getFirstName() + "." + userProfile.getLastName();
-		String finalUsername = generateUniqueUsername(baseUsername); // This method already checks for duplicates
-		userProfile.setUsername(finalUsername);
+		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName(),
+				request.isActive());
 
-		String password = generateRandomPassword();
-		userProfile.setPassword(password);
-		userProfile.setActive(true);
+		logger.info("Received new transient User object for Trainee: Username = {}", newUser.getUsername());
 
-		Trainee createdTrainee = traineeDAO.create(trainee);
-		// If DAO returns null, it indicates a failure at the DAO layer
-		if (createdTrainee == null) {
-			logger.error("Trainee creation failed at DAO layer for trainee with username: {}", finalUsername);
-			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, 
-                                     "Failed to create trainee with username: " + finalUsername + " at DAO layer."));
+		Trainee trainee = new Trainee();
+		trainee.setDateOfBirth(request.getDateOfBirth());
+		trainee.setAddress(request.getAddress());
+		trainee.setUser(newUser);
+
+		Trainee createdTrainee = traineeRepository.save(trainee);
+
+		if (createdTrainee == null || createdTrainee.getId() == null) {
+			logger.error("Failed to save Trainee entity to the database for user: {}", newUser.getUsername());
+			throw new BaseException(
+					new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Failed to create trainee profile."));
 		}
-		User createdTraineeUser =createdTrainee.getUser();
-		logger.info("Trainee created with ID={}, username={}", createdTraineeUser.getId(), createdTraineeUser.getUsername());
-		return createdTrainee;
+
+		logger.info("Trainee profile created successfully for user: {}", newUser.getUsername());
+
+		return new TraineeResponse(createdTrainee);
+
 	}
 
 	@Override
-	public Trainee updateTrainee(Trainee trainee) {
-		User userProfile =trainee.getUser();
-		if (userProfile.getId() == null || userProfile.getId() <= 0) {
-			logger.error("Trainee object or ID for update cannot be null or non-positive.");
-			// Throw BaseException for invalid argument
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, 
-                                     "Trainee object and a valid ID must be provided for update. Provided ID: " + userProfile.getId()));
+	@Transactional()
+	public TraineeResponse updateTrainee(TraineeUpdateRequest request) {
+
+		User currentUser = authManager.getCurrentUser();
+
+		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
+			logger.error("Update request or username cannot be null/empty for Trainee profile.");
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+					"Update request or username must not be null/empty."));
 		}
 
-		Optional<Trainee> existingTraineeOpt = traineeDAO.findById(userProfile.getId());
-		
-		Trainee existingTrainee = existingTraineeOpt.orElseThrow(() -> {
-			logger.warn("Trainee with ID {} not found for update.", userProfile.getId());
-			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, 
-                                      "Trainee with ID " + userProfile.getId() + " not found for update."));
+		if (!currentUser.getUsername().equals(request.getUsername())) {
+			logger.error("Unauthorized attempt to update Trainee profile for user '{}' by current user '{}'.",
+					request.getUsername(), currentUser.getUsername());
+			throw new BaseException(
+					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to update this Trainee profile."));
+		}
+
+		Optional<Trainee> optTrainee = traineeRepository.findByUserUsername(request.getUsername());
+
+		if (optTrainee.isEmpty()) {
+			logger.warn("Trainee profile not found for update with username: {}", request.getUsername());
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee profile not found."));
+		}
+
+		Trainee traineeToUpdate = optTrainee.get();
+		User userToUpdate = traineeToUpdate.getUser();
+
+		// Username is used for authorization check only; it is not updated here.
+
+		if (request.getFirstName() != null) {
+			userToUpdate.setFirstName(request.getFirstName());
+		}
+		if (request.getLastName() != null) {
+			userToUpdate.setLastName(request.getLastName());
+		}
+
+		if (request.getDateOfBirth() != null) {
+			traineeToUpdate.setDateOfBirth(request.getDateOfBirth());
+		}
+		if (request.getAddress() != null && !request.getAddress().isBlank()) {
+			traineeToUpdate.setAddress(request.getAddress());
+		}
+
+		User savedUser = userRepository.save(userToUpdate);
+
+		traineeToUpdate.setUser(savedUser);
+
+		Trainee updatedTrainee = traineeRepository.save(traineeToUpdate);
+
+		logger.info("Trainee profile updated successfully for user: {}", userToUpdate.getUsername());
+
+		return new TraineeResponse(updatedTrainee);
+	}
+
+	@Override
+	@Transactional
+	public TraineeResponse updateTraineeTrainersList(TraineeUpdateTrainersRequest request) {
+		User currentUser = authManager.getCurrentUser();
+		logger.info("User '{}' attempting to update trainers list for trainee '{}'. Requested trainers: {}.",
+				currentUser.getUsername(), request.getTraineeUsername(), request.getTrainerUsernames());
+
+		if (request == null || request.getTraineeUsername() == null || request.getTraineeUsername().isBlank()) {
+			logger.error("Update trainers list request or trainee username cannot be null/empty.");
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+					"Trainee username must not be null or empty in the update trainers list request."));
+		}
+
+		if (!currentUser.getUsername().equals(request.getTraineeUsername())) {
+			logger.warn("Access Denied: User '{}' attempted to update trainers list for trainee '{}'.",
+					currentUser.getUsername(), request.getTraineeUsername());
+			throw new BaseException(new ErrorMessage(MessageType.FORBIDDEN,
+					"You are not authorized to update trainers list for other trainees."));
+		}
+
+		Trainee traineeToUpdate = traineeRepository.findByUserUsername(request.getTraineeUsername()).orElseThrow(() -> {
+			logger.warn("Trainee with username '{}' not found for updating trainers list.",
+					request.getTraineeUsername());
+			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+					"Trainee with username " + request.getTraineeUsername() + " not found."));
 		});
 
-		User existingTraineeUser =existingTrainee.getUser();
+		if (!traineeToUpdate.getUser().isActive()) {
+			logger.warn("Trainee '{}' is not active. Cannot update their trainers list.", request.getTraineeUsername());
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
+					"Trainee " + request.getTraineeUsername() + " is not active. Cannot update their trainers list."));
+		}
+
+		Set<Trainer> newTrainers = new HashSet<>();
+		if (request.getTrainerUsernames() != null && !request.getTrainerUsernames().isEmpty()) {
+			for (String trainerUsername : request.getTrainerUsernames()) {
+				Trainer trainer = trainerRepository.findByUserUsername(trainerUsername).orElseThrow(() -> {
+					logger.warn("Trainer with username '{}' not found when updating trainers for trainee '{}'.",
+							trainerUsername, request.getTraineeUsername());
+					return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+							"Trainer with username " + trainerUsername + " not found."));
+				});
+
+				if (!trainer.getUser().isActive()) {
+					logger.warn("Trainer '{}' is not active. Cannot assign to trainee '{}'.", trainerUsername,
+							request.getTraineeUsername());
+					throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
+							"Trainer " + trainerUsername + " is not active. Cannot assign."));
+				}
+				newTrainers.add(trainer);
+			}
+		}
+
+		traineeToUpdate.setTrainers(newTrainers);
 		
-		if (userProfile.getFirstName() != null) {
-			existingTraineeUser.setFirstName(userProfile.getFirstName());
-		}
-		if (userProfile.getLastName() != null) {
-			existingTraineeUser.setLastName(userProfile.getLastName());
-		}
-		// Assuming isActive can be updated to false, so no null check
-		existingTraineeUser.setActive(userProfile.isActive()); 
+		Trainee updatedTrainee = traineeRepository.save(traineeToUpdate);
 
-		if (trainee.getDateOfBirth() != null) {
-			existingTrainee.setDateOfBirth(trainee.getDateOfBirth());
-		}
-		if (trainee.getAddress() != null) {
-			existingTrainee.setAddress(trainee.getAddress());
-		}
+		logger.info("Successfully updated trainers list for trainee '{}'. New trainer count: {} for user '{}'.",
+				updatedTrainee.getUser().getUsername(), newTrainers.size(), currentUser.getUsername());
 
-		Trainee updated = traineeDAO.update(existingTrainee);
-		if (updated == null) {
-			logger.error("Trainee update failed at DAO layer for trainee ID: {}", userProfile.getId());
-			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, 
-					"Failed to update trainee with ID: " + userProfile.getId() + " at DAO layer."));
-		}
-		User updatedUser =updated.getUser();
-		// If DAO returns null, it indicates a failure at the DAO layer
-		logger.info("Trainee updated: ID={}, username={}", updatedUser.getId(), updatedUser.getUsername());
-		return updated;
+		return new TraineeResponse(updatedTrainee);
 	}
 
 	@Override
-	public boolean deleteTrainee(Long id) {
+	@Transactional()
+	public void activateDeactivateTrainee(UserActivationRequest request) {
+		User currentUser = authManager.getCurrentUser();
+
+		logger.info("User '{}' attempting to change activation status for Trainee '{}' to '{}'.",
+				currentUser.getUsername(), request.getUsername(), request.isActive());
+
+		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
+			logger.error("Activation request or username must not be null/empty.");
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+					"Activation request or username must not be null/empty."));
+		}
+		Optional<Trainee> optTrainee = traineeRepository.findByUserUsername(request.getUsername());
+
+		if (optTrainee.isEmpty()) {
+			logger.warn("Trainee profile not found for activation status change with username: {}",
+					request.getUsername());
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee profile not found."));
+		}
+
+		Trainee traineeToUpdate = optTrainee.get();
+		User userToUpdate = traineeToUpdate.getUser();
+
+		// Check state of isActive if already same don't change it
+		if (userToUpdate.isActive() == request.isActive()) {
+			logger.info("Trainee '{}' is already in the requested state (isActive: {}). No change needed.",
+					request.getUsername(), request.isActive());
+			return;
+		}
+
+		userToUpdate.setActive(request.isActive());
+
+		User savedUser = userRepository.save(userToUpdate);
+		
+		traineeToUpdate.setUser(savedUser);
+
+		traineeRepository.save(traineeToUpdate);
+
+		logger.info("Trainee '{}' activation status changed to {} by user '{}'.", userToUpdate.getUsername(),
+				userToUpdate.isActive(), currentUser.getUsername());
+
+	}
+
+	@Override
+	@Transactional()
+	public void deleteTraineeById(Long id) {
+		User currentUser = authManager.getCurrentUser();
 		if (id == null || id <= 0) {
 			logger.error("Trainee ID for deletion cannot be null or non-positive: {}", id);
 			// Throw BaseException for invalid argument
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, 
-                                     "Trainee ID for deletion must be a positive value. Provided ID: " + id));
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+					"Trainee ID for deletion must be a positive value. Provided ID: " + id));
 		}
 
-		boolean deleted = traineeDAO.delete(id);
-		if (deleted) {
-			logger.info("Trainee deleted: ID={}", id);
-		} else {
+		Optional<Trainee> optTrainee = traineeRepository.findById(id);
+
+		if (optTrainee.isEmpty()) {
 			logger.warn("No trainee found to delete with ID={}", id);
-			// Throw BaseException if trainee not found for deletion
-			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, 
-                                     "No trainee found to delete with ID: " + id));
+			throw new BaseException(
+					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "No trainee found to delete with ID: " + id));
 		}
-		return deleted;
+
+		Trainee traineeToDelete = optTrainee.get();
+
+		if (!currentUser.getUsername().equals(traineeToDelete.getUser().getUsername())) {
+			logger.error("Unauthorized attempt to delete Trainee profile with ID '{}' by current user '{}'.", id,
+					currentUser.getUsername());
+			throw new BaseException(
+					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to delete this Trainee profile."));
+		}
+
+		traineeRepository.delete(traineeToDelete);
+
+		logger.info(
+				"Complete deletion of Trainee profile for ID '{}' (username: '{}') and all associated data (User, Trainings) performed successfully by user '{}'.",
+				id, traineeToDelete.getUser().getUsername(), currentUser.getUsername());
+
 	}
 
-	private String generateUniqueUsername(String baseUsername) {
-		String username = baseUsername;
-		int counter = 1;
-	
-		while (traineeDAO.findByUsername(username).isPresent()) {
-			username = baseUsername + counter;
-			counter++;
+	@Override
+	@Transactional()
+	public void deleteTraineeByUsername(String username) {
+		User currentUser = authManager.getCurrentUser();
+		logger.info("User '{}' attempting to delete Trainee profile for username '{}'.", currentUser.getUsername(),
+				username);
+
+		if (username == null || username.isBlank()) {
+			logger.error("Username cannot be null or empty for Trainee deletion.");
+			throw new BaseException(
+					new ErrorMessage(MessageType.INVALID_ARGUMENT, "Username must not be null or empty."));
 		}
-		logger.debug("Generated unique username: {}", username);
-		return username;
+
+		if (!currentUser.getUsername().equals(username)) {
+			logger.error("Unauthorized attempt to delete Trainee profile for user '{}' by current user '{}'.", username,
+					currentUser.getUsername());
+			throw new BaseException(
+					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to delete this Trainee profile."));
+		}
+		Optional<Trainee> optTrainee = traineeRepository.findByUserUsername(username);
+
+		if (optTrainee.isEmpty()) {
+			logger.warn("Trainee profile not found for deletion with username: {}", username);
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee profile not found."));
+		}
+
+		Trainee traineeToDelete = optTrainee.get();
+
+		traineeRepository.delete(traineeToDelete);
+
+		logger.info(
+				"Complete deletion of Trainee profile for username '{}' and all associated data (User, Trainings) performed successfully by user '{}'.",
+				username, currentUser.getUsername());
+
 	}
 
-	private String generateRandomPassword() {
-		StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
-		for (int i = 0; i < PASSWORD_LENGTH; i++) {
-			password.append(PASSWORD_CHARS.charAt(random.nextInt(PASSWORD_CHARS.length())));
-		}
-		logger.debug("Generated password of length {}", PASSWORD_LENGTH);
-		return password.toString();
-	}
 }
