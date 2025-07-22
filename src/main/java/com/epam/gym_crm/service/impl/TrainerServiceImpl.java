@@ -1,202 +1,387 @@
 package com.epam.gym_crm.service.impl;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.epam.gym_crm.dao.ITrainerDAO;
+import com.epam.gym_crm.auth.AuthManager;
+import com.epam.gym_crm.dto.request.TrainerCreateRequest;
+import com.epam.gym_crm.dto.request.TrainerUpdateRequest;
+import com.epam.gym_crm.dto.request.UserActivationRequest;
+import com.epam.gym_crm.dto.response.TrainerResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.Trainer;
+import com.epam.gym_crm.model.Training;
+import com.epam.gym_crm.model.TrainingType;
 import com.epam.gym_crm.model.User;
+import com.epam.gym_crm.repository.TraineeRepository;
+import com.epam.gym_crm.repository.TrainerRepository;
+import com.epam.gym_crm.repository.TrainingRepository;
+import com.epam.gym_crm.repository.TrainingTypeRepository;
+import com.epam.gym_crm.repository.UserRepository;
+import com.epam.gym_crm.service.IAuthenticationService;
 import com.epam.gym_crm.service.ITrainerService;
-import com.epam.gym_crm.service.init.IdGenerator;
-import com.epam.gym_crm.utils.EntityType;
 
 @Service
 public class TrainerServiceImpl implements ITrainerService {
 
 	private static final Logger logger = LoggerFactory.getLogger(TrainerServiceImpl.class);
 
-	private static final int PASSWORD_LENGTH = 10;
-	private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	private final IAuthenticationService authenticationService;
+	private final TrainerRepository trainerRepository;
+	private final TrainingTypeRepository trainingTypeRepository;
+	private final TrainingRepository trainingRepository;
+	private final TraineeRepository traineeRepository;
+	private final AuthManager authManager;
+	private final UserRepository userRepository;
 
-	private final Random random = new SecureRandom();
-
-	@Autowired
-	private ITrainerDAO trainerDAO;
-
-	private IdGenerator idGenerator;
-
-	@Autowired
-	public void setIdGenerator(IdGenerator idGenerator) {
-		this.idGenerator = idGenerator;
-		logger.info("IdGenerator successfully injected into TrainerServiceImpl via setter injection.");
+	public TrainerServiceImpl(IAuthenticationService authenticationService, TrainerRepository trainerRepository,
+			TrainingTypeRepository trainingTypeRepository, AuthManager authManager,UserRepository userRepository,TrainingRepository trainingRepository,TraineeRepository traineeRepository) {
+		this.authenticationService = authenticationService;
+		this.trainerRepository = trainerRepository;
+		this.trainingTypeRepository = trainingTypeRepository;
+		this.authManager = authManager;
+		this.userRepository=userRepository;
+		this.trainingRepository=trainingRepository;
+		this.traineeRepository=traineeRepository;
 	}
 
 	@Override
-	public Trainer findTrainerById(Long id) {
+	@Transactional(readOnly = true)
+	public TrainerResponse findTrainerById(Long id) {
+		 User currentUser = authManager.getCurrentUser();
+		    logger.info("User '{}' attempting to find Trainer profile by ID '{}'.",
+		                currentUser.getUsername(), id);
+		    
 		if (id == null || id <= 0) {
 			logger.error("Trainer ID for lookup cannot be null or non-positive: {}", id);
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
 					"Trainer ID must be a positive value. Provided: " + id));
 		}
 
-		Optional<Trainer> optTrainer = trainerDAO.findById(id);
-		Trainer found = optTrainer.orElseThrow(() -> {
+		Optional<Trainer> optTrainer = trainerRepository.findById(id);
+		Trainer foundTrainer = optTrainer.orElseThrow(() -> {
 			logger.warn("Trainer not found with ID={}", id);
 			return new BaseException(
 					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer not found with ID: " + id));
 		});
 
 		logger.info("Finding Trainer by ID={} -> Found: {}", id, true);
-		return found;
+		return new TrainerResponse(foundTrainer);
 	}
 
 	@Override
-	public Trainer findTrainerByUsername(String username) {
+	@Transactional(readOnly = true)
+	public TrainerResponse findTrainerByUsername(String username) {
+
+		 User currentUser = authManager.getCurrentUser();
+
+		 logger.info("User '{}' attempting to find Trainer profile for username '{}'.",
+	                currentUser.getUsername(), username);
+		 
 		if (username == null || username.isBlank()) {
 			logger.error("Trainer username for lookup cannot be null or empty.");
 			throw new BaseException(
 					new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainer username must not be null or empty."));
 		}
 
-		Optional<Trainer> optTrainer = trainerDAO.findByUsername(username);
-		Trainer found = optTrainer.orElseThrow(() -> {
+		Optional<Trainer> optTrainer = trainerRepository.findByUserUsername(username);
+
+		Trainer foundTrainer = optTrainer.orElseThrow(() -> {
 			logger.warn("Trainer not found with username:{}", username);
 			return new BaseException(
 					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer not found with username: " + username));
 		});
 
 		logger.info("Finding Trainer by username='{}' -> Found: {}", username, true);
-		return found;
+		return new TrainerResponse(foundTrainer);
 	}
 
 	@Override
-	public List<Trainer> getAllTrainers() {
-		List<Trainer> trainers = trainerDAO.findAll();
-		logger.info("Retrieving all trainers -> Count: {}", trainers.size());
-		return trainers;
+	@Transactional(readOnly = true)
+	public List<TrainerResponse> getAllTrainers() {
+		User currentUser = authManager.getCurrentUser();
+        logger.info("User '{}' attempting to retrieve all Trainers.", currentUser.getUsername());
+        
+        List<Trainer> trainers = trainerRepository.findAll();
+        logger.info("Retrieved {} trainers from the database.", trainers.size());
+        
+        List<TrainerResponse> returnList = trainers
+        		.stream()
+                .map(TrainerResponse::new) 
+                .collect(Collectors.toList());
+        
+        logger.info("Converted {} Trainer entities to TrainerResponse DTOs.", returnList.size());
+        return returnList;
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<TrainerResponse> getUnassignedTrainersForTrainee(String traineeUsername) {
+		 User currentUser = authManager.getCurrentUser();
+	        logger.info("User '{}' attempting to retrieve unassigned and active trainers for trainee '{}'.",
+	                    currentUser.getUsername(), traineeUsername);
+	        
+	        if (!currentUser.getUsername().equals(traineeUsername)) {
+	            logger.warn("Access Denied: User '{}' attempted to get unassigned trainers for trainee '{}'.",
+	                        currentUser.getUsername(), traineeUsername);
+	            throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED,
+	                                    "You are not authorized to view unassigned trainers for other trainees."));
+	        }
+	        
+	        Trainee foundTrainee = traineeRepository.findByUserUsername(traineeUsername)
+	                .orElseThrow(() -> {
+	                    logger.warn("Trainee with username '{}' not found when trying to get unassigned trainers.",
+	                                traineeUsername);
+	                    return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+	                            "Trainee with username " + traineeUsername + " not found."));
+	                });
+	        
+	        if (!foundTrainee.getUser().isActive()) {
+	            logger.warn("Trainee '{}' is not active. Cannot retrieve unassigned trainers.", traineeUsername);
+	            throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
+	                    "Trainee " + traineeUsername + " is not active. Cannot retrieve unassigned trainers."));
+	        }
+	        
+	        List<Trainer> unassignedTrainers = trainerRepository.findActiveTrainersNotAssignedToTrainee(traineeUsername);
+	        
+	        List<TrainerResponse> unassignedTrainerList = unassignedTrainers
+	        		.stream()
+	                .map(TrainerResponse::new)
+	                .collect(Collectors.toList());
+	        
+	        logger.info("Successfully retrieved {} unassigned and active trainers for trainee '{}' for user '{}'.",
+                    unassignedTrainerList.size(), traineeUsername, currentUser.getUsername());
+
+        return unassignedTrainerList;
+
+	        
 	}
 
 	@Override
-	public Trainer create(Trainer trainer) {
-		if (trainer == null) {
+	@Transactional()
+	public TrainerResponse createTrainer(TrainerCreateRequest request) {
+		if (request == null) {
 			logger.error("Trainer must not be null");
-			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer must not be null"));
-		}
-		User userProfile = trainer.getUser();
-		Long trainerId = idGenerator.getNextId(EntityType.TRAINER);
-		userProfile.setId(trainerId);
-
-		String baseUsername = userProfile.getFirstName() + "." + userProfile.getLastName();
-		String finalUsername = generateUniqueUsername(baseUsername);
-		userProfile.setUsername(finalUsername);
-
-		String password = generateRandomPassword();
-		userProfile.setPassword(password);
-		userProfile.setActive(true);
-
-		Trainer createdTrainer = trainerDAO.create(trainer);
-		if (createdTrainer == null) {
-			logger.error("Trainer creation failed at DAO layer for trainer with username: {}", finalUsername);
-			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
-					"Failed to create trainer with username: " + finalUsername));
-		}
-		User createdTrainerUser = createdTrainer.getUser();
-		logger.info("Trainer created with ID={}, username={}", createdTrainerUser.getId(),
-				createdTrainerUser.getUsername());
-		return createdTrainer;
-	}
-
-	@Override
-	public Trainer updateTrainer(Trainer trainer) {
-		if (trainer == null) {
-			logger.error("Trainer must not be null");
-			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer must not be null"));
-		}
-		User userProfile = trainer.getUser();
-		if (userProfile.getId() == null || userProfile.getId() <= 0) {
-			logger.error("Trainer ID for update cannot be null or non-positive.");
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-					"Trainer ID must be a positive value. Provided: " + userProfile.getId()));
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainer must not be null"));
 		}
 
-		Optional<Trainer> existingTrainerOpt = trainerDAO.findById(userProfile.getId());
-		Trainer existingTrainer = existingTrainerOpt.orElseThrow(() -> {
-			logger.warn("Trainer with ID {} not found for update.", userProfile.getId());
-			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-					"Trainer with ID " + userProfile.getId() + " not found for update."));
-		});
+		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName(),
+				request.isActive());
 
-		User existingTrainerUser = existingTrainer.getUser();
+		TrainingType specialization = trainingTypeRepository
+				.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName()).orElseThrow(() -> {
+					logger.error("Training type not found: {}", request.getTrainingTypeName());
+					return new BaseException(new ErrorMessage(MessageType.ENTITY_NOT_FOUND,
+							"Training type not found: " + request.getTrainingTypeName()));
+				});
 
-		if (userProfile.getFirstName() != null) {
-			existingTrainerUser.setFirstName(userProfile.getFirstName());
-		}
-		if (userProfile.getLastName() != null) {
-			existingTrainerUser.setLastName(userProfile.getLastName());
-		}
-//		if (trainer.getSpecialization() != null) {
-//			existingTrainer.setSpecialization(trainer.getSpecialization());
-//		}
-		existingTrainerUser.setActive(userProfile.isActive());
+		Trainer trainer = new Trainer();
+		trainer.setSpecialization(specialization);
+		trainer.setUser(newUser);
 
-		Trainer updated = trainerDAO.update(existingTrainer);
-		if (updated == null) {
-			logger.error("Trainer update failed at DAO layer for trainer ID: {}", userProfile.getId());
-			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
-					"Failed to update trainer with ID: " + userProfile.getId()));
-		}
-		User updatedUser = updated.getUser();
-		logger.info("Trainer updated: ID={}, username={}", updatedUser.getId(), updatedUser.getUsername());
-		return updated;
-	}
+		Trainer savedTrainer = trainerRepository.save(trainer);
 
-	@Override
-	public boolean deleteTrainer(Long id) {
-		if (id == null || id <= 0) {
-			logger.error("Trainer ID for deletion cannot be null or non-positive: {}", id);
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-					"Trainer ID for deletion must be a positive value. Provided: " + id));
-		}
-
-		boolean deleted = trainerDAO.delete(id);
-		if (!deleted) {
-			logger.warn("No trainer found to delete with ID={}", id);
+		if (savedTrainer == null || savedTrainer.getId() == null) {
+			logger.error("Failed to save Trainer entity to the database for user: {}", newUser.getUsername());
 			throw new BaseException(
-					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "No trainer found to delete with ID: " + id));
+					new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Failed to create trainer profile."));
 		}
 
-		logger.info("Trainer deleted: ID={}", id);
-		return true;
+		logger.info("Trainer profile created successfully for user: {}", newUser.getUsername());
+
+		return new TrainerResponse(savedTrainer);
+
 	}
 
-	private String generateUniqueUsername(String baseUsername) {
-		String username = baseUsername;
-		int counter = 1;
+	@Override
+	@Transactional()
+	public TrainerResponse updateTrainer(TrainerUpdateRequest request) {
+		User currentUser = authManager.getCurrentUser();
 
-		while (trainerDAO.findByUsername(username).isPresent()) {
-			username = baseUsername + counter;
-			counter++;
+		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
+			logger.error("Update request or username cannot be null/empty for Trainer profile.");
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+					"Update request or username must not be null/empty."));
 		}
-		logger.debug("Generated unique username: {}", username);
-		return username;
+		if (!currentUser.getUsername().equals(request.getUsername())) {
+			logger.error("Unauthorized attempt to update Trainer profile for user '{}' by current user '{}'.",
+					request.getUsername(), currentUser.getUsername());
+			throw new BaseException(
+					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to update this Trainer profile."));
+		}
+
+		Optional<Trainer> optTrainer = trainerRepository.findByUserUsername(request.getUsername());
+
+		if (optTrainer.isEmpty()) {
+			logger.warn("Trainer profile not found for update with username: {}", request.getUsername());
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer profile not found."));
+		}
+
+		Trainer trainerToUpdate = optTrainer.get();
+		User userToUpdate = trainerToUpdate.getUser();
+
+		// Username is used for authorization check only; it is not updated here.
+		
+		if (request.getFirstName() != null) {
+			userToUpdate.setFirstName(request.getFirstName());
+		}
+		if (request.getLastName() != null) {
+			userToUpdate.setLastName(request.getLastName());
+		}
+
+		if (request.getSpecializationName() != null && !request.getSpecializationName().isBlank()) {
+            TrainingType newSpecialization = trainingTypeRepository
+                    .findByTrainingTypeNameIgnoreCase(request.getSpecializationName())
+                    .orElseThrow(() -> {
+                        logger.warn("Invalid training type for update: {}", request.getSpecializationName());
+                        return new BaseException(new ErrorMessage(MessageType.ENTITY_NOT_FOUND,
+                                "Training type not found: " + request.getSpecializationName()));
+                    });
+            trainerToUpdate.setSpecialization(newSpecialization);
+        }
+		Trainer updatedTrainer = trainerRepository.save(trainerToUpdate);
+		
+		logger.info("Trainer profile updated successfully for user: {}", userToUpdate.getUsername());
+
+        return new TrainerResponse(updatedTrainer);
 	}
 
-	private String generateRandomPassword() {
-		StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
-		for (int i = 0; i < PASSWORD_LENGTH; i++) {
-			password.append(PASSWORD_CHARS.charAt(random.nextInt(PASSWORD_CHARS.length())));
+	@Override
+	@Transactional()
+	public void activateDeactivateTrainer(UserActivationRequest request) {
+		User currentUser =authManager.getCurrentUser();
+		
+		logger.info("User '{}' attempting to change activation status for Trainer '{}' to '{}'.",
+                currentUser.getUsername(), request.getUsername(), request.isActive());
+		
+		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
+            logger.error("Activation request or username cannot be null/empty.");
+            throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+                    "Activation request or username must not be null/empty."));
+        }
+		
+		Optional<Trainer> optTrainer =trainerRepository.findByUserUsername(request.getUsername());
+		
+		if(optTrainer.isEmpty()) {
+			logger.warn("Trainer profile not found for activation status change with username: {}", request.getUsername());
+            throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer profile not found."));
 		}
-		logger.debug("Generated password of length {}", PASSWORD_LENGTH);
-		return password.toString();
+
+		Trainer trainerToUpdate =optTrainer.get();
+		User userToUpdate =trainerToUpdate.getUser();
+		
+		 if (userToUpdate.isActive() == request.isActive()) { 
+	            logger.info("Trainer '{}' is already in the requested state (isActive: {}). No change needed.",
+	                        request.getUsername(), request.isActive()); 
+	            return;
+	        }
+		 
+		 userToUpdate.setActive(request.isActive());
+		 
+		 User savedUser =userRepository.save(userToUpdate);
+		 trainerToUpdate.setUser(savedUser);
+		 trainerRepository.save(trainerToUpdate);
+		 
+		 logger.info("Trainer '{}' activation status changed to {} by user '{}'.",
+                 userToUpdate.getUsername(), userToUpdate.isActive(), currentUser.getUsername());
+		
 	}
+	
+	@Override
+	@Transactional()
+	public void deleteTrainerById(Long id) {
+		User currentUser=authManager.getCurrentUser();
+		if (id == null || id <= 0) {
+            logger.error("Trainer ID for deletion cannot be null or non-positive: {}", id);
+            throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+                    "Trainer ID for deletion must be a positive value. Provided ID: " + id));
+        }
+
+        Optional<Trainer> optTrainer = trainerRepository.findById(id);
+
+        if (optTrainer.isEmpty()) {
+            logger.warn("No trainer found to delete with ID={}", id);
+            throw new BaseException(
+                    new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "No trainer found to delete with ID: " + id));
+        }
+
+        Trainer trainerToDelete = optTrainer.get();
+
+        if (!currentUser.getUsername().equals(trainerToDelete.getUser().getUsername())) {
+            logger.error("Unauthorized attempt to delete Trainer profile with ID '{}' by current user '{}'.",
+                         id, currentUser.getUsername());
+            throw new BaseException(
+                    new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to delete this Trainer profile."));
+        }
+
+        Set<Training> associatedTrainings = trainerToDelete.getTrainings();
+        if (associatedTrainings != null && !associatedTrainings.isEmpty()) {
+            logger.info("Disassociating {} trainings from Trainer '{}' (ID: {}).", associatedTrainings.size(), trainerToDelete.getUser().getUsername(), id);
+            for (Training training : associatedTrainings) {
+                training.setTrainer(null); 
+                trainingRepository.save(training); 
+            }
+        }
+
+        trainerRepository.delete(trainerToDelete);
+        logger.info("Complete deletion of Trainer profile for ID '{}' (username: '{}') and associated User data performed successfully by user '{}'. Trainings disassociated.",
+                    id, trainerToDelete.getUser().getUsername(), currentUser.getUsername());
+		
+	}
+	
+	@Override
+	@Transactional()
+    public void deleteTrainerByUsername(String username) {
+        User currentUser = authManager.getCurrentUser();
+        
+        logger.info("User '{}' attempting to delete Trainer profile for username '{}'.",
+                currentUser.getUsername(), username);
+
+        if (username == null || username.isBlank()) {
+            logger.error("Username cannot be null or empty for Trainer deletion.");
+            throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Username must not be null or empty."));
+        }
+
+        if (!currentUser.getUsername().equals(username)) {
+            logger.error("Unauthorized attempt to delete Trainer profile for user '{}' by current user '{}'.",
+                         username, currentUser.getUsername());
+            throw new BaseException(
+                    new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to delete this Trainer profile."));
+        }
+
+        Optional<Trainer> optTrainer = trainerRepository.findByUserUsername(username);
+
+        if (optTrainer.isEmpty()) {
+            logger.warn("Trainer profile not found for deletion with username: {}", username);
+            throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer profile not found."));
+        }
+
+        Trainer trainerToDelete = optTrainer.get();
+
+        Set<Training> associatedTrainings = trainerToDelete.getTrainings();
+        if (associatedTrainings != null && !associatedTrainings.isEmpty()) {
+            logger.info("Disassociating {} trainings from Trainer '{}'.", associatedTrainings.size(), username);
+            for (Training training : associatedTrainings) {
+                training.setTrainer(null); 
+                trainingRepository.save(training); 
+            }
+        }
+
+        trainerRepository.delete(trainerToDelete);
+        logger.info("Complete deletion of Trainer profile for username '{}' and associated User data performed successfully by user '{}'. Trainings disassociated.",
+                    username, currentUser.getUsername());
+    }
+
+	
+
 }
