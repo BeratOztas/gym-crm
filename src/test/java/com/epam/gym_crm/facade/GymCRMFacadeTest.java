@@ -2,11 +2,16 @@ package com.epam.gym_crm.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-import static org.mockito.Mockito.*;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,240 +19,581 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import com.epam.gym_crm.exception.BaseException;
-import com.epam.gym_crm.exception.ErrorMessage;
-import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.model.Trainee;
-import com.epam.gym_crm.model.Trainer;
-import com.epam.gym_crm.model.Training;
-import com.epam.gym_crm.model.User;
+import com.epam.gym_crm.dto.request.TraineeCreateRequest;
+import com.epam.gym_crm.dto.request.TraineeTrainingListRequest;
+import com.epam.gym_crm.dto.request.TraineeUpdateRequest;
+import com.epam.gym_crm.dto.request.TraineeUpdateTrainersRequest;
+import com.epam.gym_crm.dto.request.TrainerCreateRequest;
+import com.epam.gym_crm.dto.request.TrainerTrainingListRequest;
+import com.epam.gym_crm.dto.request.TrainerUpdateRequest;
+import com.epam.gym_crm.dto.request.TrainingCreateRequest;
+import com.epam.gym_crm.dto.request.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.request.UserActivationRequest;
+import com.epam.gym_crm.dto.response.TraineeResponse;
+import com.epam.gym_crm.dto.response.TrainerResponse;
+import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.service.ITraineeService;
 import com.epam.gym_crm.service.ITrainerService;
 import com.epam.gym_crm.service.ITrainingService;
 
 class GymCRMFacadeTest {
 
-	private ITrainerService trainerService;
+	@Mock
 	private ITraineeService traineeService;
+	@Mock
+	private ITrainerService trainerService;
+	@Mock
 	private ITrainingService trainingService;
-	private GymCRMFacade facade;
+
+	@InjectMocks
+	private GymCRMFacade gymCRMFacade;
 
 	@BeforeEach
 	void setUp() {
-		trainerService = mock(ITrainerService.class);
-		traineeService = mock(ITraineeService.class);
-		trainingService = mock(ITrainingService.class);
-		facade = new GymCRMFacade(trainerService, traineeService, trainingService);
-	}
-
-	// ========== Trainee Tests ==========
-
-	@Test
-	void testCreateTrainee_success() {
-		Trainee trainee = new Trainee();
-		when(traineeService.create(trainee)).thenReturn(trainee);
-		assertEquals(trainee, facade.createTrainee(trainee));
+		MockitoAnnotations.openMocks(this);
 	}
 
 	@Test
-	void testGetTraineeById_success() {
-		Trainee trainee = new Trainee();
-		when(traineeService.findTraineeById(1L)).thenReturn(trainee);
-		assertEquals(trainee, facade.getTraineeById(1L));
+	void createTrainee_Success() {
+		// Hazırlık
+		TraineeCreateRequest request = new TraineeCreateRequest("John", "Doe", LocalDate.of(1990, 1, 1), "123 Main St",
+				true);
+		TraineeResponse expectedResponse = new TraineeResponse();
+		expectedResponse.setFirstName("John");
+		expectedResponse.setLastName("Doe");
+		expectedResponse.setUsername("John.Doe");
+
+		when(traineeService.createTrainee(request)).thenReturn(expectedResponse);
+
+		// Çağrı
+		TraineeResponse actualResponse = gymCRMFacade.createTrainee(request);
+
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals("John.Doe", actualResponse.getUsername());
+		verify(traineeService, times(1)).createTrainee(request);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
 	}
 
 	@Test
-	void testDeleteTrainee_failure() {
-		when(traineeService.deleteTrainee(99L)).thenReturn(false);
-		assertFalse(facade.deleteTrainee(99L));
-	}
+	void findTraineeById_Success() {
+		// Hazırlık
+		Long id = 1L;
+		TraineeResponse expectedResponse = new TraineeResponse();
+		expectedResponse.setUsername("test.trainee");
 
-	// ========== Trainer Tests ==========
+		when(traineeService.findTraineeById(id)).thenReturn(expectedResponse);
 
-	@Test
-	void testCreateTrainer_success() {
-		Trainer trainer = new Trainer();
-		when(trainerService.create(trainer)).thenReturn(trainer);
-		assertEquals(trainer, facade.createTrainer(trainer));
-	}
+		// Çağrı
+		TraineeResponse actualResponse = gymCRMFacade.findTraineeById(id);
 
-	@Test
-	void testGetTrainerByUsername_notFound() {
-		when(trainerService.findTrainerByUsername("unknown")).thenReturn(null);
-		assertNull(facade.getTrainerByUsername("unknown"));
-	}
-
-	// ========== Training Tests ==========
-
-	@Test
-	void testCreateTraining_success() {
-		Training training = new Training();
-		when(trainingService.create(training)).thenReturn(training);
-		assertEquals(training, facade.createTraining(training));
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals("test.trainee", actualResponse.getUsername());
+		verify(traineeService, times(1)).findTraineeById(id);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
 	}
 
 	@Test
-	void testGetTrainingsByDate_success() {
-		LocalDate date = LocalDate.now();
-		List<Training> expected = Arrays.asList(new Training());
-		when(trainingService.findByTrainingDate(date)).thenReturn(expected);
-		assertEquals(expected, facade.getTrainingsByTrainingDate(date));
+	void findTraineeById_Failure_NotFound() {
+		// Hazırlık
+		Long id = 99L;
+		when(traineeService.findTraineeById(id)).thenThrow(new RuntimeException("Trainee not found"));
+
+		// Çağrı ve Doğrulama
+		assertThrows(RuntimeException.class, () -> gymCRMFacade.findTraineeById(id));
+		verify(traineeService, times(1)).findTraineeById(id);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
 	}
 
 	@Test
-	void testGetTrainingsByTrainerId_empty() {
-		when(trainingService.findByTrainerId(123L)).thenReturn(Collections.emptyList());
-		assertTrue(facade.getTrainingsByTrainerId(123L).isEmpty());
-	}
+	void findTraineeByUsername_Success() {
+		// Hazırlık
+		String username = "test.trainee";
+		TraineeResponse expectedResponse = new TraineeResponse();
+		expectedResponse.setUsername(username);
 
-	@Test
-	void testDeleteTraining_success() {
-		when(trainingService.delete(10L)).thenReturn(true);
-		assertTrue(facade.deleteTraining(10L));
-	}
+		when(traineeService.findTraineeByUsername(username)).thenReturn(expectedResponse);
 
-	// --- Trainee Failure ---
+		// Çağrı
+		TraineeResponse actualResponse = gymCRMFacade.findTraineeByUsername(username);
 
-	@Test
-	void testCreateTrainee_serviceThrowsException() {
-		Trainee inputTrainee = new Trainee();
-		when(traineeService.create(any(Trainee.class))).thenThrow(
-				new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainee verileri geçersiz.")));
-
-		BaseException exception = assertThrows(BaseException.class, () -> facade.createTrainee(inputTrainee));
-		assertTrue(exception.getMessage().contains("Trainee verileri geçersiz."));
-		verify(traineeService, times(1)).create(any(Trainee.class));
-	}
-
-	@Test
-	void testGetTraineeById_notFound() {
-		Long traineeId = 99L;
-		when(traineeService.findTraineeById(traineeId))
-				.thenThrow(new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee bulunamadı.")));
-
-		BaseException exception = assertThrows(BaseException.class, () -> facade.getTraineeById(traineeId));
-		assertTrue(exception.getMessage().contains("Trainee bulunamadı."));
-		verify(traineeService, times(1)).findTraineeById(traineeId);
-	}
-
-	@Test
-	void testUpdateTrainee_nullInput_shouldThrow() {
-		when(traineeService.updateTrainee(ArgumentMatchers.isNull())).thenThrow(
-				new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainee objesi boş olamaz.")));
-
-		BaseException exception = assertThrows(BaseException.class, () -> facade.updateTrainee(null));
-		assertTrue(exception.getMessage().contains("Trainee objesi boş olamaz."));
-		verify(traineeService, times(1)).updateTrainee(ArgumentMatchers.isNull());
-	}
-
-	@Test
-	void testUpdateTrainee_notFound() {
-		Trainee inputTrainee = new Trainee();
-		User inputUser = new User();
-//		inputUser.setId(99L);
-		inputTrainee.setUser(inputUser);
-
-		when(traineeService.updateTrainee(any(Trainee.class))).thenThrow(new BaseException(
-				new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Güncellenecek Trainee bulunamadı.")));
-
-		BaseException exception = assertThrows(BaseException.class, () -> facade.updateTrainee(inputTrainee));
-		assertTrue(exception.getMessage().contains("Güncellenecek Trainee bulunamadı."));
-		verify(traineeService, times(1)).updateTrainee(any(Trainee.class));
-	}
-
-	@Test
-	void testDeleteTrainee_serviceThrowsException() {
-		Long traineeId = 99L;
-		when(traineeService.deleteTrainee(traineeId)).thenThrow(
-				new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Trainee silinirken hata oluştu.")));
-
-		BaseException exception = assertThrows(BaseException.class, () -> facade.deleteTrainee(traineeId));
-		assertTrue(exception.getMessage().contains("Trainee silinirken hata oluştu."));
-		verify(traineeService, times(1)).deleteTrainee(traineeId);
-	}
-
-	@Test
-	void testGetTraineeProfileByUsername_notFound() {
-		String username = "bilinmeyen.kullanici";
-		when(traineeService.findTraineeByUsername(username)).thenThrow(new BaseException(
-				new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Kullanıcı adına göre Trainee bulunamadı.")));
-
-		BaseException exception = assertThrows(BaseException.class, () -> facade.getTraineeByUsername(username));
-		assertTrue(exception.getMessage().contains("Kullanıcı adına göre Trainee bulunamadı."));
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals(username, actualResponse.getUsername());
 		verify(traineeService, times(1)).findTraineeByUsername(username);
-	}
-
-	// --- Trainer Failure ---
-	@Test
-	void testUpdateTrainer_nullInput_shouldThrow() {
-		when(trainerService.updateTrainer(ArgumentMatchers.isNull())).thenThrow(
-				new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer must not be null")));
-
-		BaseException exception = assertThrows(BaseException.class, () -> facade.updateTrainer(null));
-		assertTrue(exception.getMessage().contains("Trainer must not be null"));
-		verify(trainerService, times(1)).updateTrainer(ArgumentMatchers.isNull());
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
 	}
 
 	@Test
-	void testCreateTrainer_serviceThrowsException() {
-		Trainer inputTrainer = new Trainer();
-		when(trainerService.create(any(Trainer.class))).thenThrow(
-				new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainer verileri geçersiz.")));
+	void findTraineeByUsername_Failure_NotFound() {
+		// Hazırlık
+		String username = "nonexistent.user";
+		when(traineeService.findTraineeByUsername(username)).thenThrow(new RuntimeException("Trainee not found"));
 
-		BaseException exception = assertThrows(BaseException.class, () -> facade.createTrainer(inputTrainer));
-		assertTrue(exception.getMessage().contains("Trainer verileri geçersiz."));
-		verify(trainerService, times(1)).create(any(Trainer.class));
+		// Çağrı ve Doğrulama
+		assertThrows(RuntimeException.class, () -> gymCRMFacade.findTraineeByUsername(username));
+		verify(traineeService, times(1)).findTraineeByUsername(username);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
 	}
 
 	@Test
-	void testGetTrainerById_notFound() {
-		Long trainerId = 99L;
-		when(trainerService.findTrainerById(trainerId))
-				.thenThrow(new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer bulunamadı.")));
+	void getAllTrainees_Success() {
+		// Hazırlık
+		List<TraineeResponse> expectedList = Arrays.asList(new TraineeResponse(), new TraineeResponse());
+		when(traineeService.getAllTrainees()).thenReturn(expectedList);
 
-		BaseException exception = assertThrows(BaseException.class, () -> facade.getTrainerById(trainerId));
-		assertTrue(exception.getMessage().contains("Trainer bulunamadı."));
-		verify(trainerService, times(1)).findTrainerById(trainerId);
+		// Çağrı
+		List<TraineeResponse> actualList = gymCRMFacade.getAllTrainees();
+
+		// Doğrulama
+		assertNotNull(actualList);
+		assertEquals(2, actualList.size());
+		verify(traineeService, times(1)).getAllTrainees();
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
 	}
 
 	@Test
-	void testUpdateTrainer_notFound() {
-		Trainer inputTrainer = new Trainer();
-		User inputUser = new User();
-		inputUser.setId(99L);
-		inputTrainer.setUser(inputUser);
+	void updateTrainee_Success() {
+		
+		TraineeUpdateRequest request = new TraineeUpdateRequest("test.trainee", "Updated", "User",
+				LocalDate.of(1990, 1, 1), "New Address");
+		TraineeResponse expectedResponse = new TraineeResponse();
+		expectedResponse.setUsername("test.trainee");
+		expectedResponse.setFirstName("Updated");
+		expectedResponse.setActive(true); // TraineeResponse'ta isActive alanı olmaya devam edebilir
 
-		when(trainerService.updateTrainer(any(Trainer.class))).thenThrow(new BaseException(
-				new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Güncellenecek Trainer bulunamadı.")));
+		when(traineeService.updateTrainee(request)).thenReturn(expectedResponse);
 
-		BaseException exception = assertThrows(BaseException.class, () -> facade.updateTrainer(inputTrainer));
-		assertTrue(exception.getMessage().contains("Güncellenecek Trainer bulunamadı."));
-		verify(trainerService, times(1)).updateTrainer(any(Trainer.class));
+		// Çağrı
+		TraineeResponse actualResponse = gymCRMFacade.updateTrainee(request);
+
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals("Updated", actualResponse.getFirstName());
+		assertEquals("test.trainee", actualResponse.getUsername());
+		// TraineeResponse'taki isActive kontrolü, servisin değeri kendisinin atadığını
+		// varsayar.
+		assertEquals(true, actualResponse.isActive());
+		verify(traineeService, times(1)).updateTrainee(request);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
 	}
 
-	// --- Training Failure ---
-
 	@Test
-	void testCreateTraining_serviceThrowsException() {
-		Training inputTraining = new Training();
-		when(trainingService.create(any(Training.class))).thenThrow(
-				new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Antrenman verileri geçersiz.")));
+	void updateTraineeTrainers_Success() {
+		// Hazırlık
+		TraineeUpdateTrainersRequest request = new TraineeUpdateTrainersRequest("trainee.user",
+				List.of("trainer.one", "trainer.two"));
+		TraineeResponse expectedResponse = new TraineeResponse();
+		expectedResponse.setUsername("trainee.user");
 
-		BaseException exception = assertThrows(BaseException.class, () -> facade.createTraining(inputTraining));
-		assertTrue(exception.getMessage().contains("Antrenman verileri geçersiz."));
-		verify(trainingService, times(1)).create(any(Training.class));
+		when(traineeService.updateTraineeTrainersList(request)).thenReturn(expectedResponse);
+
+		// Çağrı
+		TraineeResponse actualResponse = gymCRMFacade.updateTraineeTrainers(request);
+
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals("trainee.user", actualResponse.getUsername());
+		verify(traineeService, times(1)).updateTraineeTrainersList(request);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
 	}
 
 	@Test
-	void testDeleteTraining_serviceThrowsException() {
-		Long trainingId = 99L;
-		when(trainingService.delete(trainingId)).thenThrow(new BaseException(
-				new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Antrenman silinirken hata oluştu.")));
+	void updateTraineeTrainers_Failure_TraineeNotFound() {
+		// Hazırlık
+		TraineeUpdateTrainersRequest request = new TraineeUpdateTrainersRequest("nonexistent.trainee",
+				List.of("trainer.one"));
+		when(traineeService.updateTraineeTrainersList(request)).thenThrow(new RuntimeException("Trainee not found"));
 
-		BaseException exception = assertThrows(BaseException.class, () -> facade.deleteTraining(trainingId));
-		assertTrue(exception.getMessage().contains("Antrenman silinirken hata oluştu."));
-		verify(trainingService, times(1)).delete(trainingId);
+		// Çağrı ve Doğrulama
+		assertThrows(RuntimeException.class, () -> gymCRMFacade.updateTraineeTrainers(request));
+		verify(traineeService, times(1)).updateTraineeTrainersList(request);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
+	}
+
+	@Test
+	void activateDeactivateTrainee_Success() {
+		// Hazırlık
+		UserActivationRequest request = new UserActivationRequest("test.trainee", true);
+		doNothing().when(traineeService).activateDeactivateTrainee(request);
+
+		// Çağrı
+		gymCRMFacade.activateDeactivateTrainee(request);
+
+		// Doğrulama
+		verify(traineeService, times(1)).activateDeactivateTrainee(request);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
+	}
+
+	@Test
+	void deleteTraineeById_Success() {
+		// Hazırlık
+		Long id = 1L;
+		doNothing().when(traineeService).deleteTraineeById(id);
+
+		// Çağrı
+		gymCRMFacade.deleteTraineeById(id);
+
+		// Doğrulama
+		verify(traineeService, times(1)).deleteTraineeById(id);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
+	}
+
+	@Test
+	void deleteTraineeByUsername_Success() {
+		// Hazırlık
+		String username = "test.trainee";
+		doNothing().when(traineeService).deleteTraineeByUsername(username);
+
+		// Çağrı
+		gymCRMFacade.deleteTraineeByUsername(username);
+
+		// Doğrulama
+		verify(traineeService, times(1)).deleteTraineeByUsername(username);
+		verifyNoMoreInteractions(traineeService);
+		verifyNoInteractions(trainerService, trainingService);
+	}
+
+	@Test
+	void getTraineeTrainingsList_Success() {
+		// Hazırlık
+		TraineeTrainingListRequest request = new TraineeTrainingListRequest("trainee.user", null, null, null, null);
+		List<TrainingResponse> expectedList = Collections.singletonList(new TrainingResponse());
+		when(trainingService.getTraineeTrainingsList(request)).thenReturn(expectedList);
+
+		// Çağrı
+		List<TrainingResponse> actualList = gymCRMFacade.getTraineeTrainingsList(request);
+
+		// Doğrulama
+		assertNotNull(actualList);
+		assertFalse(actualList.isEmpty());
+		verify(trainingService, times(1)).getTraineeTrainingsList(request);
+		verifyNoMoreInteractions(trainingService);
+		verifyNoInteractions(traineeService, trainerService);
+	}
+
+	// --- Trainer Facade Methods Test ---
+
+	@Test
+	void createTrainer_Success() {
+		TrainerCreateRequest request = new TrainerCreateRequest("Jane", "Smith", true, "Yoga");
+		TrainerResponse expectedResponse = new TrainerResponse();
+		expectedResponse.setFirstName("Jane");
+		expectedResponse.setLastName("Smith");
+		expectedResponse.setUsername("Jane.Smith");
+		expectedResponse.setActive(true);
+		expectedResponse.setSpecializationName("Yoga");
+
+		when(trainerService.createTrainer(request)).thenReturn(expectedResponse);
+
+		TrainerResponse actualResponse = gymCRMFacade.createTrainer(request);
+
+		assertNotNull(actualResponse);
+		assertEquals("Jane.Smith", actualResponse.getUsername());
+		assertEquals(true, actualResponse.isActive());
+		verify(trainerService, times(1)).createTrainer(request);
+		verifyNoMoreInteractions(trainerService);
+		verifyNoInteractions(traineeService, trainingService);
+	}
+
+	@Test
+	void findTrainerById_Success() {
+		// Hazırlık
+		Long id = 1L;
+		TrainerResponse expectedResponse = new TrainerResponse();
+		expectedResponse.setUsername("test.trainer");
+
+		when(trainerService.findTrainerById(id)).thenReturn(expectedResponse);
+
+		// Çağrı
+		TrainerResponse actualResponse = gymCRMFacade.findTrainerById(id);
+
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals("test.trainer", actualResponse.getUsername());
+		verify(trainerService, times(1)).findTrainerById(id);
+		verifyNoMoreInteractions(trainerService);
+		verifyNoInteractions(traineeService, trainingService);
+	}
+
+	@Test
+	void findTrainerByUsername_Success() {
+		// Hazırlık
+		String username = "test.trainer";
+		TrainerResponse expectedResponse = new TrainerResponse();
+		expectedResponse.setUsername(username);
+
+		when(trainerService.findTrainerByUsername(username)).thenReturn(expectedResponse);
+
+		// Çağrı
+		TrainerResponse actualResponse = gymCRMFacade.findTrainerByUsername(username);
+
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals(username, actualResponse.getUsername());
+		verify(trainerService, times(1)).findTrainerByUsername(username);
+		verifyNoMoreInteractions(trainerService);
+		verifyNoInteractions(traineeService, trainingService);
+	}
+
+	@Test
+	void getAllTrainers_Success() {
+		// Hazırlık
+		List<TrainerResponse> expectedList = Arrays.asList(new TrainerResponse(), new TrainerResponse());
+		when(trainerService.getAllTrainers()).thenReturn(expectedList);
+
+		// Çağrı
+		List<TrainerResponse> actualList = gymCRMFacade.getAllTrainers();
+
+		// Doğrulama
+		assertNotNull(actualList);
+		assertEquals(2, actualList.size());
+		verify(trainerService, times(1)).getAllTrainers();
+		verifyNoMoreInteractions(trainerService);
+		verifyNoInteractions(traineeService, trainingService);
+	}
+
+	@Test
+	void getUnassignedTrainersForTrainee_Success() {
+		// Hazırlık
+		String traineeUsername = "test.trainee";
+		List<TrainerResponse> expectedList = Collections.singletonList(new TrainerResponse());
+		when(trainerService.getUnassignedTrainersForTrainee(traineeUsername)).thenReturn(expectedList);
+
+		// Çağrı
+		List<TrainerResponse> actualList = gymCRMFacade.getUnassignedTrainersForTrainee(traineeUsername);
+
+		// Doğrulama
+		assertNotNull(actualList);
+		assertFalse(actualList.isEmpty());
+		verify(trainerService, times(1)).getUnassignedTrainersForTrainee(traineeUsername);
+		verifyNoMoreInteractions(trainerService);
+		verifyNoInteractions(traineeService, trainingService);
+	}
+
+	@Test
+	void updateTrainer_Success() {
+		TrainerUpdateRequest request = new TrainerUpdateRequest("test.trainer", "Updated", "Name", "Cardio");
+		TrainerResponse expectedResponse = new TrainerResponse();
+		expectedResponse.setUsername("test.trainer");
+		expectedResponse.setFirstName("Updated");
+		expectedResponse.setSpecializationName("Cardio");
+		expectedResponse.setActive(true); // TrainerResponse'ta isActive alanı olmaya devam edebilir
+
+		when(trainerService.updateTrainer(request)).thenReturn(expectedResponse);
+
+		// Çağrı
+		TrainerResponse actualResponse = gymCRMFacade.updateTrainer(request);
+
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals("Updated", actualResponse.getFirstName());
+		assertEquals("test.trainer", actualResponse.getUsername());
+		assertEquals("Cardio", actualResponse.getSpecializationName());
+		assertEquals(true, actualResponse.isActive()); // isActive kontrolü
+		verify(trainerService, times(1)).updateTrainer(request);
+		verifyNoMoreInteractions(trainerService);
+		verifyNoInteractions(traineeService, trainingService);
+	}
+
+	@Test
+	void activateDeactivateTrainer_Success() {
+		// Hazırlık
+		UserActivationRequest request = new UserActivationRequest("test.trainer", false);
+		doNothing().when(trainerService).activateDeactivateTrainer(request);
+
+		// Çağrı
+		gymCRMFacade.activateDeactivateTrainer(request);
+
+		// Doğrulama
+		verify(trainerService, times(1)).activateDeactivateTrainer(request);
+		verifyNoMoreInteractions(trainerService);
+		verifyNoInteractions(traineeService, trainingService);
+	}
+
+	@Test
+	void deleteTrainerById_Success() {
+		// Hazırlık
+		Long id = 1L;
+		doNothing().when(trainerService).deleteTrainerById(id);
+
+		// Çağrı
+		gymCRMFacade.deleteTrainerById(id);
+
+		// Doğrulama
+		verify(trainerService, times(1)).deleteTrainerById(id);
+		verifyNoMoreInteractions(trainerService);
+		verifyNoInteractions(traineeService, trainingService);
+	}
+
+	@Test
+	void deleteTrainerByUsername_Success() {
+		// Hazırlık
+		String username = "test.trainer";
+		doNothing().when(trainerService).deleteTrainerByUsername(username);
+
+		// Çağrı
+		gymCRMFacade.deleteTrainerByUsername(username);
+
+		// Doğrulama
+		verify(trainerService, times(1)).deleteTrainerByUsername(username);
+		verifyNoMoreInteractions(trainerService);
+		verifyNoInteractions(traineeService, trainingService);
+	}
+
+	@Test
+	void getTrainerTrainingsList_Success() {
+		// Hazırlık
+		TrainerTrainingListRequest request = new TrainerTrainingListRequest("trainer.user", null, null, null, null);
+		List<TrainingResponse> expectedList = Collections.singletonList(new TrainingResponse());
+		when(trainingService.getTrainerTrainingsList(request)).thenReturn(expectedList);
+
+		// Çağrı
+		List<TrainingResponse> actualList = gymCRMFacade.getTrainerTrainingsList(request);
+
+		// Doğrulama
+		assertNotNull(actualList);
+		assertFalse(actualList.isEmpty());
+		verify(trainingService, times(1)).getTrainerTrainingsList(request);
+		verifyNoMoreInteractions(trainingService);
+		verifyNoInteractions(traineeService, trainerService);
+	}
+
+	// --- Training Facade Methods Test ---
+
+	@Test
+	void createTraining_Success() {
+		// Hazırlık
+		TrainingCreateRequest request = new TrainingCreateRequest("Morning Yoga", LocalDate.now(), 60, "trainer.user",
+				"trainee.user", "Yoga");
+		TrainingResponse expectedResponse = new TrainingResponse();
+		expectedResponse.setTrainingName("Morning Yoga");
+
+		when(trainingService.createTraining(request)).thenReturn(expectedResponse);
+
+		// Çağrı
+		TrainingResponse actualResponse = gymCRMFacade.createTraining(request);
+
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals("Morning Yoga", actualResponse.getTrainingName());
+		verify(trainingService, times(1)).createTraining(request);
+		verifyNoMoreInteractions(trainingService);
+		verifyNoInteractions(traineeService, trainerService);
+	}
+
+	@Test
+	void getTrainingById_Success() {
+		// Hazırlık
+		Long id = 1L;
+		TrainingResponse expectedResponse = new TrainingResponse();
+		expectedResponse.setTrainingName("Test Training");
+
+		when(trainingService.getTrainingById(id)).thenReturn(expectedResponse);
+
+		// Çağrı
+		TrainingResponse actualResponse = gymCRMFacade.getTrainingById(id);
+
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals("Test Training", actualResponse.getTrainingName());
+		verify(trainingService, times(1)).getTrainingById(id);
+		verifyNoMoreInteractions(trainingService);
+		verifyNoInteractions(traineeService, trainerService);
+	}
+
+	@Test
+	void getTrainingById_Failure_NotFound() {
+		// Hazırlık
+		Long id = 99L;
+		when(trainingService.getTrainingById(id)).thenThrow(new RuntimeException("Training not found"));
+
+		// Çağrı ve Doğrulama
+		assertThrows(RuntimeException.class, () -> gymCRMFacade.getTrainingById(id));
+		verify(trainingService, times(1)).getTrainingById(id);
+		verifyNoMoreInteractions(trainingService);
+		verifyNoInteractions(traineeService, trainerService);
+	}
+
+	@Test
+	void getAllTrainings_Success() {
+		// Hazırlık
+		List<TrainingResponse> expectedList = Arrays.asList(new TrainingResponse(), new TrainingResponse());
+		when(trainingService.getAllTrainings()).thenReturn(expectedList);
+
+		// Çağrı
+		List<TrainingResponse> actualList = gymCRMFacade.getAllTrainings();
+
+		// Doğrulama
+		assertNotNull(actualList);
+		assertEquals(2, actualList.size());
+		verify(trainingService, times(1)).getAllTrainings();
+		verifyNoMoreInteractions(trainingService);
+		verifyNoInteractions(traineeService, trainerService);
+	}
+
+	@Test
+	void updateTraining_Success() {
+		// Hazırlık
+		TrainingUpdateRequest request = new TrainingUpdateRequest(1L, "Updated Training", LocalDate.now(), 75,
+				"trainer.user", "trainee.user", "Cardio");
+		TrainingResponse expectedResponse = new TrainingResponse();
+		expectedResponse.setTrainingName("Updated Training");
+
+		when(trainingService.updateTraining(request)).thenReturn(expectedResponse);
+
+		// Çağrı
+		TrainingResponse actualResponse = gymCRMFacade.updateTraining(request);
+
+		// Doğrulama
+		assertNotNull(actualResponse);
+		assertEquals("Updated Training", actualResponse.getTrainingName());
+		verify(trainingService, times(1)).updateTraining(request);
+		verifyNoMoreInteractions(trainingService);
+		verifyNoInteractions(traineeService, trainerService);
+	}
+
+	@Test
+	void deleteTrainingById_Success() {
+		// Hazırlık
+		Long id = 1L;
+		doNothing().when(trainingService).deleteTrainingById(id);
+
+		// Çağrı
+		gymCRMFacade.deleteTrainingById(id);
+
+		// Doğrulama
+		verify(trainingService, times(1)).deleteTrainingById(id);
+		verifyNoMoreInteractions(trainingService);
+		verifyNoInteractions(traineeService, trainerService);
+	}
+
+	@Test
+	void deleteTrainingById_Failure_NotFound() {
+		// Hazırlık
+		Long id = 99L;
+		doThrow(new RuntimeException("Training not found")).when(trainingService).deleteTrainingById(id);
+
+		// Çağrı ve Doğrulama
+		assertThrows(RuntimeException.class, () -> gymCRMFacade.deleteTrainingById(id));
+		verify(trainingService, times(1)).deleteTrainingById(id);
+		verifyNoMoreInteractions(trainingService);
+		verifyNoInteractions(traineeService, trainerService);
 	}
 }
