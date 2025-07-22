@@ -1,145 +1,625 @@
 package com.epam.gym_crm.service.impl;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import com.epam.gym_crm.dao.ITrainerDAO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.epam.gym_crm.auth.AuthManager;
+import com.epam.gym_crm.dto.request.TrainerCreateRequest;
+import com.epam.gym_crm.dto.request.TrainerUpdateRequest;
+import com.epam.gym_crm.dto.request.UserActivationRequest;
+import com.epam.gym_crm.dto.response.TrainerResponse;
 import com.epam.gym_crm.exception.BaseException;
-import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.TrainingType;
-import com.epam.gym_crm.service.init.IdGenerator;
-import com.epam.gym_crm.utils.EntityType;
+import com.epam.gym_crm.model.User;
+import com.epam.gym_crm.repository.TraineeRepository;
+import com.epam.gym_crm.repository.TrainerRepository;
+import com.epam.gym_crm.repository.TrainingRepository;
+import com.epam.gym_crm.repository.TrainingTypeRepository;
+import com.epam.gym_crm.repository.UserRepository;
+import com.epam.gym_crm.service.IAuthenticationService;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-
+@ExtendWith(MockitoExtension.class)
 class TrainerServiceImplTest {
 
+    @Mock
+    private IAuthenticationService authenticationService;
+    @Mock
+    private TrainerRepository trainerRepository;
+    @Mock
+    private TrainingTypeRepository trainingTypeRepository;
+    @Mock
+    private TrainingRepository trainingRepository;
+    @Mock
+    private TraineeRepository traineeRepository;
+    @Mock
+    private AuthManager authManager;
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
     private TrainerServiceImpl trainerService;
-    private ITrainerDAO trainerDAO;
-    private IdGenerator idGenerator;
+
+    private User testUser;
+    private Trainer testTrainer;
+    private TrainingType testSpecialization;
 
     @BeforeEach
     void setUp() {
-        trainerService = new TrainerServiceImpl();
-        trainerDAO = mock(ITrainerDAO.class);
-        idGenerator = mock(IdGenerator.class);
+        testUser = new User();
+        testUser.setId(1L);
+        testUser.setFirstName("John");
+        testUser.setLastName("Doe");
+        testUser.setUsername("John.Doe");
+        testUser.setPassword("password");
+        testUser.setActive(true);
 
-        ReflectionTestUtils.setField(trainerService, "trainerDAO", trainerDAO);
-        trainerService.setIdGenerator(idGenerator);
-    }
-//
-//    @Test
-//    @DisplayName("Should create trainer successfully")
-//    void testCreateTrainer() {
-//        Trainer newTrainer = new Trainer(null, "Merve", "Yılmaz", null, null, true, TrainingType.YOGA);
-//        Trainer savedTrainer = new Trainer(1L, "Merve", "Yılmaz", "Merve.Yılmaz", "123456", true, TrainingType.YOGA);
-//
-//        when(idGenerator.getNextId(EntityType.TRAINER)).thenReturn(1L);
-//        when(trainerDAO.findByUsername("Merve.Yılmaz")).thenReturn(Optional.empty());
-//        when(trainerDAO.create(any(Trainer.class))).thenReturn(savedTrainer);
-//
-//        Trainer result = trainerService.create(newTrainer);
-//
-//        assertEquals("Merve.Yılmaz", result.getUser().getUsername());
-//        assertEquals(1L, result.getUser().getId());
-////        assertEquals(TrainingType.YOGA, result.getSpecialization());
-//    }
+        testSpecialization = new TrainingType();
+        testSpecialization.setId(1L);
+        testSpecialization.setTrainingTypeName("Fitness");
 
-    @Test
-    @DisplayName("Should throw exception when creating null trainer")
-    void testCreateTrainerWithNullInput() {
-        assertThrows(BaseException.class, () -> trainerService.create(null));
+        testTrainer = new Trainer();
+        testTrainer.setId(1L);
+        testTrainer.setUser(testUser);
+        testTrainer.setSpecialization(testSpecialization);
+        testTrainer.setTrainings(new HashSet<>()); 
     }
 
-//    @Test
-//    @DisplayName("Should find trainer by ID")
-//    void testFindTrainerById() {
-//        Trainer trainer = new Trainer(1L, "Mehmet", "Demir", "mehmet.demir", "pass", true, TrainingType.FITNESS);
-//        when(trainerDAO.findById(1L)).thenReturn(Optional.of(trainer));
-//
-//        Trainer result = trainerService.findTrainerById(1L);
-//        assertEquals("Mehmet", result.getUser().getFirstName());
-//    }
-
+    // --- 1. findTrainerById(Long id) ---
     @Test
-    @DisplayName("Should throw exception when trainer ID is invalid")
-    void testFindTrainerByInvalidId() {
-        BaseException ex = assertThrows(BaseException.class, () -> trainerService.findTrainerById(-1L));
-        String generalInvalidArgMessage = MessageType.INVALID_ARGUMENT.getMessage();
-        assertTrue(ex.getMessage().startsWith(generalInvalidArgMessage + " : "));
-        assertTrue(ex.getMessage().contains("ID must be a positive value"));
-        assertTrue(ex.getMessage().contains("-1"));
+    void shouldFindTrainerByIdSuccessfully() {
+        // Given
+        Long trainerId = 1L;
+        
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(testTrainer));
+
+        // When
+        TrainerResponse response = trainerService.findTrainerById(trainerId);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(testTrainer.getUser().getUsername(), response.getUsername());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findById(trainerId);
     }
 
     @Test
-    @DisplayName("Should throw exception when trainer not found by ID")
-    void testFindTrainerByIdNotFound() {
-        when(trainerDAO.findById(999L)).thenReturn(Optional.empty());
+    void shouldThrowExceptionWhenFindTrainerByIdWithNullOrInvalidId() {
+        // Given
+        Long invalidId = 0L;
+        
+        when(authManager.getCurrentUser()).thenReturn(testUser);
 
-        BaseException e = assertThrows(BaseException.class, () -> trainerService.findTrainerById(999L));
-        assertTrue(e.getMessage().contains("Trainer not found"));
-    }
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.findTrainerById(invalidId));
 
-//    @Test
-//    @DisplayName("Should update existing trainer")
-//    void testUpdateTrainer() {
-//        Trainer existing = new Trainer(1L, "Ali", "Kaya", "Ali.Kaya", "pass", true, TrainingType.FITNESS);
-//        Trainer update = new Trainer(1L, "AliUpdated", null, null, null, false, TrainingType.YOGA);
-//
-//        when(trainerDAO.findById(1L)).thenReturn(Optional.of(existing));
-//        when(trainerDAO.update(any(Trainer.class))).thenReturn(existing);
-//
-//        Trainer updated = trainerService.updateTrainer(update);
-//
-//        assertEquals("AliUpdated", updated.getUser().getFirstName());
-//        assertEquals(TrainingType.YOGA, updated.getSpecialization());
-//        assertFalse(updated.getUser().isActive());
-//    }
-
-//    @Test
-//    @DisplayName("Should throw exception when updating non-existing trainer")
-//    void testUpdateNonExistingTrainer() {
-//        Trainer update = new Trainer(999L, "No", "Body", null, null, false, TrainingType.YOGA);
-//
-//        when(trainerDAO.findById(999L)).thenReturn(Optional.empty());
-//
-//        assertThrows(BaseException.class, () -> trainerService.updateTrainer(update));
-//    }
-
-    @Test
-    @DisplayName("Should delete trainer successfully")
-    void testDeleteTrainer() {
-        when(trainerDAO.delete(1L)).thenReturn(true);
-        assertTrue(trainerService.deleteTrainer(1L));
+        // Then
+        assertEquals("Invalid parameter provided. : Trainer ID must be a positive value. Provided: " + invalidId, exception.getMessage());
+        verify(authManager).getCurrentUser();
+        verifyNoInteractions(trainerRepository);
     }
 
     @Test
-    @DisplayName("Should throw exception when trainer deletion fails")
-    void testDeleteNonExistingTrainer() {
-        when(trainerDAO.delete(999L)).thenReturn(false);
-        assertThrows(BaseException.class, () -> trainerService.deleteTrainer(999L));
+    void shouldThrowExceptionWhenFindTrainerByIdNotFound() {
+        // Given
+        Long nonExistentId = 99L;
+        
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+        when(trainerRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.findTrainerById(nonExistentId));
+
+        // Then
+        assertEquals("Resource not found. : Trainer not found with ID: " + nonExistentId, exception.getMessage());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findById(nonExistentId);
+        // verifyNoInteractions(trainerRepository); // Bu satır kaldırıldı çünkü findById() bir etkileşimdir.
     }
 
-//    @Test
-//    @DisplayName("Should get all trainers")
-//    void testGetAllTrainers() {
-//        List<Trainer> trainers = Arrays.asList(
-//                new Trainer(1L, "Asli", "Akgün", "asli.akgun", "1234", true, TrainingType.YOGA),
-//                new Trainer(2L, "Baris", "Demir", "baris.demir", "abcd", true, TrainingType.FITNESS)
-//        );
-//
-//        when(trainerDAO.findAll()).thenReturn(trainers);
-//        List<Trainer> result = trainerService.getAllTrainers();
-//
-//        assertEquals(2, result.size());
-//    }
+    // --- 2. findTrainerByUsername(String username) ---
+    @Test
+    void shouldFindTrainerByUsernameSuccessfully() {
+        // Given
+        String username = "John.Doe";
+
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        when(trainerRepository.findByUserUsername(username)).thenReturn(Optional.of(testTrainer));
+
+        // When
+        TrainerResponse response = trainerService.findTrainerByUsername(username);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(username, response.getUsername());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findByUserUsername(username);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFindTrainerByUsernameWithNullOrEmpty() {
+        // Given
+        String nullUsername = null;
+        String emptyUsername = "";
+
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        // NullPointerException yerine BaseException fırlatılmasını bekliyoruz
+        BaseException exceptionNull = assertThrows(BaseException.class, () -> trainerService.findTrainerByUsername(nullUsername));
+        assertEquals("Invalid parameter provided. : Trainer username must not be null or empty.", exceptionNull.getMessage());
+        
+        verify(authManager).getCurrentUser(); 
+        // trainerRepository ile hiçbir etkileşim olmadığını doğrulayın, çünkü doğrulama başarısız oldu.
+        verifyNoInteractions(trainerRepository);
+
+        // Tekrar NullPointerException yerine BaseException fırlatılmasını bekliyoruz.
+        BaseException exceptionEmpty = assertThrows(BaseException.class, () -> trainerService.findTrainerByUsername(emptyUsername));
+        assertEquals("Invalid parameter provided. : Trainer username must not be null or empty.", exceptionEmpty.getMessage());
+        
+        verify(authManager, times(2)).getCurrentUser();
+        
+        verifyNoInteractions(trainerRepository);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFindTrainerByUsernameNotFound() {
+        // Given
+        String nonExistentUsername = "NonExistent.Trainer";
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+        when(trainerRepository.findByUserUsername(nonExistentUsername)).thenReturn(Optional.empty());
+
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.findTrainerByUsername(nonExistentUsername));
+
+        // Then
+        assertEquals("Resource not found. : Trainer not found with username: " + nonExistentUsername, exception.getMessage());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findByUserUsername(nonExistentUsername);
+    }
+
+    // --- 3. getAllTrainers() ---
+    
+    @Test
+    void shouldGetAllTrainersSuccessfully() {
+        // Given
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        Trainer trainer2 = new Trainer();
+        trainer2.setId(2L);
+        User user2 = new User();
+        user2.setUsername("Jane.Doe");
+        trainer2.setUser(user2);
+        trainer2.setSpecialization(testSpecialization);
+
+        when(trainerRepository.findAll()).thenReturn(Arrays.asList(testTrainer, trainer2));
+
+        // When
+        List<TrainerResponse> responseList = trainerService.getAllTrainers();
+
+        // Then
+        assertNotNull(responseList);
+        assertEquals(2, responseList.size());
+        assertEquals("John.Doe", responseList.get(0).getUsername());
+        assertEquals("Jane.Doe", responseList.get(1).getUsername());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findAll();
+    }
+    @Test
+    void shouldReturnEmptyListWhenNoTrainersExist() {
+        // Given
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        when(trainerRepository.findAll()).thenReturn(List.of()); // Boş liste dön
+
+        // When
+        List<TrainerResponse> responseList = trainerService.getAllTrainers();
+
+        // Then
+        assertNotNull(responseList);
+        assertTrue(responseList.isEmpty());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findAll();
+    }
+
+ // --- 4. getUnassignedTrainersForTrainee(String traineeUsername) ---
+    @Test
+    void shouldGetUnassignedTrainersForTraineeSuccessfully() {
+        // Given
+        String traineeUsername = "Test.Trainee";
+        User traineeUser = new User(2L, "Test", "Trainee", traineeUsername, "pass", true, null, null);
+        Trainee trainee = new Trainee(2L, null, null, traineeUser, new HashSet<>(), new HashSet<>());
+
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(traineeUser);
+        when(traineeRepository.findByUserUsername(traineeUsername)).thenReturn(Optional.of(trainee));
+
+        Trainer unassignedTrainer1 = new Trainer();
+        unassignedTrainer1.setId(3L);
+        User unassignedUser1 = new User(3L, "Unassigned", "One", "Unassigned.One", "pass", true, null, null);
+        unassignedTrainer1.setUser(unassignedUser1);
+        unassignedTrainer1.setSpecialization(testSpecialization);
+        unassignedTrainer1.setTrainings(new HashSet<>());
+
+        Trainer unassignedTrainer2 = new Trainer();
+        unassignedTrainer2.setId(4L);
+        User unassignedUser2 = new User(4L, "Unassigned", "Two", "Unassigned.Two", "pass", true, null, null);
+        unassignedTrainer2.setUser(unassignedUser2);
+        unassignedTrainer2.setSpecialization(testSpecialization);
+        unassignedTrainer2.setTrainings(new HashSet<>());
+
+        when(trainerRepository.findActiveTrainersNotAssignedToTrainee(traineeUsername))
+                .thenReturn(Arrays.asList(unassignedTrainer1, unassignedTrainer2));
+
+        // When
+        List<TrainerResponse> result = trainerService.getUnassignedTrainersForTrainee(traineeUsername);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("Unassigned.One", result.get(0).getUsername());
+        assertEquals("Unassigned.Two", result.get(1).getUsername());
+        verify(authManager).getCurrentUser();
+        verify(traineeRepository).findByUserUsername(traineeUsername);
+        verify(trainerRepository).findActiveTrainersNotAssignedToTrainee(traineeUsername);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenGetUnassignedTrainersForInactiveTrainee() {
+        // Given
+        String inactiveTraineeUsername = "Inactive.Trainee";
+        User inactiveTraineeUser = new User(2L, "Inactive", "Trainee", inactiveTraineeUsername, "pass", false, null, null);
+        Trainee inactiveTrainee = new Trainee(2L, null, null, inactiveTraineeUser, new HashSet<>(), new HashSet<>());
+
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(inactiveTraineeUser);
+        when(traineeRepository.findByUserUsername(inactiveTraineeUsername)).thenReturn(Optional.of(inactiveTrainee));
+
+        // When
+        BaseException exception = assertThrows(BaseException.class,
+                () -> trainerService.getUnassignedTrainersForTrainee(inactiveTraineeUsername));
+
+        assertEquals("User is not active : Trainee " + inactiveTraineeUsername + " is not active. Cannot retrieve unassigned trainers.", exception.getMessage());
+
+        verify(authManager).getCurrentUser();
+        verify(traineeRepository).findByUserUsername(inactiveTraineeUsername);
+        verifyNoInteractions(trainerRepository);
+    }
+
+ // --- 5. createTrainer(TrainerCreateRequest request) ---
+    @Test
+    void shouldCreateTrainerSuccessfully() {
+        // Given
+        TrainerCreateRequest request = new TrainerCreateRequest("Jane", "Doe", true, "Fitness");
+        User createdUser = new User(2L, "Jane", "Doe", "Jane.Doe", "generatedPass", true, null, null);
+
+        when(authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName(), request.isActive()))
+                .thenReturn(createdUser);
+        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName()))
+                .thenReturn(Optional.of(testSpecialization));
+
+        Trainer expectedSavedTrainer = new Trainer();
+        expectedSavedTrainer.setId(2L);
+        expectedSavedTrainer.setUser(createdUser);
+        expectedSavedTrainer.setSpecialization(testSpecialization);
+        expectedSavedTrainer.setTrainings(new HashSet<>()); 
+        
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(expectedSavedTrainer);
+
+        // When
+        TrainerResponse response = trainerService.createTrainer(request);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(request.getFirstName(), response.getFirstName());
+        assertEquals(request.getLastName(), response.getLastName());
+        assertEquals(request.getTrainingTypeName(), response.getSpecializationName()); 
+        assertEquals(createdUser.getUsername(), response.getUsername());
+        
+        verify(authenticationService).createAndSaveUser(request.getFirstName(), request.getLastName(), request.isActive());
+        verify(trainingTypeRepository).findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName());
+        verify(trainerRepository).save(any(Trainer.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCreateTrainerRequestIsNull() {
+        // Given
+        TrainerCreateRequest nullRequest = null;
+
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.createTrainer(nullRequest));
+
+        // Then
+        assertEquals("Invalid parameter provided. : Trainer must not be null", exception.getMessage());
+        verifyNoInteractions(authenticationService);
+        verifyNoInteractions(trainingTypeRepository);
+        verifyNoInteractions(trainerRepository);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCreateTrainerTrainingTypeNotFound() {
+        // Given
+        TrainerCreateRequest request = new TrainerCreateRequest("Jane", "Doe", true, "NonExistentType");
+        User createdUser = new User(2L, "Jane", "Doe", "Jane.Doe", "generatedPass", true, null, null);
+
+        when(authenticationService.createAndSaveUser(anyString(), anyString(), anyBoolean()))
+                .thenReturn(createdUser);
+        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName()))
+                .thenReturn(Optional.empty());
+
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.createTrainer(request));
+
+        // Then
+        assertEquals("Entity Not Found. : Training type not found: " + request.getTrainingTypeName(), exception.getMessage());
+        verify(authenticationService).createAndSaveUser(request.getFirstName(), request.getLastName(), request.isActive());
+        verify(trainingTypeRepository).findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName());
+        verifyNoInteractions(trainerRepository);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCreateTrainerFailedToSave() {
+        // Given
+        TrainerCreateRequest request = new TrainerCreateRequest("Jane", "Doe", true, "Fitness");
+        User createdUser = new User(2L, "Jane", "Doe", "Jane.Doe", "generatedPass", true, null, null);
+
+        when(authenticationService.createAndSaveUser(anyString(), anyString(), anyBoolean()))
+                .thenReturn(createdUser);
+        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName()))
+                .thenReturn(Optional.of(testSpecialization));
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(null); // Simulate save failure
+
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.createTrainer(request));
+
+        // Then
+        assertEquals("An unexpected error occurred. : Failed to create trainer profile.", exception.getMessage());
+        verify(authenticationService).createAndSaveUser(request.getFirstName(), request.getLastName(), request.isActive());
+        verify(trainingTypeRepository).findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName());
+        verify(trainerRepository).save(any(Trainer.class));
+    }
+
+
+    // --- 6. updateTrainer(TrainerUpdateRequest request) ---
+    @Test
+    void shouldUpdateTrainerSuccessfully() {
+        // Given
+        TrainerUpdateRequest request = new TrainerUpdateRequest("John.Doe", "Johnny", "Dorian", "Yoga");
+        Trainer existingTrainer = new Trainer();
+        existingTrainer.setId(1L);
+        existingTrainer.setUser(new User(testUser.getId(), "John", "Doe", "John.Doe", "password", true, null, null));
+        existingTrainer.setSpecialization(testSpecialization); // "Fitness"
+
+        TrainingType newSpecialization = new TrainingType(2L, "Yoga");
+
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+        when(trainerRepository.findByUserUsername(request.getUsername())).thenReturn(Optional.of(existingTrainer));
+        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getSpecializationName()))
+                .thenReturn(Optional.of(newSpecialization));
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(existingTrainer);
+
+        // When
+        TrainerResponse response = trainerService.updateTrainer(request);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(request.getFirstName(), response.getFirstName());
+        assertEquals(request.getLastName(), response.getLastName());
+        assertEquals(request.getSpecializationName(), response.getSpecializationName());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findByUserUsername(request.getUsername());
+        verify(trainingTypeRepository).findByTrainingTypeNameIgnoreCase(request.getSpecializationName());
+        verify(trainerRepository).save(existingTrainer);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdateTrainerRequestIsNull() {
+        // Given
+        TrainerUpdateRequest nullRequest = null;
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.updateTrainer(nullRequest));
+
+        // Then
+        assertEquals("Invalid parameter provided. : Update request or username must not be null/empty.", exception.getMessage());
+        verify(authManager).getCurrentUser();
+        verifyNoInteractions(trainerRepository);
+        verifyNoInteractions(trainingTypeRepository);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdateTrainerUnauthorized() {
+        // Given
+        TrainerUpdateRequest request = new TrainerUpdateRequest("Other.Trainer", "New", "Name", "Yoga");
+        User currentUser = new User(1L, "Current", "User", "Current.User", "pass", true, null, null);
+
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(currentUser);
+
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.updateTrainer(request));
+
+        // Then
+        assertEquals("You are not authorized. : You are not authorized to update this Trainer profile.", exception.getMessage());
+        verify(authManager).getCurrentUser();
+        verifyNoInteractions(trainerRepository);
+        verifyNoInteractions(trainingTypeRepository);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdateTrainerNotFound() {
+        // Given
+        TrainerUpdateRequest request = new TrainerUpdateRequest("NonExistent.Trainer", "New", "Name", "Yoga");
+        User authorizedUser = new User(5L, "Auth", "User", request.getUsername(), "pass", true, null, null);
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(authorizedUser);
+
+        when(trainerRepository.findByUserUsername(request.getUsername())).thenReturn(Optional.empty());
+
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.updateTrainer(request));
+
+        // Then
+        assertEquals("Resource not found. : Trainer profile not found.", exception.getMessage());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findByUserUsername(request.getUsername());
+        verifyNoInteractions(trainingTypeRepository);
+        verify(trainerRepository, never()).save(any(Trainer.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdateTrainerTrainingTypeNotFound() {
+        // Given
+        TrainerUpdateRequest request = new TrainerUpdateRequest("John.Doe", "Johnny", "Dorian", "NonExistentType");
+        Trainer existingTrainer = new Trainer();
+        existingTrainer.setId(1L);
+        existingTrainer.setUser(new User(testUser.getId(), "John", "Doe", "John.Doe", "password", true, null, null));
+        existingTrainer.setSpecialization(testSpecialization);
+
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+        when(trainerRepository.findByUserUsername(request.getUsername())).thenReturn(Optional.of(existingTrainer));
+        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getSpecializationName()))
+                .thenReturn(Optional.empty());
+
+        // When
+        BaseException exception = assertThrows(BaseException.class, () -> trainerService.updateTrainer(request));
+
+        // Then
+        assertEquals("Entity Not Found. : Training type not found: " + request.getSpecializationName(), exception.getMessage());
+
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findByUserUsername(request.getUsername());
+        verify(trainingTypeRepository).findByTrainingTypeNameIgnoreCase(request.getSpecializationName());
+        verify(trainerRepository, never()).save(any(Trainer.class));
+    }
+
+    // --- 7. activateDeactivateTrainer(UserActivationRequest request) ---
+    @Test
+    void shouldActivateTrainerSuccessfully() {
+        // Given
+        UserActivationRequest request = new UserActivationRequest("John.Doe", true);
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        Trainer existingTrainer = new Trainer();
+        existingTrainer.setId(1L);
+        existingTrainer.setUser(new User(testUser.getId(), testUser.getFirstName(), testUser.getLastName(), testUser.getUsername(), testUser.getPassword(), false, null, null));
+        existingTrainer.setSpecialization(testSpecialization);
+        when(trainerRepository.findByUserUsername(request.getUsername())).thenReturn(Optional.of(existingTrainer));
+
+        when(userRepository.save(any(User.class))).thenReturn(existingTrainer.getUser());
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(existingTrainer);
+
+        // When
+        trainerService.activateDeactivateTrainer(request);
+
+        // Then
+        assertTrue(existingTrainer.getUser().isActive());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findByUserUsername(request.getUsername());
+        verify(userRepository).save(existingTrainer.getUser());
+        verify(trainerRepository).save(existingTrainer);
+    }
+
+    @Test
+    void shouldDeactivateTrainerSuccessfully() {
+        // Given
+        UserActivationRequest request = new UserActivationRequest("John.Doe", false);
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        Trainer existingTrainer = new Trainer();
+        existingTrainer.setId(1L);
+        existingTrainer.setUser(new User(testUser.getId(), testUser.getFirstName(), testUser.getLastName(), testUser.getUsername(), testUser.getPassword(), true, null, null));
+        existingTrainer.setSpecialization(testSpecialization);
+        when(trainerRepository.findByUserUsername(request.getUsername())).thenReturn(Optional.of(existingTrainer));
+
+        when(userRepository.save(any(User.class))).thenReturn(existingTrainer.getUser());
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(existingTrainer);
+
+        // When
+        trainerService.activateDeactivateTrainer(request);
+
+        // Then
+        assertFalse(existingTrainer.getUser().isActive());
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findByUserUsername(request.getUsername());
+        verify(userRepository).save(existingTrainer.getUser());
+        verify(trainerRepository).save(existingTrainer);
+    }
+
+    @Test
+    void shouldDoNothingWhenTrainerAlreadyInDesiredState() {
+        // Given
+        UserActivationRequest request = new UserActivationRequest("John.Doe", true);
+        // authManager.getCurrentUser() çağrısını stub'la
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        Trainer existingTrainer = new Trainer();
+        existingTrainer.setId(1L);
+        existingTrainer.setUser(new User(testUser.getId(), testUser.getFirstName(), testUser.getLastName(), testUser.getUsername(), testUser.getPassword(), true, null, null));
+        existingTrainer.setSpecialization(testSpecialization);
+
+        when(trainerRepository.findByUserUsername(request.getUsername())).thenReturn(Optional.of(existingTrainer));
+
+        // When
+        trainerService.activateDeactivateTrainer(request);
+
+        // Then
+        assertTrue(existingTrainer.getUser().isActive());
+
+        verify(authManager).getCurrentUser();
+        verify(trainerRepository).findByUserUsername(request.getUsername());
+
+        verify(userRepository, never()).save(any(User.class));
+        verify(trainerRepository, never()).save(any(Trainer.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenActivateDeactivateTrainerRequestIsNull() {
+        // Given
+        UserActivationRequest nullRequest = null;
+
+        when(authManager.getCurrentUser()).thenReturn(testUser);
+
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> trainerService.activateDeactivateTrainer(nullRequest));
+
+        assertEquals("Cannot invoke \"com.epam.gym_crm.dto.request.UserActivationRequest.getUsername()\" because \"request\" is null", exception.getMessage());
+
+        verify(authManager).getCurrentUser(); // Eskiden verifyNoInteractions idi, şimdi verify(authManager)
+        verifyNoInteractions(trainerRepository);
+        verifyNoInteractions(userRepository);
+    }
 }
