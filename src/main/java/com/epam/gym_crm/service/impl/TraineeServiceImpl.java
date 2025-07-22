@@ -286,7 +286,8 @@ public class TraineeServiceImpl implements ITraineeService {
 		if (optTrainee.isEmpty()) {
 			logger.warn("Trainee profile not found for activation status change with username: {}",
 					request.getUsername());
-			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee profile not found."));
+			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+	                "Trainee with username '" + request.getUsername() + "' not found."));
 		}
 
 		Trainee traineeToUpdate = optTrainee.get();

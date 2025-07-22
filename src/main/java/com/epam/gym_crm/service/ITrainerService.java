@@ -11,7 +11,7 @@ public interface ITrainerService {
 
 	TrainerResponse findTrainerById(Long id);
 
-	TrainerResponse findTrainerByUsername(String username);
+	TrainerResponse findTrainerByUsername(String username); 
 
 	List<TrainerResponse> getAllTrainers();
 	

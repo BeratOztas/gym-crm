@@ -15,8 +15,8 @@ import com.epam.gym_crm.exception.MessageType;
 
 import jakarta.validation.ConstraintViolationException;
 
-@Aspect // This class is an Aspect
-@Component // Register this as a Spring Bean
+@Aspect 
+@Component 
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
