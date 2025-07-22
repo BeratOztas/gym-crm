@@ -5,9 +5,13 @@ import java.time.LocalDate;
 import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.User;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TraineeResponse {
 
 	private LocalDate dateOfBirth;

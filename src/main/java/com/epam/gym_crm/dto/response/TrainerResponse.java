@@ -4,9 +4,13 @@ import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.TrainingType;
 import com.epam.gym_crm.model.User;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TrainerResponse {
 
     private String firstName;
