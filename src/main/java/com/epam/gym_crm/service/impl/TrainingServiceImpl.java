@@ -256,108 +256,98 @@ public class TrainingServiceImpl implements ITrainingService {
 	}
 
 	@Override
-	@Transactional
-	public TrainingResponse updateTraining(TrainingUpdateRequest request) {
-		User currentUser = authManager.getCurrentUser();
-		logger.info("User '{}' attempting to update training with ID: {}. Update request: {}",
-				currentUser.getUsername(), request.getId(), request);
+    @Transactional 
+    public TrainingResponse updateTraining(TrainingUpdateRequest request) {
+        User currentUser = authManager.getCurrentUser();
+        logger.info("User '{}' attempting to update training with ID: {}. Update request: {}",
+                currentUser.getUsername(), request.getId(), request);
 
-		if (request.getId() == null || request.getId() <= 0) {
-			logger.error("Training ID for update cannot be null or non-positive: {}. User: {}", request.getId(),
-					currentUser.getUsername());
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-					"Training ID for update must be a positive value. Provided ID: " + request.getId()));
-		}
+        if (request.getId() == null || request.getId() <= 0) {
+            logger.error("Training ID for update cannot be null or non-positive: {}. User: {}", request.getId(),
+                    currentUser.getUsername());
+            throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+                    "Training ID for update must be a positive value. Provided ID: " + request.getId()));
+        }
 
-		Training existingTraining = trainingRepository.findById(request.getId()).orElseThrow(() -> {
-			logger.warn("Training with ID {} not found for update by user '{}'.", request.getId(),
-					currentUser.getUsername());
-			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-					"Training with ID " + request.getId() + " not found."));
-		});
+        Training existingTraining = trainingRepository.findById(request.getId()).orElseThrow(() -> {
+            logger.warn("Training with ID {} not found for update by user '{}'.",
+                    request.getId(), currentUser.getUsername());
+            return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+                    "Training with ID " + request.getId() + " not found."));
+        });
 
-		boolean isAssociatedTrainee = existingTraining.getTrainee().getUser().getUsername()
-				.equals(currentUser.getUsername());
-		boolean isAssociatedTrainer = existingTraining.getTrainer().getUser().getUsername()
-				.equals(currentUser.getUsername());
+        boolean isAssociatedTrainee = existingTraining.getTrainee().getUser().getUsername()
+                .equals(currentUser.getUsername());
+        boolean isAssociatedTrainer = existingTraining.getTrainer().getUser().getUsername()
+                .equals(currentUser.getUsername());
 
-		if (!isAssociatedTrainee && !isAssociatedTrainer) {
-			logger.warn("Access Denied: User '{}' attempted to update training with ID {} not associated with them.",
-					currentUser.getUsername(), request.getId());
-			throw new BaseException(
-					new ErrorMessage(MessageType.UNAUTHORIZED, "You are not authorized to update this training."));
-		}
+        if (!isAssociatedTrainee && !isAssociatedTrainer) {
+            logger.warn("Access Denied: User '{}' attempted to update training with ID {} not associated with them.",
+                    currentUser.getUsername(), request.getId());
+            throw new BaseException(
+                    new ErrorMessage(MessageType.UNAUTHORIZED, "You are not authorized to update this training."));
+        }
 
-		Trainer updatedTrainer = existingTraining.getTrainer();
-		if (request.getTrainerUsername() != null && !request.getTrainerUsername().isEmpty()
-				&& !request.getTrainerUsername().equals(existingTraining.getTrainer().getUser().getUsername())) {
+       
+        if (request.getTrainerUsername() != null && !request.getTrainerUsername().isEmpty()) {
+            Trainer updatedTrainer = trainerRepository.findByUserUsername(request.getTrainerUsername()).orElseThrow(() -> {
+                logger.warn("New Trainer with username '{}' not found for updating training ID {} by user '{}'.",
+                        request.getTrainerUsername(), request.getId(), currentUser.getUsername());
+                return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+                        "New Trainer with username '" + request.getTrainerUsername() + "' not found.")); // Changed to English
+            });
+            if (!updatedTrainer.getUser().isActive()) {
+                logger.warn("New Trainer '{}' is not active. Cannot update training.", request.getTrainerUsername());
+                throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
+                        "New Trainer '" + request.getTrainerUsername() + "' is not active. Cannot update training."));
+            }
+            existingTraining.setTrainer(updatedTrainer); // Update the trainer of the existing training
+        }
 
-			updatedTrainer = trainerRepository.findByUserUsername(request.getTrainerUsername()).orElseThrow(() -> {
-				logger.warn("New Trainer with username '{}' not found for updating training ID {} by user '{}'.",
-						request.getTrainerUsername(), request.getId(), currentUser.getUsername());
-				return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-						"New Trainer with username " + request.getTrainerUsername() + " not found."));
-			});
-			if (!updatedTrainer.getUser().isActive()) {
-				logger.warn("New Trainer '{}' is not active. Cannot update training.", request.getTrainerUsername());
-				throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
-						"New Trainer " + request.getTrainerUsername() + " is not active. Cannot update training."));
-			}
+        if (request.getTraineeUsername() != null && !request.getTraineeUsername().isEmpty()) {
+            Trainee updatedTrainee = traineeRepository.findByUserUsername(request.getTraineeUsername()).orElseThrow(() -> {
+                logger.warn("New Trainee with username '{}' not found for updating training ID {} by user '{}'.",
+                        request.getTraineeUsername(), request.getId(), currentUser.getUsername());
+                return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+                        "New Trainee with username '" + request.getTraineeUsername() + "' not found.")); // Changed to English
+            });
+            if (!updatedTrainee.getUser().isActive()) {
+                logger.warn("New Trainee '{}' is not active. Cannot update training.", request.getTraineeUsername());
+                throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
+                        "New Trainee '" + request.getTraineeUsername() + "' is not active. Cannot update training."));
+            }
+            existingTraining.setTrainee(updatedTrainee); // Update the trainee of the existing training
+        }
 
-			existingTraining.setTrainer(updatedTrainer);
-		}
+        if (request.getTrainingTypeName() != null && !request.getTrainingTypeName().isEmpty()) {
+            TrainingType updatedTrainingType = trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName())
+                    .orElseThrow(() -> {
+                        logger.warn(
+                                "New Training Type with name '{}' not found for updating training ID {} by user '{}'.",
+                                request.getTrainingTypeName(), request.getId(), currentUser.getUsername());
+                        return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+                                "New Training Type '" + request.getTrainingTypeName() + "' not found.")); 
+                    });
+            existingTraining.setTrainingType(updatedTrainingType); 
+        }
 
-		Trainee updatedTrainee = existingTraining.getTrainee();
-		if (request.getTraineeUsername() != null && !request.getTraineeUsername().isEmpty()
-				&& !request.getTraineeUsername().equals(existingTraining.getTrainee().getUser().getUsername())) {
+        if (request.getTrainingName() != null) {
+            existingTraining.setTrainingName(request.getTrainingName());
+        }
+        if (request.getTrainingDate() != null) {
+            existingTraining.setTrainingDate(request.getTrainingDate());
+        }
+        if (request.getTrainingDuration() != null) {
+            existingTraining.setTrainingDuration(request.getTrainingDuration());
+        }
 
-			updatedTrainee = traineeRepository.findByUserUsername(request.getTraineeUsername()).orElseThrow(() -> {
-				logger.warn("New Trainee with username '{}' not found for updating training ID {} by user '{}'.",
-						request.getTraineeUsername(), request.getId(), currentUser.getUsername());
-				return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-						"New Trainee with username " + request.getTraineeUsername() + " not found."));
-			});
-			if (!updatedTrainee.getUser().isActive()) {
-				logger.warn("New Trainee '{}' is not active. Cannot update training.", request.getTraineeUsername());
-				throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
-						"New Trainee " + request.getTraineeUsername() + " is not active. Cannot update training."));
-			}
-			existingTraining.setTrainee(updatedTrainee);
-		}
+        Training updatedTraining = trainingRepository.save(existingTraining);
 
-		TrainingType updatedTrainingType = existingTraining.getTrainingType(); 
-		if (request.getTrainingTypeName() != null && !request.getTrainingTypeName().isEmpty()
-				&& !request.getTrainingTypeName().equals(existingTraining.getTrainingType().getTrainingTypeName())) {
+        logger.info("Training with ID: {} updated successfully by user '{}'.", updatedTraining.getId(),
+                currentUser.getUsername());
 
-			updatedTrainingType = trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName())
-					.orElseThrow(() -> {
-						logger.warn(
-								"New Training Type with name '{}' not found for updating training ID {} by user '{}'.",
-								request.getTrainingTypeName(), request.getId(), currentUser.getUsername());
-						return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-								"New Training Type " + request.getTrainingTypeName() + " not found."));
-					});
-			existingTraining.setTrainingType(updatedTrainingType);
-		}
-
-		if (request.getTrainingName() != null) {
-			existingTraining.setTrainingName(request.getTrainingName());
-		}
-		if (request.getTrainingDate() != null) {
-			existingTraining.setTrainingDate(request.getTrainingDate());
-		}
-		if (request.getTrainingDuration() != null) {
-			existingTraining.setTrainingDuration(request.getTrainingDuration());
-		}
-
-		Training updatedTraining = trainingRepository.save(existingTraining);
-
-		logger.info("Training with ID: {} updated successfully by user '{}'.", updatedTraining.getId(),
-				currentUser.getUsername());
-
-		return new TrainingResponse(updatedTraining);
-
-	}
+        return new TrainingResponse(updatedTraining);
+    }
 
 	@Override
 	@Transactional
@@ -384,8 +374,8 @@ public class TrainingServiceImpl implements ITrainingService {
         if (!isAssociatedTrainee && !isAssociatedTrainer) {
             logger.warn("Access Denied: User '{}' attempted to delete training with ID {} not associated with them.",
                         currentUser.getUsername(), id);
-            throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED,
-                                    "You are not authorized to delete this training."));
+            throw new BaseException(
+                    new ErrorMessage(MessageType.UNAUTHORIZED, "You are not authorized to delete this training."));
         }
         
         trainingRepository.delete(trainingToDelete);
