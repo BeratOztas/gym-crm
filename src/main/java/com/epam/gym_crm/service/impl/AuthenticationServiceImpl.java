@@ -64,7 +64,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 	@Override
 	public void logout() {
-		authManager.checkAuthentication();
 	    String username = authManager.getCurrentUser().getUsername();
 	    authManager.logout();
 	    logger.info("User logged out: {}", username);
@@ -109,7 +108,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 	@Override
 	public void changePassword(ChangePasswordRequest request) {
-		authManager.checkAuthentication();
+		User currentUser = authManager.getCurrentUser(); 
 		
 		if (request == null) {
             logger.error("Change password request DTO cannot be null.");
@@ -128,9 +127,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                                      "Invalid credentials or user not found."));
         }
         
-        if (!authManager.getCurrentUser().getUsername().equals(username)) {
+        if (!currentUser.getUsername().equals(username)) {
             logger.error("Unauthorized attempt to change password for user '{}' by current user '{}'.",
-                         username, authManager.getCurrentUser().getUsername());
+                         username, currentUser.getUsername());
             throw new BaseException(new ErrorMessage(MessageType.FORBIDDEN,
                                      "You are not authorized to change this user's password."));
         }
@@ -150,6 +149,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         }
         
         user.setPassword(newPassword);
+        
         userRepository.save(user);
         
         logger.info("Password changed successfully for user: {}", username);
