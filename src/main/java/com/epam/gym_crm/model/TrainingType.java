@@ -9,12 +9,14 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "training_type")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class TrainingType {
 
 	@Id
