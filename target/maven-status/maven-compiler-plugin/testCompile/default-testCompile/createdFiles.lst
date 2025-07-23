@@ -1,6 +1,6 @@
 com\epam\gym_crm\service\impl\AuthenticationServiceImplTest.class
-com\epam\gym_crm\facade\GymCRMFacadeTest.class
-com\epam\gym_crm\GymCrmApplicationTests.class
 com\epam\gym_crm\service\impl\TraineeServiceImplTest.class
 com\epam\gym_crm\service\impl\TrainerServiceImplTest.class
+com\epam\gym_crm\facade\GymCRMFacadeTest.class
+com\epam\gym_crm\GymCrmApplicationTests.class
 com\epam\gym_crm\service\impl\TrainingServiceImplTest.class
