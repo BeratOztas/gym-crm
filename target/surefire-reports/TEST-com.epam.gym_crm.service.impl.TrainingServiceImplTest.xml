@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.107" tests="34" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.111" tests="34" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -15,7 +15,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="TR"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-17\bin"/>
-    <property name="sun.java.command" value="C:\Users\merve\AppData\Local\Temp\surefire12997726116954853191\surefirebooter-20250723195214060_3.jar C:\Users\merve\AppData\Local\Temp\surefire12997726116954853191 2025-07-23T19-52-13_932-jvmRun1 surefire-20250723195214060_1tmp surefire_0-20250723195214060_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\merve\AppData\Local\Temp\surefire12945346342025341804\surefirebooter-20250724142910181_3.jar C:\Users\merve\AppData\Local\Temp\surefire12945346342025341804 2025-07-24T14-29-10_054-jvmRun1 surefire-20250724142910181_1tmp surefire_0-20250724142910181_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\merve\OneDrive\Masaüstü\Spring\gym-crm\target\test-classes;C:\Users\merve\OneDrive\Masaüstü\Spring\gym-crm\target\classes;C:\Users\merve\.m2\repository\org\springframework\spring-context\6.1.6\spring-context-6.1.6.jar;C:\Users\merve\.m2\repository\org\springframework\spring-beans\6.1.6\spring-beans-6.1.6.jar;C:\Users\merve\.m2\repository\org\springframework\spring-core\6.1.6\spring-core-6.1.6.jar;C:\Users\merve\.m2\repository\org\springframework\spring-jcl\6.1.6\spring-jcl-6.1.6.jar;C:\Users\merve\.m2\repository\org\springframework\spring-expression\6.1.6\spring-expression-6.1.6.jar;C:\Users\merve\.m2\repository\io\micrometer\micrometer-observation\1.12.5\micrometer-observation-1.12.5.jar;C:\Users\merve\.m2\repository\io\micrometer\micrometer-commons\1.12.5\micrometer-commons-1.12.5.jar;C:\Users\merve\.m2\repository\org\springframework\spring-orm\6.1.6\spring-orm-6.1.6.jar;C:\Users\merve\.m2\repository\org\springframework\spring-tx\6.1.6\spring-tx-6.1.6.jar;C:\Users\merve\.m2\repository\org\springframework\data\spring-data-jpa\3.2.5\spring-data-jpa-3.2.5.jar;C:\Users\merve\.m2\repository\org\springframework\data\spring-data-commons\3.2.5\spring-data-commons-3.2.5.jar;C:\Users\merve\.m2\repository\org\antlr\antlr4-runtime\4.13.0\antlr4-runtime-4.13.0.jar;C:\Users\merve\.m2\repository\org\springframework\spring-jdbc\6.1.6\spring-jdbc-6.1.6.jar;C:\Users\merve\.m2\repository\org\springframework\spring-aop\6.1.6\spring-aop-6.1.6.jar;C:\Users\merve\.m2\repository\org\aspectj\aspectjrt\1.9.22.1\aspectjrt-1.9.22.1.jar;C:\Users\merve\.m2\repository\org\slf4j\slf4j-api\2.0.13\slf4j-api-2.0.13.jar;C:\Users\merve\.m2\repository\org\slf4j\slf4j-simple\2.0.13\slf4j-simple-2.0.13.jar;C:\Users\merve\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\merve\.m2\repository\org\hibernate\orm\hibernate-core\6.5.2.Final\hibernate-core-6.5.2.Final.jar;C:\Users\merve\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\merve\.m2\repository\org\jboss\logging\jboss-logging\3.5.0.Final\jboss-logging-3.5.0.Final.jar;C:\Users\merve\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\merve\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\merve\.m2\repository\com\fasterxml\classmate\1.5.1\classmate-1.5.1.jar;C:\Users\merve\.m2\repository\net\bytebuddy\byte-buddy\1.14.15\byte-buddy-1.14.15.jar;C:\Users\merve\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.0\jakarta.xml.bind-api-4.0.0.jar;C:\Users\merve\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.0\jakarta.activation-api-2.1.0.jar;C:\Users\merve\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.2\jaxb-runtime-4.0.2.jar;C:\Users\merve\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.2\jaxb-core-4.0.2.jar;C:\Users\merve\.m2\repository\org\eclipse\angus\angus-activation\2.0.0\angus-activation-2.0.0.jar;C:\Users\merve\.m2\repository\org\glassfish\jaxb\txw2\4.0.2\txw2-4.0.2.jar;C:\Users\merve\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.1\istack-commons-runtime-4.1.1.jar;C:\Users\merve\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\merve\.m2\repository\org\projectlombok\lombok\1.18.30\lombok-1.18.30.jar;C:\Users\merve\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\merve\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\merve\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\merve\.m2\repository\org\postgresql\postgresql\42.7.7\postgresql-42.7.7.jar;C:\Users\merve\.m2\repository\org\checkerframework\checker-qual\3.49.3\checker-qual-3.49.3.jar;C:\Users\merve\.m2\repository\org\aspectj\aspectjweaver\1.9.22.1\aspectjweaver-1.9.22.1.jar;C:\Users\merve\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\merve\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\merve\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\merve\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\merve\.m2\repository\org\springframework\spring-test\6.1.6\spring-test-6.1.6.jar;C:\Users\merve\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.11.0\junit-jupiter-api-5.11.0.jar;C:\Users\merve\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\merve\.m2\repository\org\junit\platform\junit-platform-commons\1.11.0\junit-platform-commons-1.11.0.jar;C:\Users\merve\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\merve\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.11.0\junit-jupiter-engine-5.11.0.jar;C:\Users\merve\.m2\repository\org\junit\platform\junit-platform-engine\1.11.0\junit-platform-engine-1.11.0.jar;C:\Users\merve\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\merve\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.12\byte-buddy-agent-1.14.12.jar;C:\Users\merve\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\merve\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\merve\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -30,7 +30,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\merve\AppData\Local\Temp\surefire12997726116954853191\surefirebooter-20250723195214060_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\merve\AppData\Local\Temp\surefire12945346342025341804\surefirebooter-20250724142910181_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.12+8-LTS-286"/>
@@ -61,7 +61,7 @@
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Trainee with username 'nonexistent.trainee' not found for training creation by user 'test.user'.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldGetTrainingByIdSuccessfullyForAssociatedTrainee" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.004">
+  <testcase name="shouldGetTrainingByIdSuccessfullyForAssociatedTrainee" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'trainee.user' attempting to retrieve training with ID: 1.
 [main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - Successfully retrieved training with ID: 1 for user 'trainee.user'.
 ]]></system-err>
@@ -71,7 +71,7 @@
 [main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - Successfully retrieved training with ID: 1 for user 'trainer.user'.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldUpdateTrainingSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.012">
+  <testcase name="shouldUpdateTrainingSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.016">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'trainee.user' attempting to update training with ID: 1. Update request: TrainingUpdateRequest(id=1, trainingName=Updated Yoga, trainingDate=2023-10-27, trainingDuration=75, trainerUsername=trainer.user, traineeUsername=trainee.user, trainingTypeName=Yoga)
 [main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - Training with ID: 1 updated successfully by user 'trainee.user'.
 ]]></system-err>
@@ -86,7 +86,7 @@
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Trainer with username 'nonexistent.trainer' not found when trying to retrieve their trainings.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenUpdateTrainingNewTrainerNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldThrowExceptionWhenUpdateTrainingNewTrainerNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.016">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'trainee.user' attempting to update training with ID: 1. Update request: TrainingUpdateRequest(id=1, trainingName=Name, trainingDate=null, trainingDuration=null, trainerUsername=nonexistent.trainer, traineeUsername=null, trainingTypeName=null)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - New Trainer with username 'nonexistent.trainer' not found for updating training ID 1 by user 'trainee.user'.
 ]]></system-err>
@@ -96,12 +96,12 @@
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - New Trainee 'inact.trainee' is not active. Cannot update training.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenCreateTrainingTrainerNotActive" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.016">
+  <testcase name="shouldThrowExceptionWhenCreateTrainingTrainerNotActive" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'test.user' attempting to create a new training, Training creation request: TrainingCreateRequest(trainingName=Morning Yoga, trainingDate=2023-10-26, trainingDuration=60, trainerUsername=inactive.trainer, traineeUsername=trainee.user, trainingTypeName=Yoga)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Trainer 'inactive.trainer' is not active. Cannot create training.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenCreateTrainingTrainingTypeNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.002">
+  <testcase name="shouldThrowExceptionWhenCreateTrainingTrainingTypeNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'test.user' attempting to create a new training, Training creation request: TrainingCreateRequest(trainingName=Morning Yoga, trainingDate=2023-10-26, trainingDuration=60, trainerUsername=trainer.user, traineeUsername=trainee.user, trainingTypeName=NonExistentType)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Training Type with name 'NonExistentType' not found for training creation by user 'test.user'.
 ]]></system-err>
@@ -116,7 +116,7 @@
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Access Denied: User 'unauth.user' attempted to access training with ID 1 not associated with them.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldGetTraineeTrainingsListSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldGetTraineeTrainingsListSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.016">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'trainee.user' attempting to retrieve trainings list for trainee 'trainee.user' with criteria: TraineeTrainingListRequest(traineeUsername=trainee.user, fromDate=2023-01-01, toDate=2023-12-31, trainerName=Trainer, trainingTypeName=Yoga)
 [main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - Successfully retrieved 2 trainings for trainee 'trainee.user' for user 'trainee.user'.
 ]]></system-err>
@@ -131,44 +131,44 @@
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Trainer 'inactive.trainer' is not active. Cannot retrieve their trainings.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldGetTrainerTrainingsListSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldGetTrainerTrainingsListSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.008">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'trainer.user' attempting to retrieve trainings list for trainer 'trainer.user' with criteria: TrainerTrainingListRequest(trainerUsername=trainer.user, fromDate=2023-01-01, toDate=2023-12-31, traineeName=Trainee, trainingTypeName=Yoga)
 [main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - Successfully retrieved 2 trainings for trainer 'trainer.user' for user 'trainer.user'.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenUpdateTrainingUnauthorized" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldThrowExceptionWhenUpdateTrainingUnauthorized" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.002">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'unauth.user' attempting to update training with ID: 1. Update request: TrainingUpdateRequest(id=1, trainingName=Updated Name, trainingDate=null, trainingDuration=null, trainerUsername=null, traineeUsername=null, trainingTypeName=null)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Access Denied: User 'unauth.user' attempted to update training with ID 1 not associated with them.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenUpdateTrainingNewTrainingTypeNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldThrowExceptionWhenUpdateTrainingNewTrainingTypeNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.004">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'trainee.user' attempting to update training with ID: 1. Update request: TrainingUpdateRequest(id=1, trainingName=Name, trainingDate=null, trainingDuration=null, trainerUsername=null, traineeUsername=null, trainingTypeName=NonExistentType)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - New Training Type with name 'NonExistentType' not found for updating training ID 1 by user 'trainee.user'.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenGetTrainingByIdWithNullOrInvalidId" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldThrowExceptionWhenGetTrainingByIdWithNullOrInvalidId" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.001">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'test.user' attempting to retrieve training with ID: null.
 [main] ERROR com.epam.gym_crm.service.impl.TrainingServiceImpl - Training ID for lookup cannot be null or non-positive: null. User: test.user
 [main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'test.user' attempting to retrieve training with ID: -5.
 [main] ERROR com.epam.gym_crm.service.impl.TrainingServiceImpl - Training ID for lookup cannot be null or non-positive: -5. User: test.user
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenGetTraineeTrainingsListTraineeNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldThrowExceptionWhenGetTraineeTrainingsListTraineeNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.002">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'nonexistent.trainee' attempting to retrieve trainings list for trainee 'nonexistent.trainee' with criteria: TraineeTrainingListRequest(traineeUsername=nonexistent.trainee, fromDate=null, toDate=null, trainerName=null, trainingTypeName=null)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Trainee with username 'nonexistent.trainee' not found when trying to retrieve their trainings.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenCreateTrainingTrainerNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldThrowExceptionWhenCreateTrainingTrainerNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.003">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'test.user' attempting to create a new training, Training creation request: TrainingCreateRequest(trainingName=Morning Yoga, trainingDate=2023-10-26, trainingDuration=60, trainerUsername=nonexistent.trainer, traineeUsername=trainee.user, trainingTypeName=Yoga)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Trainer with username 'nonexistent.trainer' not found for training creation by user 'test.user'.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenGetTrainingByIdNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.015">
+  <testcase name="shouldThrowExceptionWhenGetTrainingByIdNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'test.user' attempting to retrieve training with ID: 99.
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Training not found with ID=99 for user 'test.user'.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldDeleteTrainingByIdSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldDeleteTrainingByIdSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.005">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'trainee.user' attempting to delete training with ID: 1.
 [main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - Training with ID: 1 deleted successfully by user 'trainee.user'.
 ]]></system-err>
@@ -178,7 +178,7 @@
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - New Trainer 'inact.trainer' is not active. Cannot update training.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenUpdateTrainingNewTraineeNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
+  <testcase name="shouldThrowExceptionWhenUpdateTrainingNewTraineeNotFound" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.004">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'trainer.user' attempting to update training with ID: 1. Update request: TrainingUpdateRequest(id=1, trainingName=Name, trainingDate=null, trainingDuration=null, trainerUsername=null, traineeUsername=nonexistent.trainee, trainingTypeName=null)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - New Trainee with username 'nonexistent.trainee' not found for updating training ID 1 by user 'trainer.user'.
 ]]></system-err>
@@ -212,12 +212,12 @@
 [main] ERROR com.epam.gym_crm.service.impl.TrainingServiceImpl - Training ID for update cannot be null or non-positive: -5. User: test.user
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenGetTraineeTrainingsListTraineeNotActive" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.006">
+  <testcase name="shouldThrowExceptionWhenGetTraineeTrainingsListTraineeNotActive" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'inactive.trainee' attempting to retrieve trainings list for trainee 'inactive.trainee' with criteria: TraineeTrainingListRequest(traineeUsername=inactive.trainee, fromDate=null, toDate=null, trainerName=null, trainingTypeName=null)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Trainee 'inactive.trainee' is not active. Cannot retrieve their trainings.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenGetTraineeTrainingsListUnauthorizedUser" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.002">
+  <testcase name="shouldThrowExceptionWhenGetTraineeTrainingsListUnauthorizedUser" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.016">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'other.user' attempting to retrieve trainings list for trainee 'trainee.user' with criteria: TraineeTrainingListRequest(traineeUsername=trainee.user, fromDate=null, toDate=null, trainerName=null, trainingTypeName=null)
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Access Denied: User 'other.user' attempted to access trainings of trainee 'trainee.user'.
 ]]></system-err>
@@ -227,7 +227,7 @@
 [main] WARN com.epam.gym_crm.service.impl.TrainingServiceImpl - Access Denied: User 'other.user' attempted to access trainings of trainer 'trainer.user'.
 ]]></system-err>
   </testcase>
-  <testcase name="shouldCreateTrainingSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.004">
+  <testcase name="shouldCreateTrainingSuccessfully" classname="com.epam.gym_crm.service.impl.TrainingServiceImplTest" time="0.0">
     <system-err><![CDATA[[main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - User 'test.user' attempting to create a new training, Training creation request: TrainingCreateRequest(trainingName=Morning Yoga, trainingDate=2023-10-26, trainingDuration=60, trainerUsername=trainer.user, traineeUsername=trainee.user, trainingTypeName=Yoga)
 [main] INFO com.epam.gym_crm.service.impl.TrainingServiceImpl - Training 'Morning Yoga' created successfully with ID: 10 by user 'test.user'.
 ]]></system-err>
