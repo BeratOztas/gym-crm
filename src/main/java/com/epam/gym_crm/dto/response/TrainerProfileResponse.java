@@ -1,5 +1,8 @@
 package com.epam.gym_crm.dto.response;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.epam.gym_crm.model.Trainer;
 import com.epam.gym_crm.model.TrainingType;
 import com.epam.gym_crm.model.User;
@@ -11,26 +14,32 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrainerResponse {
+public class TrainerProfileResponse {
 
+	private String username;
     private String firstName;
     private String lastName;
-    private String username;
+    private String specialization;
     private boolean isActive;
-    private String specializationName;
+    private List<TraineeInfoResponse> traineesList;
 
-    public TrainerResponse(Trainer trainer) {
+    public TrainerProfileResponse(Trainer trainer) {
         if (trainer != null) {
             User user = trainer.getUser();
             if (user != null) {
                 this.firstName = user.getFirstName();
                 this.lastName = user.getLastName();
-                this.username = user.getUsername();
+                this.username = user.getUsername(); 
                 this.isActive = user.isActive();
             }
             TrainingType specialization = trainer.getSpecialization();
             if (specialization != null) {
-                this.specializationName = specialization.getTrainingTypeName();
+                this.specialization = specialization.getTrainingTypeName();
+            }
+            if (trainer.getTrainees() != null) {
+                this.traineesList = trainer.getTrainees().stream()
+                                         .map(TraineeInfoResponse::new)
+                                         .collect(Collectors.toList());
             }
         }
     }
