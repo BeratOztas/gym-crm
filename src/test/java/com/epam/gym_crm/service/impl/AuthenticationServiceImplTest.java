@@ -136,12 +136,11 @@ class AuthenticationServiceImplTest {
     void shouldCreateAndSaveUserSuccessfully() {
         String firstName = "New";
         String lastName = "User";
-        boolean isActive = true;
 
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
         
 
-        User createdUser = authenticationService.createAndSaveUser(firstName, lastName, isActive);
+        User createdUser = authenticationService.createAndSaveUser(firstName, lastName);
 
         assertNotNull(createdUser);
         assertEquals(firstName, createdUser.getFirstName());
@@ -158,7 +157,6 @@ class AuthenticationServiceImplTest {
     void shouldCreateAndSaveUserWithUniqueUsernameWhenBaseUsernameExists() {
         String firstName = "Existing";
         String lastName = "User";
-        boolean isActive = true;
         String baseUsername = "Existing.User";
         String firstUniqueUsername = "Existing.User1";
 
@@ -166,7 +164,7 @@ class AuthenticationServiceImplTest {
         when(userRepository.findByUsername(firstUniqueUsername)).thenReturn(Optional.empty());
 
         
-        User createdUser = authenticationService.createAndSaveUser(firstName, lastName, isActive);
+        User createdUser = authenticationService.createAndSaveUser(firstName, lastName);
 
         assertNotNull(createdUser);
         assertEquals(firstUniqueUsername, createdUser.getUsername());
