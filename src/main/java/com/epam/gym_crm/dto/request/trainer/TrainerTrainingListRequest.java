@@ -1,4 +1,4 @@
-package com.epam.gym_crm.dto.request;
+package com.epam.gym_crm.dto.request.trainer;
 
 import java.time.LocalDate;
 
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+	
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,5 +25,4 @@ public class TrainerTrainingListRequest {
 
     private String traineeName;
     
-    private String trainingTypeName;
 }
