@@ -17,7 +17,6 @@ public class AuthManager {
 	}
 
 	public void logout() {
-
 		currentUser.remove();
 	}
 
@@ -37,12 +36,7 @@ public class AuthManager {
 	public void checkAuthentication() {
 		if (currentUser.get() == null) {
 			throw new BaseException(
-					new ErrorMessage(MessageType.UNAUTHORIZED,
-							"User is not authenticated. Login required."));
+					new ErrorMessage(MessageType.UNAUTHORIZED, "User is not authenticated. Login required."));
 		}
-	}
-
-	public void clearCurrentUser() {
-		currentUser.remove();
 	}
 }
