@@ -10,7 +10,7 @@ public interface IAuthenticationService {
 
 	void logout();
 
-	User createAndSaveUser(String firstName, String lastName, boolean isActive);
+	User createAndSaveUser(String firstName, String lastName);
 
 	void changePassword(ChangePasswordRequest request);
 }

@@ -14,7 +14,6 @@ import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.model.User;
-import com.epam.gym_crm.repository.TraineeRepository;
 import com.epam.gym_crm.repository.UserRepository;
 import com.epam.gym_crm.service.IAuthenticationService;
 
@@ -30,8 +29,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 	private final UserRepository userRepository;
 	private final AuthManager authManager;
 
-	public AuthenticationServiceImpl(UserRepository userRepository, AuthManager authManager,
-			TraineeRepository traineeRepository) {
+	public AuthenticationServiceImpl(UserRepository userRepository, AuthManager authManager) {
 		this.userRepository = userRepository;
 		this.authManager = authManager;
 	}
@@ -48,7 +46,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 		User user = userRepository.findByUsername(username).orElseThrow(
 				() -> new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED, "Invalid username or password.")));
-		
+
 		if (!user.isActive()) {
 			throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED, "User account is inactive."));
 		}
@@ -59,18 +57,18 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 		authManager.login(user);
 		logger.info("User logged in successfully: {}", username);
-		
+
 	}
 
 	@Override
 	public void logout() {
-	    String username = authManager.getCurrentUser().getUsername();
-	    authManager.logout();
-	    logger.info("User logged out: {}", username);
+		String username = authManager.getCurrentUser().getUsername();
+		authManager.logout();
+		logger.info("User logged out: {}", username);
 	}
 
 	@Override
-	public User createAndSaveUser(String firstName, String lastName, boolean isActive) {
+	public User createAndSaveUser(String firstName, String lastName) {
 		String baseUsername = firstName.trim() + "." + lastName.trim();
 		String username = generateUniqueUsername(baseUsername);
 		String password = generateRandomPassword();
@@ -80,7 +78,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 		newUser.setLastName(lastName.trim());
 		newUser.setUsername(username);
 		newUser.setPassword(password);
-		newUser.setActive(isActive);
 
 		return newUser;
 	}
@@ -108,51 +105,51 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 	@Override
 	public void changePassword(ChangePasswordRequest request) {
-		User currentUser = authManager.getCurrentUser(); 
-		
-		if (request == null) {
-            logger.error("Change password request DTO cannot be null.");
-            throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-                                     "Change password request DTO cannot be null."));
-        }
-		
-		String username = request.getUsername();
-        String oldPassword = request.getOldPassword();
-        String newPassword = request.getNewPassword();
-        
-        Optional<User> optUser = userRepository.findByUsername(username);
-        if (optUser.isEmpty()) {
-            logger.error("Password change failed: User with username '{}' not found.", username);
-            throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED,
-                                     "Invalid credentials or user not found."));
-        }
-        
-        if (!currentUser.getUsername().equals(username)) {
-            logger.error("Unauthorized attempt to change password for user '{}' by current user '{}'.",
-                         username, currentUser.getUsername());
-            throw new BaseException(new ErrorMessage(MessageType.FORBIDDEN,
-                                     "You are not authorized to change this user's password."));
-        }
-        
-        User user =optUser.get();
+		User currentUser = authManager.getCurrentUser();
 
-        if (!user.getPassword().equals(oldPassword)) {
-            logger.warn("Password change failed: Invalid old password for username: {}", username);
-            throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED,
-                                     "Invalid old password."));
-        }
-        
-        if (oldPassword.equals(newPassword)) {
-            logger.warn("Password change failed: New password cannot be the same as the old password for username: {}", username);
-            throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-                                     "New password cannot be the same as the old password."));
-        }
-        
-        user.setPassword(newPassword);
-        
-        userRepository.save(user);
-        
-        logger.info("Password changed successfully for user: {}", username);
-		
+		if (request == null) {
+			logger.error("Change password request DTO cannot be null.");
+			throw new BaseException(
+					new ErrorMessage(MessageType.INVALID_ARGUMENT, "Change password request DTO cannot be null."));
+		}
+
+		String username = request.getUsername();
+		String oldPassword = request.getOldPassword();
+		String newPassword = request.getNewPassword();
+
+		Optional<User> optUser = userRepository.findByUsername(username);
+		if (optUser.isEmpty()) {
+			logger.error("Password change failed: User with username '{}' not found.", username);
+			throw new BaseException(
+					new ErrorMessage(MessageType.UNAUTHORIZED, "Invalid credentials or user not found."));
+		}
+
+		if (!currentUser.getUsername().equals(username)) {
+			logger.error("Unauthorized attempt to change password for user '{}' by current user '{}'.", username,
+					currentUser.getUsername());
+			throw new BaseException(
+					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to change this user's password."));
+		}
+
+		User user = optUser.get();
+
+		if (!user.getPassword().equals(oldPassword)) {
+			logger.warn("Password change failed: Invalid old password for username: {}", username);
+			throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED, "Invalid old password."));
+		}
+
+		if (oldPassword.equals(newPassword)) {
+			logger.warn("Password change failed: New password cannot be the same as the old password for username: {}",
+					username);
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+					"New password cannot be the same as the old password."));
+		}
+
+		user.setPassword(newPassword);
+
+		userRepository.save(user);
+
+		logger.info("Password changed successfully for user: {}", username);
+
 	}
 }
