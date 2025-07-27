@@ -1,4 +1,4 @@
-package com.epam.gym_crm.dto.request;
+package com.epam.gym_crm.dto.request.training;
 
 import java.time.LocalDate;
 
@@ -16,6 +16,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TrainingCreateRequest {
 
+	@NotBlank(message = "Trainee username cannot be blank for training creation")
+	private String traineeUsername;
+	
+	@NotBlank(message = "Trainer username cannot be blank for training creation")
+	private String trainerUsername;
+	
     @NotBlank(message = "Training name cannot be blank")
     private String trainingName;
 
@@ -27,12 +33,4 @@ public class TrainingCreateRequest {
     @Positive(message = "Training duration must be a positive number")
     private Integer trainingDuration;
 
-    @NotBlank(message = "Trainer username cannot be blank for training creation")
-    private String trainerUsername;
-
-    @NotBlank(message = "Trainee username cannot be blank for training creation")
-    private String traineeUsername;
-
-    @NotBlank(message = "Training type name cannot be blank for training creation") 
-    private String trainingTypeName;
 }
