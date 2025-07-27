@@ -1,4 +1,4 @@
-package com.epam.gym_crm.dto.request;
+package com.epam.gym_crm.dto.request.trainee;
 
 import java.time.LocalDate;
 
