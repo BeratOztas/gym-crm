@@ -1,9 +1,8 @@
-package com.epam.gym_crm.dto.request;
+package com.epam.gym_crm.dto.request.trainee;
 
 import java.time.LocalDate;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -30,6 +29,4 @@ public class TraineeCreateRequest {
 	
 	private String address;
 	
-	@NotNull(message = "Active status cannot be null")
-	private boolean isActive;
 }
