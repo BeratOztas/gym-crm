@@ -1,7 +1,6 @@
-package com.epam.gym_crm.dto.request;
+package com.epam.gym_crm.dto.request.trainer;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,10 +21,7 @@ public class TrainerCreateRequest {
     @Size(min = 3, max = 50, message = "Last name must be between 3 and 50 characters")
     private String lastName;
 
-    @NotNull(message = "Active status cannot be null")
-    private boolean isActive;
-
     @NotBlank(message = "Training type name must be provided")
-    private String trainingTypeName;
+    private String specialization;
 	
 }
