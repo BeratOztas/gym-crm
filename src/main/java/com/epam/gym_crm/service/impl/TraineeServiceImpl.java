@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.epam.gym_crm.auth.AuthManager;
-import com.epam.gym_crm.dto.request.TraineeCreateRequest;
-import com.epam.gym_crm.dto.request.TraineeUpdateRequest;
-import com.epam.gym_crm.dto.request.TraineeUpdateTrainersRequest;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
-import com.epam.gym_crm.dto.response.TraineeResponse;
+import com.epam.gym_crm.dto.request.trainee.TraineeCreateRequest;
+import com.epam.gym_crm.dto.request.trainee.TraineeUpdateRequest;
+import com.epam.gym_crm.dto.request.trainee.TraineeUpdateTrainersRequest;
+import com.epam.gym_crm.dto.response.TraineeProfileResponse;
 // Exception imports
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
@@ -52,9 +52,10 @@ public class TraineeServiceImpl implements ITraineeService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public TraineeResponse findTraineeById(Long id) {
+	public TraineeProfileResponse findTraineeById(Long id) {
 
 		User currentUser = authManager.getCurrentUser();
+		
 		logger.info("User '{}' attempting to find Trainee profile by ID '{}'.", currentUser.getUsername(), id);
 
 		if (id == null || id <= 0) {
@@ -72,12 +73,13 @@ public class TraineeServiceImpl implements ITraineeService {
 					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee not found with ID: " + id));
 		});
 		logger.info("Finding Trainee by ID={} -> Found: {}", id, true);
-		return new TraineeResponse(foundTrainee);
+		
+		return new TraineeProfileResponse(foundTrainee);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public TraineeResponse findTraineeByUsername(String username) {
+	public TraineeProfileResponse findTraineeByUsername(String username) {
 
 		User currentUser = authManager.getCurrentUser();
 		logger.info("User '{}' attempting to find Trainee profile for username '{}'.", currentUser.getUsername(),
@@ -100,18 +102,18 @@ public class TraineeServiceImpl implements ITraineeService {
 
 		logger.info("Finding Trainee by username='{}' -> Found: {}", username, true); // Always true if not thrown
 
-		return new TraineeResponse(foundTrainee);
+		return new TraineeProfileResponse(foundTrainee);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TraineeResponse> getAllTrainees() {
+	public List<TraineeProfileResponse> getAllTrainees() {
 		User currentUser = authManager.getCurrentUser();
 		logger.info("User '{}' attempting to retrieve all Trainees.", currentUser.getUsername());
 
 		List<Trainee> trainees = traineeRepository.findAll();
 		logger.info("Retrieving all trainees -> Count: {}", trainees.size());
-		List<TraineeResponse> returnList = trainees.stream().map(TraineeResponse::new).collect(Collectors.toList());
+		List<TraineeProfileResponse> returnList = trainees.stream().map(TraineeProfileResponse::new).collect(Collectors.toList());
 
 		logger.info("Converted {} Trainee entities to TraineeResponse DTOs.", returnList.size());
 		return returnList;
@@ -119,14 +121,14 @@ public class TraineeServiceImpl implements ITraineeService {
 
 	@Override
 	@Transactional()
-	public TraineeResponse createTrainee(TraineeCreateRequest request) {
+	public TraineeProfileResponse createTrainee(TraineeCreateRequest request) {
 		if (request == null) {
 			logger.error("Trainee can not be null");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainee can not be null"));
 		}
 
-		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName(),
-				request.isActive());
+		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName()
+				);
 
 		logger.info("Received new transient User object for Trainee: Username = {}", newUser.getUsername());
 
@@ -145,13 +147,13 @@ public class TraineeServiceImpl implements ITraineeService {
 
 		logger.info("Trainee profile created successfully for user: {}", newUser.getUsername());
 
-		return new TraineeResponse(createdTrainee);
+		return new TraineeProfileResponse(createdTrainee);
 
 	}
 
 	@Override
 	@Transactional()
-	public TraineeResponse updateTrainee(TraineeUpdateRequest request) {
+	public TraineeProfileResponse updateTrainee(TraineeUpdateRequest request) {
 
 		User currentUser = authManager.getCurrentUser();
 
@@ -202,12 +204,12 @@ public class TraineeServiceImpl implements ITraineeService {
 
 		logger.info("Trainee profile updated successfully for user: {}", userToUpdate.getUsername());
 
-		return new TraineeResponse(updatedTrainee);
+		return new TraineeProfileResponse(updatedTrainee);
 	}
 
 	@Override
 	@Transactional
-	public TraineeResponse updateTraineeTrainersList(TraineeUpdateTrainersRequest request) {
+	public TraineeProfileResponse updateTraineeTrainersList(TraineeUpdateTrainersRequest request) {
 		User currentUser = authManager.getCurrentUser();
 		logger.info("User '{}' attempting to update trainers list for trainee '{}'. Requested trainers: {}.",
 				currentUser.getUsername(), request.getTraineeUsername(), request.getTrainerUsernames());
@@ -265,7 +267,7 @@ public class TraineeServiceImpl implements ITraineeService {
 		logger.info("Successfully updated trainers list for trainee '{}'. New trainer count: {} for user '{}'.",
 				updatedTrainee.getUser().getUsername(), newTrainers.size(), currentUser.getUsername());
 
-		return new TraineeResponse(updatedTrainee);
+		return new TraineeProfileResponse(updatedTrainee);
 	}
 
 	@Override
