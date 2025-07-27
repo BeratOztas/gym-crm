@@ -2,25 +2,25 @@ package com.epam.gym_crm.service;
 
 import java.util.List;
 
-import com.epam.gym_crm.dto.request.TraineeCreateRequest;
-import com.epam.gym_crm.dto.request.TraineeUpdateRequest;
-import com.epam.gym_crm.dto.request.TraineeUpdateTrainersRequest;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
-import com.epam.gym_crm.dto.response.TraineeResponse;
+import com.epam.gym_crm.dto.request.trainee.TraineeCreateRequest;
+import com.epam.gym_crm.dto.request.trainee.TraineeUpdateRequest;
+import com.epam.gym_crm.dto.request.trainee.TraineeUpdateTrainersRequest;
+import com.epam.gym_crm.dto.response.TraineeProfileResponse;
 
 public interface ITraineeService {
 
-	TraineeResponse findTraineeById(Long id);
+	TraineeProfileResponse findTraineeById(Long id);
 
-	TraineeResponse findTraineeByUsername(String username);
+	TraineeProfileResponse findTraineeByUsername(String username);
 
-	List<TraineeResponse> getAllTrainees();
+	List<TraineeProfileResponse> getAllTrainees();
 
-	TraineeResponse createTrainee(TraineeCreateRequest request);
+	TraineeProfileResponse createTrainee(TraineeCreateRequest request);
 
-	TraineeResponse updateTrainee(TraineeUpdateRequest trainee);
+	TraineeProfileResponse updateTrainee(TraineeUpdateRequest trainee);
 	
-	TraineeResponse updateTraineeTrainersList(TraineeUpdateTrainersRequest request);
+	TraineeProfileResponse updateTraineeTrainersList(TraineeUpdateTrainersRequest request);
 	
 	void activateDeactivateTrainee(UserActivationRequest request);
 
