@@ -30,11 +30,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.epam.gym_crm.auth.AuthManager;
-import com.epam.gym_crm.dto.request.TraineeCreateRequest;
-import com.epam.gym_crm.dto.request.TraineeUpdateRequest;
-import com.epam.gym_crm.dto.request.TraineeUpdateTrainersRequest;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
-import com.epam.gym_crm.dto.response.TraineeResponse;
+import com.epam.gym_crm.dto.request.trainee.TraineeCreateRequest;
+import com.epam.gym_crm.dto.request.trainee.TraineeUpdateRequest;
+import com.epam.gym_crm.dto.request.trainee.TraineeUpdateTrainersRequest;
+import com.epam.gym_crm.dto.response.TraineeProfileResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
@@ -92,7 +92,6 @@ class TraineeServiceImplTest {
         createRequest.setLastName("Trainee");
         createRequest.setDateOfBirth(LocalDate.of(1995, 5, 10));
         createRequest.setAddress("New Trainee Address");
-        createRequest.setActive(true); 
 
         updateRequest = new TraineeUpdateRequest();
         updateRequest.setUsername("Test.Trainee");
@@ -129,14 +128,13 @@ class TraineeServiceImplTest {
         // Çünkü servis metodu 'false' ile çağırıyor.
         when(authenticationService.createAndSaveUser(
                 createRequest.getFirstName(),
-                createRequest.getLastName(),
-                createRequest.isActive() 
+                createRequest.getLastName()
         )).thenReturn(newUser);
 
         when(traineeRepository.save(any(Trainee.class))).thenReturn(newTrainee);
 
         // When
-        TraineeResponse response = traineeService.createTrainee(createRequest);
+        TraineeProfileResponse response = traineeService.createTrainee(createRequest);
 
         // Then
         assertNotNull(response);
@@ -148,7 +146,7 @@ class TraineeServiceImplTest {
         assertEquals(createRequest.getAddress(), response.getAddress());
 
        
-        verify(authenticationService).createAndSaveUser(createRequest.getFirstName(), createRequest.getLastName(), createRequest.isActive());
+        verify(authenticationService).createAndSaveUser(createRequest.getFirstName(), createRequest.getLastName());
         verify(traineeRepository).save(any(Trainee.class));
     }
 
@@ -164,13 +162,12 @@ class TraineeServiceImplTest {
     void shouldPropagateExceptionWhenUserCreationFails() {
         when(authenticationService.createAndSaveUser(
                 anyString(),
-                anyString(),
-                anyBoolean()
+                anyString()
         )).thenThrow(new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "User creation failed")));
 
         BaseException exception = assertThrows(BaseException.class, () -> traineeService.createTrainee(createRequest));
         assertTrue(exception.getMessage().contains("User creation failed"));
-        verify(authenticationService).createAndSaveUser(anyString(), anyString(), anyBoolean());
+        verify(authenticationService).createAndSaveUser(anyString(), anyString());
         verify(traineeRepository, never()).save(any(Trainee.class));
     }
 
@@ -184,7 +181,7 @@ class TraineeServiceImplTest {
 
         when(traineeRepository.findById(testTrainee.getId())).thenReturn(Optional.of(testTrainee));
 
-        TraineeResponse response = traineeService.findTraineeById(testTrainee.getId());
+        TraineeProfileResponse response = traineeService.findTraineeById(testTrainee.getId());
 
         // Then
         assertNotNull(response);
@@ -227,7 +224,7 @@ class TraineeServiceImplTest {
         when(traineeRepository.findByUserUsername(testUser.getUsername())).thenReturn(Optional.of(testTrainee));
 
         // When
-        TraineeResponse response = traineeService.findTraineeByUsername(testUser.getUsername());
+        TraineeProfileResponse response = traineeService.findTraineeByUsername(testUser.getUsername());
 
         // Then
         assertNotNull(response);
@@ -291,7 +288,7 @@ class TraineeServiceImplTest {
         when(traineeRepository.findAll()).thenReturn(trainees);
 
         // When
-        List<TraineeResponse> responses = traineeService.getAllTrainees();
+        List<TraineeProfileResponse> responses = traineeService.getAllTrainees();
 
         // Then
         assertNotNull(responses);
@@ -312,7 +309,7 @@ class TraineeServiceImplTest {
         when(traineeRepository.findAll()).thenReturn(new ArrayList<>());
 
         // When
-        List<TraineeResponse> responses = traineeService.getAllTrainees();
+        List<TraineeProfileResponse> responses = traineeService.getAllTrainees();
 
         // Then
         assertNotNull(responses);
@@ -353,7 +350,7 @@ class TraineeServiceImplTest {
         when(traineeRepository.save(any(Trainee.class))).thenAnswer(i -> i.getArgument(0));
 
         // When
-        TraineeResponse response = traineeService.updateTrainee(updateRequest);
+        TraineeProfileResponse response = traineeService.updateTrainee(updateRequest);
 
         // Then
         assertNotNull(response);
@@ -463,7 +460,7 @@ class TraineeServiceImplTest {
         when(traineeRepository.save(any(Trainee.class))).thenAnswer(i -> i.getArgument(0));
 
         // When
-        TraineeResponse response = traineeService.updateTraineeTrainersList(req);
+        TraineeProfileResponse response = traineeService.updateTraineeTrainersList(req);
 
         // Then
         assertNotNull(response);
@@ -493,7 +490,7 @@ class TraineeServiceImplTest {
         when(traineeRepository.save(any(Trainee.class))).thenAnswer(i -> i.getArgument(0));
 
         // When
-        TraineeResponse response = traineeService.updateTraineeTrainersList(req);
+        TraineeProfileResponse response = traineeService.updateTraineeTrainersList(req);
 
         // Then
         assertNotNull(response);

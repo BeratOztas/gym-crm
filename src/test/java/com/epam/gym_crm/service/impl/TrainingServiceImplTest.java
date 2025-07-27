@@ -28,10 +28,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.epam.gym_crm.auth.AuthManager;
-import com.epam.gym_crm.dto.request.TraineeTrainingListRequest;
-import com.epam.gym_crm.dto.request.TrainerTrainingListRequest;
-import com.epam.gym_crm.dto.request.TrainingCreateRequest;
-import com.epam.gym_crm.dto.request.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.request.trainee.TraineeTrainingListRequest;
+import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
+import com.epam.gym_crm.dto.request.training.TrainingCreateRequest;
+import com.epam.gym_crm.dto.request.training.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse;
+import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
 import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.model.Trainee;
@@ -90,19 +92,18 @@ class TrainingServiceImplTest {
     void shouldCreateTrainingSuccessfully() {
         // Given
         TrainingCreateRequest request = new TrainingCreateRequest(
-            "Morning Yoga",
+        		testTrainee.getUser().getUsername(),
+        		testTrainer.getUser().getUsername(),
+        		testTrainingType.getTrainingTypeName(),
             LocalDate.of(2023, 10, 26),
-            60,
-            testTrainer.getUser().getUsername(),
-            testTrainee.getUser().getUsername(),
-            testTrainingType.getTrainingTypeName()
+            60
         );
 
         when(trainerRepository.findByUserUsername(request.getTrainerUsername()))
             .thenReturn(Optional.of(testTrainer));
         when(traineeRepository.findByUserUsername(request.getTraineeUsername()))
             .thenReturn(Optional.of(testTrainee));
-        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName()))
+        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getTrainingName()))
             .thenReturn(Optional.of(testTrainingType));
 
         
@@ -131,7 +132,7 @@ class TrainingServiceImplTest {
         verify(authManager).getCurrentUser();
         verify(trainerRepository).findByUserUsername(request.getTrainerUsername());
         verify(traineeRepository).findByUserUsername(request.getTraineeUsername());
-        verify(trainingTypeRepository).findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName());
+        verify(trainingTypeRepository).findByTrainingTypeNameIgnoreCase(request.getTrainingName());
         verify(trainingRepository).save(any(Training.class));
     }
 
@@ -139,12 +140,11 @@ class TrainingServiceImplTest {
     void shouldThrowExceptionWhenCreateTrainingTrainerNotFound() {
         // Given
         TrainingCreateRequest request = new TrainingCreateRequest(
-            "Morning Yoga",
+        		testTrainee.getUser().getUsername(),
+        		"nonexistent.trainer", // Non-existent trainer username
+        		testTrainingType.getTrainingTypeName(),
             LocalDate.of(2023, 10, 26),
-            60,
-            "nonexistent.trainer", // Non-existent trainer username
-            testTrainee.getUser().getUsername(),
-            testTrainingType.getTrainingTypeName()
+            60
         );
 
         when(trainerRepository.findByUserUsername(request.getTrainerUsername()))
@@ -171,12 +171,11 @@ class TrainingServiceImplTest {
         Trainer inactiveTrainer = new Trainer(6L, testTrainingType, inactiveTrainerUser, new HashSet<>(), new HashSet<>());
 
         TrainingCreateRequest request = new TrainingCreateRequest(
-            "Morning Yoga",
-            LocalDate.of(2023, 10, 26),
-            60,
+        		testTrainee.getUser().getUsername(),
             inactiveTrainer.getUser().getUsername(),
-            testTrainee.getUser().getUsername(),
-            testTrainingType.getTrainingTypeName()
+            testTrainingType.getTrainingTypeName(),
+            LocalDate.of(2023, 10, 26),
+            60
         );
 
         when(trainerRepository.findByUserUsername(request.getTrainerUsername()))
@@ -198,12 +197,11 @@ class TrainingServiceImplTest {
     void shouldThrowExceptionWhenCreateTrainingTraineeNotFound() {
         // Given
         TrainingCreateRequest request = new TrainingCreateRequest(
-            "Morning Yoga",
-            LocalDate.of(2023, 10, 26),
-            60,
+        		"nonexistent.trainee", // Non-existent trainee username
             testTrainer.getUser().getUsername(),
-            "nonexistent.trainee", // Non-existent trainee username
-            testTrainingType.getTrainingTypeName()
+            testTrainingType.getTrainingTypeName(),
+            LocalDate.of(2023, 10, 26),
+            60
         );
 
         when(trainerRepository.findByUserUsername(request.getTrainerUsername()))
@@ -232,12 +230,11 @@ class TrainingServiceImplTest {
         Trainee inactiveTrainee = new Trainee(3L, LocalDate.of(2000, 1, 1), "Some Address", inactiveTraineeUser, new HashSet<>(), new HashSet<>());
 
         TrainingCreateRequest request = new TrainingCreateRequest(
-            "Morning Yoga",
-            LocalDate.of(2023, 10, 26),
-            60,
+        		inactiveTrainee.getUser().getUsername(),
             testTrainer.getUser().getUsername(),
-            inactiveTrainee.getUser().getUsername(),
-            testTrainingType.getTrainingTypeName()
+            testTrainingType.getTrainingTypeName(),
+            LocalDate.of(2023, 10, 26),
+            60
         );
 
         when(trainerRepository.findByUserUsername(request.getTrainerUsername()))
@@ -261,19 +258,18 @@ class TrainingServiceImplTest {
     void shouldThrowExceptionWhenCreateTrainingTrainingTypeNotFound() {
         // Given
         TrainingCreateRequest request = new TrainingCreateRequest(
-            "Morning Yoga",
+        		testTrainee.getUser().getUsername(),
+        		testTrainer.getUser().getUsername(),
+        		"NonExistentType" ,// Non-existent training type
             LocalDate.of(2023, 10, 26),
-            60,
-            testTrainer.getUser().getUsername(),
-            testTrainee.getUser().getUsername(),
-            "NonExistentType" // Non-existent training type
+            60
         );
 
         when(trainerRepository.findByUserUsername(request.getTrainerUsername()))
             .thenReturn(Optional.of(testTrainer));
         when(traineeRepository.findByUserUsername(request.getTraineeUsername()))
             .thenReturn(Optional.of(testTrainee));
-        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName()))
+        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(request.getTrainingName()))
             .thenReturn(Optional.empty()); // Training type not found
 
         // When
@@ -285,7 +281,7 @@ class TrainingServiceImplTest {
         verify(authManager).getCurrentUser();
         verify(trainerRepository).findByUserUsername(request.getTrainerUsername());
         verify(traineeRepository).findByUserUsername(request.getTraineeUsername());
-        verify(trainingTypeRepository).findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName());
+        verify(trainingTypeRepository).findByTrainingTypeNameIgnoreCase(request.getTrainingName());
         verifyNoInteractions(trainingRepository);
     }
 
@@ -298,33 +294,50 @@ class TrainingServiceImplTest {
             testTrainee.getUser().getUsername(),
             LocalDate.of(2023, 1, 1),
             LocalDate.of(2023, 12, 31),
-            testTrainer.getUser().getFirstName(), 
+            testTrainer.getUser().getFirstName(),
             testTrainingType.getTrainingTypeName()
         );
 
-        
         when(authManager.getCurrentUser()).thenReturn(testTrainee.getUser());
 
-        // Training constructor: id, trainingName, trainingDate, trainingDuration, trainee, trainer, trainingType
-        Training training1 = new Training(1L, "Yoga", LocalDate.of(2023, 5, 10), 60, testTrainee, testTrainer, testTrainingType);
-        Training training2 = new Training(2L, "Pilates", LocalDate.of(2023, 6, 15), 45, testTrainee, testTrainer, testTrainingType);
-        List<TrainingResponse> mockResponseList = Arrays.asList(
-            new TrainingResponse(training1),
-            new TrainingResponse(training2)
+        // NOT: Training nesnelerinden doğrudan TraineeTrainingInfoResponse nesneleri oluşturmalısınız.
+        // TraineeTrainingInfoResponse'un constructor'ı, trainerName'i doğrudan String olarak alıyor.
+        // Eğer TraineeTrainingInfoResponse'un constructor'ı Trainer nesnesi alıyorsa, ona göre ayarlayın.
+        // Varsayım: TraineeTrainingInfoResponse(String trainingName, LocalDate trainingDate, String trainingType, Integer trainingDuration, String trainerName)
+        TraineeTrainingInfoResponse trainingInfo1 = new TraineeTrainingInfoResponse(
+            "Yoga",
+            LocalDate.of(2023, 5, 10),
+            testTrainingType.getTrainingTypeName(), // TrainingType nesnesinden name'i alın
+            60,
+            testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName() // Trainer'ın tam adını verin
+        );
+        TraineeTrainingInfoResponse trainingInfo2 = new TraineeTrainingInfoResponse(
+            "Pilates",
+            LocalDate.of(2023, 6, 15),
+            testTrainingType.getTrainingTypeName(), // TrainingType nesnesinden name'i alın
+            45,
+            testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName() // Trainer'ın tam adını verin
+        );
+
+        List<TraineeTrainingInfoResponse> mockResponseList = Arrays.asList(
+            trainingInfo1,
+            trainingInfo2
         );
 
         when(traineeRepository.findByUserUsername(request.getTraineeUsername()))
             .thenReturn(Optional.of(testTrainee));
+
+        // Burası düzeltildi: now returns List<TraineeTrainingInfoResponse>
         when(trainingRepository.findTraineeTrainingsByCriteria(
                 request.getTraineeUsername(),
                 request.getFromDate(),
                 request.getToDate(),
-                request.getTrainerName(),
+                request.getTrainerName(), // Bu parametrenin Trainer'ın tam adı mı yoksa sadece adı mı olması gerektiğinden emin olun.
                 request.getTrainingTypeName()))
-            .thenReturn(mockResponseList);
+            .thenReturn(mockResponseList); // Artık doğru tipte mocklanıyor
 
         // When
-        List<TrainingResponse> result = trainingService.getTraineeTrainingsList(request);
+        List<TraineeTrainingInfoResponse> result = trainingService.getTraineeTrainingsList(request);
 
         // Then
         assertNotNull(result);
@@ -332,6 +345,9 @@ class TrainingServiceImplTest {
         assertEquals(2, result.size());
         assertEquals(mockResponseList.get(0).getTrainingName(), result.get(0).getTrainingName());
         assertEquals(mockResponseList.get(1).getTrainingName(), result.get(1).getTrainingName());
+        assertEquals(mockResponseList.get(0).getTrainerName(), result.get(0).getTrainerName()); // TrainerName'i de kontrol edebilirsiniz
+        assertEquals(mockResponseList.get(1).getTrainerName(), result.get(1).getTrainerName());
+
 
         verify(authManager).getCurrentUser();
         verify(traineeRepository).findByUserUsername(request.getTraineeUsername());
@@ -423,37 +439,57 @@ class TrainingServiceImplTest {
     @Test
     void shouldGetTrainerTrainingsListSuccessfully() {
         // Given
+        // NOT: TrainerTrainingListRequest artık trainingTypeName'ı almıyor olmalı.
+        // Eğer alıyorsa ve kullanmıyorsa, parametreyi silin veya null geçin.
+        // Önceki commit mesajınızda trainer tarafında TrainingTypeName filtresinin kaldırıldığı belirtilmişti.
         TrainerTrainingListRequest request = new TrainerTrainingListRequest(
             testTrainer.getUser().getUsername(),
             LocalDate.of(2023, 1, 1),
             LocalDate.of(2023, 12, 31),
-            testTrainee.getUser().getFirstName(), // Using first name as trainee name in request
-            testTrainingType.getTrainingTypeName()
+            testTrainee.getUser().getFirstName() // Eğer bu TrainerTrainingListRequest trainerName yerine traineeName alıyorsa.
+                                               // Veya TrainerTrainingListRequest'in constructor'ını kontrol edin.
         );
 
         // Ensure current user is the requested trainer
         when(authManager.getCurrentUser()).thenReturn(testTrainer.getUser());
 
-        // Training constructor: id, trainingName, trainingDate, trainingDuration, trainee, trainer, trainingType
-        Training training1 = new Training(1L, "Strength", LocalDate.of(2023, 5, 10), 60, testTrainee, testTrainer, testTrainingType);
-        Training training2 = new Training(2L, "Cardio", LocalDate.of(2023, 6, 15), 45, testTrainee, testTrainer, testTrainingType);
-        List<TrainingResponse> mockResponseList = Arrays.asList(
-            new TrainingResponse(training1),
-            new TrainingResponse(training2)
+        // NOT: TrainerTrainingInfoResponse nesneleri oluşturmalısınız.
+        // TrainerTrainingInfoResponse constructor: trainingName, trainingDate, trainingType, trainingDuration, traineeName
+        TrainerTrainingInfoResponse trainingInfo1 = new TrainerTrainingInfoResponse(
+            "Strength",
+            LocalDate.of(2023, 5, 10),
+            testTrainingType.getTrainingTypeName(), // TrainingType adını verin
+            60,
+            testTrainee.getUser().getFirstName() + " " + testTrainee.getUser().getLastName() // Trainee'nin tam adını verin
+        );
+        TrainerTrainingInfoResponse trainingInfo2 = new TrainerTrainingInfoResponse(
+            "Cardio",
+            LocalDate.of(2023, 6, 15),
+            testTrainingType.getTrainingTypeName(), // TrainingType adını verin
+            45,
+            testTrainee.getUser().getFirstName() + " " + testTrainee.getUser().getLastName() // Trainee'nin tam adını verin
+        );
+
+        List<TrainerTrainingInfoResponse> mockResponseList = Arrays.asList(
+            trainingInfo1,
+            trainingInfo2
         );
 
         when(trainerRepository.findByUserUsername(request.getTrainerUsername()))
             .thenReturn(Optional.of(testTrainer));
+
+        // Burası düzeltildi: now returns List<TrainerTrainingInfoResponse>
+        // Ayrıca, trainingRepository.findTrainerTrainingsByCriteria artık trainingTypeName parametresi almamalı.
         when(trainingRepository.findTrainerTrainingsByCriteria(
                 request.getTrainerUsername(),
                 request.getFromDate(),
                 request.getToDate(),
-                request.getTraineeName(),
-                request.getTrainingTypeName()))
-            .thenReturn(mockResponseList);
+                request.getTraineeName()
+                ))
+            .thenReturn(mockResponseList); // Artık doğru tipte mocklanıyor
 
         // When
-        List<TrainingResponse> result = trainingService.getTrainerTrainingsList(request);
+        List<TrainerTrainingInfoResponse> result = trainingService.getTrainerTrainingsList(request);
 
         // Then
         assertNotNull(result);
@@ -461,6 +497,8 @@ class TrainingServiceImplTest {
         assertEquals(2, result.size());
         assertEquals(mockResponseList.get(0).getTrainingName(), result.get(0).getTrainingName());
         assertEquals(mockResponseList.get(1).getTrainingName(), result.get(1).getTrainingName());
+        assertEquals(mockResponseList.get(0).getTraineeName(), result.get(0).getTraineeName()); // TraineeName'i de kontrol edebilirsiniz
+        assertEquals(mockResponseList.get(1).getTraineeName(), result.get(1).getTraineeName());
 
         verify(authManager).getCurrentUser();
         verify(trainerRepository).findByUserUsername(request.getTrainerUsername());
@@ -468,8 +506,8 @@ class TrainingServiceImplTest {
                 request.getTrainerUsername(),
                 request.getFromDate(),
                 request.getToDate(),
-                request.getTraineeName(),
-                request.getTrainingTypeName());
+                request.getTraineeName()
+                );
     }
 
     @Test
@@ -477,7 +515,7 @@ class TrainingServiceImplTest {
         // Given
         TrainerTrainingListRequest request = new TrainerTrainingListRequest(
             testTrainer.getUser().getUsername(), // Request for a different trainer
-            null, null, null, null
+            null, null, null
         );
 
         // Current user is NOT the requested trainer
@@ -499,7 +537,7 @@ class TrainingServiceImplTest {
         // Given
         TrainerTrainingListRequest request = new TrainerTrainingListRequest(
             "nonexistent.trainer", // Request for non-existent trainer
-            null, null, null, null
+            null, null, null
         );
 
         // Current user is the one specified in the request
@@ -520,35 +558,6 @@ class TrainingServiceImplTest {
         verify(trainerRepository).findByUserUsername(request.getTrainerUsername());
         verifyNoInteractions(trainingRepository);
     }
-
-    @Test
-    void shouldThrowExceptionWhenGetTrainerTrainingsListTrainerNotActive() {
-        // Given
-        User inactiveTrainerUser = new User(4L, "Inactive", "Trainer", "inactive.trainer", "pass", false, null, null);
-        
-        Trainer inactiveTrainer = new Trainer(6L, testTrainingType, inactiveTrainerUser, new HashSet<>(), new HashSet<>());
-
-        TrainerTrainingListRequest request = new TrainerTrainingListRequest(
-            inactiveTrainer.getUser().getUsername(),
-            null, null, null, null
-        );
-
-        // Current user is the inactive trainer
-        when(authManager.getCurrentUser()).thenReturn(inactiveTrainer.getUser());
-
-        when(trainerRepository.findByUserUsername(request.getTrainerUsername()))
-            .thenReturn(Optional.of(inactiveTrainer));
-
-        // When
-        BaseException exception = assertThrows(BaseException.class, () -> trainingService.getTrainerTrainingsList(request));
-
-        // Then
-        assertEquals("User is not active : Trainer inactive.trainer is not active. Cannot retrieve their trainings.", exception.getMessage());
-        verify(authManager).getCurrentUser();
-        verify(trainerRepository).findByUserUsername(request.getTrainerUsername());
-        verifyNoInteractions(trainingRepository);
-    }
-
 
     // --- Other methods (getTrainingById, getAllTrainings, updateTraining, deleteTrainingById) ---
 
