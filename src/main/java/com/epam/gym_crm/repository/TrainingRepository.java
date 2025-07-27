@@ -1,7 +1,9 @@
 package com.epam.gym_crm.repository;
 
 import com.epam.gym_crm.model.Training;
-import com.epam.gym_crm.dto.response.TrainingResponse;
+import com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse;
+import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,17 +16,12 @@ import java.util.List;
 public interface TrainingRepository extends JpaRepository<Training, Long> {
 
     @Query("""
-            SELECT NEW com.epam.gym_crm.dto.response.TrainingResponse(
+            SELECT NEW com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse(
                 t.trainingName,
                 t.trainingDate,
-                t.trainingDuration,
                 tt.trainingTypeName,
-                tr.user.username,
-                tr.user.firstName,
-                tr.user.lastName,
-                ts.user.username,
-                ts.user.firstName,
-                ts.user.lastName
+                t.trainingDuration,
+                CONCAT(tr.user.firstName, ' ', tr.user.lastName)
             )
             FROM Training t
             JOIN t.trainee ts
@@ -43,7 +40,7 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
                 LOWER(tt.trainingTypeName) LIKE LOWER(CONCAT('%', :trainingTypeName, '%'))
               )
         """)
-    List<TrainingResponse> findTraineeTrainingsByCriteria(
+    List<TraineeTrainingInfoResponse> findTraineeTrainingsByCriteria(
         @Param("traineeUsername") String traineeUsername,
         @Param("fromDate") LocalDate fromDate,
         @Param("toDate") LocalDate toDate,
@@ -52,17 +49,12 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
     );
 
     @Query("""
-            SELECT NEW com.epam.gym_crm.dto.response.TrainingResponse(
+            SELECT NEW com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse(
                 t.trainingName,
                 t.trainingDate,
-                t.trainingDuration,
                 tt.trainingTypeName,
-                tr.user.username,
-                tr.user.firstName,
-                tr.user.lastName,
-                ts.user.username,
-                ts.user.firstName,
-                ts.user.lastName
+                t.trainingDuration,
+                CONCAT(ts.user.firstName, ' ', ts.user.lastName)
             )
             FROM Training t
             JOIN t.trainee ts
@@ -76,16 +68,11 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
                 LOWER(ts.user.firstName) LIKE LOWER(CONCAT('%', :traineeName, '%')) OR
                 LOWER(ts.user.lastName) LIKE LOWER(CONCAT('%', :traineeName, '%'))
               )
-              AND (
-                :trainingTypeName IS NULL OR
-                LOWER(tt.trainingTypeName) LIKE LOWER(CONCAT('%', :trainingTypeName, '%'))
-              )
         """)
-    List<TrainingResponse> findTrainerTrainingsByCriteria(
+    List<TrainerTrainingInfoResponse> findTrainerTrainingsByCriteria(
         @Param("trainerUsername") String trainerUsername,
         @Param("fromDate") LocalDate fromDate,
         @Param("toDate") LocalDate toDate,
-        @Param("traineeName") String traineeName,
-        @Param("trainingTypeName") String trainingTypeName
+        @Param("traineeName") String traineeName
     );
 }
