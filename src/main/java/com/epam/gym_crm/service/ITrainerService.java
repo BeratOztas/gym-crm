@@ -2,24 +2,24 @@ package com.epam.gym_crm.service;
 
 import java.util.List;
 
-import com.epam.gym_crm.dto.request.TrainerCreateRequest;
-import com.epam.gym_crm.dto.request.TrainerUpdateRequest;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
-import com.epam.gym_crm.dto.response.TrainerResponse;
+import com.epam.gym_crm.dto.request.trainer.TrainerCreateRequest;
+import com.epam.gym_crm.dto.request.trainer.TrainerUpdateRequest;
+import com.epam.gym_crm.dto.response.TrainerProfileResponse;
 
 public interface ITrainerService {
 
-	TrainerResponse findTrainerById(Long id);
+	TrainerProfileResponse findTrainerById(Long id);
 
-	TrainerResponse findTrainerByUsername(String username); 
+	TrainerProfileResponse findTrainerByUsername(String username); 
 
-	List<TrainerResponse> getAllTrainers();
+	List<TrainerProfileResponse> getAllTrainers();
 	
-	List<TrainerResponse> getUnassignedTrainersForTrainee(String traineeUsername);
+	List<TrainerProfileResponse> getUnassignedTrainersForTrainee(String traineeUsername);
 
-	TrainerResponse createTrainer(TrainerCreateRequest request);
+	TrainerProfileResponse createTrainer(TrainerCreateRequest request);
 
-	TrainerResponse updateTrainer(TrainerUpdateRequest request);
+	TrainerProfileResponse updateTrainer(TrainerUpdateRequest request);
 
 	void activateDeactivateTrainer(UserActivationRequest request);
 

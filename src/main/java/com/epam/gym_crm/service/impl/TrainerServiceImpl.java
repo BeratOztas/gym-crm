@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.epam.gym_crm.auth.AuthManager;
-import com.epam.gym_crm.dto.request.TrainerCreateRequest;
-import com.epam.gym_crm.dto.request.TrainerUpdateRequest;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
-import com.epam.gym_crm.dto.response.TrainerResponse;
+import com.epam.gym_crm.dto.request.trainer.TrainerCreateRequest;
+import com.epam.gym_crm.dto.request.trainer.TrainerUpdateRequest;
+import com.epam.gym_crm.dto.response.TrainerProfileResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
@@ -57,7 +57,7 @@ public class TrainerServiceImpl implements ITrainerService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public TrainerResponse findTrainerById(Long id) {
+	public TrainerProfileResponse findTrainerById(Long id) {
 		 User currentUser = authManager.getCurrentUser();
 		    logger.info("User '{}' attempting to find Trainer profile by ID '{}'.",
 		                currentUser.getUsername(), id);
@@ -76,12 +76,12 @@ public class TrainerServiceImpl implements ITrainerService {
 		});
 
 		logger.info("Finding Trainer by ID={} -> Found: {}", id, true);
-		return new TrainerResponse(foundTrainer);
+		return new TrainerProfileResponse(foundTrainer);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public TrainerResponse findTrainerByUsername(String username) {
+	public TrainerProfileResponse findTrainerByUsername(String username) {
 
 		 User currentUser = authManager.getCurrentUser();
 
@@ -103,21 +103,21 @@ public class TrainerServiceImpl implements ITrainerService {
 		});
 
 		logger.info("Finding Trainer by username='{}' -> Found: {}", username, true);
-		return new TrainerResponse(foundTrainer);
+		return new TrainerProfileResponse(foundTrainer);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TrainerResponse> getAllTrainers() {
+	public List<TrainerProfileResponse> getAllTrainers() {
 		User currentUser = authManager.getCurrentUser();
         logger.info("User '{}' attempting to retrieve all Trainers.", currentUser.getUsername());
         
         List<Trainer> trainers = trainerRepository.findAll();
         logger.info("Retrieved {} trainers from the database.", trainers.size());
         
-        List<TrainerResponse> returnList = trainers
+        List<TrainerProfileResponse> returnList = trainers
         		.stream()
-                .map(TrainerResponse::new) 
+                .map(TrainerProfileResponse::new) 
                 .collect(Collectors.toList());
         
         logger.info("Converted {} Trainer entities to TrainerResponse DTOs.", returnList.size());
@@ -126,7 +126,7 @@ public class TrainerServiceImpl implements ITrainerService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<TrainerResponse> getUnassignedTrainersForTrainee(String traineeUsername) {
+	public List<TrainerProfileResponse> getUnassignedTrainersForTrainee(String traineeUsername) {
 		 User currentUser = authManager.getCurrentUser();
 	        logger.info("User '{}' attempting to retrieve unassigned and active trainers for trainee '{}'.",
 	                    currentUser.getUsername(), traineeUsername);
@@ -154,9 +154,9 @@ public class TrainerServiceImpl implements ITrainerService {
 	        
 	        List<Trainer> unassignedTrainers = trainerRepository.findActiveTrainersNotAssignedToTrainee(traineeUsername);
 	        
-	        List<TrainerResponse> unassignedTrainerList = unassignedTrainers
+	        List<TrainerProfileResponse> unassignedTrainerList = unassignedTrainers
 	        		.stream()
-	                .map(TrainerResponse::new)
+	                .map(TrainerProfileResponse::new)
 	                .collect(Collectors.toList());
 	        
 	        logger.info("Successfully retrieved {} unassigned and active trainers for trainee '{}' for user '{}'.",
@@ -169,20 +169,20 @@ public class TrainerServiceImpl implements ITrainerService {
 
 	@Override
 	@Transactional()
-	public TrainerResponse createTrainer(TrainerCreateRequest request) {
+	public TrainerProfileResponse createTrainer(TrainerCreateRequest request) {
 		if (request == null) {
 			logger.error("Trainer must not be null");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainer must not be null"));
 		}
 
-		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName(),
-				request.isActive());
+		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName()
+				);
 
 		TrainingType specialization = trainingTypeRepository
-				.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName()).orElseThrow(() -> {
-					logger.error("Training type not found: {}", request.getTrainingTypeName());
+				.findByTrainingTypeNameIgnoreCase(request.getSpecialization()).orElseThrow(() -> {
+					logger.error("Training type not found: {}", request.getSpecialization());
 					return new BaseException(new ErrorMessage(MessageType.ENTITY_NOT_FOUND,
-							"Training type not found: " + request.getTrainingTypeName()));
+							"Training type not found: " + request.getSpecialization()));
 				});
 
 		Trainer trainer = new Trainer();
@@ -199,13 +199,13 @@ public class TrainerServiceImpl implements ITrainerService {
 
 		logger.info("Trainer profile created successfully for user: {}", newUser.getUsername());
 
-		return new TrainerResponse(savedTrainer);
+		return new TrainerProfileResponse(savedTrainer);
 
 	}
 
 	@Override
 	@Transactional()
-	public TrainerResponse updateTrainer(TrainerUpdateRequest request) {
+	public TrainerProfileResponse updateTrainer(TrainerUpdateRequest request) {
 		User currentUser = authManager.getCurrentUser();
 
 		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
@@ -239,13 +239,13 @@ public class TrainerServiceImpl implements ITrainerService {
 			userToUpdate.setLastName(request.getLastName());
 		}
 
-		if (request.getSpecializationName() != null && !request.getSpecializationName().isBlank()) {
+		if (request.getSpecialization() != null && !request.getSpecialization().isBlank()) {
             TrainingType newSpecialization = trainingTypeRepository
-                    .findByTrainingTypeNameIgnoreCase(request.getSpecializationName())
+                    .findByTrainingTypeNameIgnoreCase(request.getSpecialization())
                     .orElseThrow(() -> {
-                        logger.warn("Invalid training type for update: {}", request.getSpecializationName());
+                        logger.warn("Invalid training type for update: {}", request.getSpecialization());
                         return new BaseException(new ErrorMessage(MessageType.ENTITY_NOT_FOUND,
-                                "Training type not found: " + request.getSpecializationName()));
+                                "Training type not found: " + request.getSpecialization()));
                     });
             trainerToUpdate.setSpecialization(newSpecialization);
         }
@@ -253,7 +253,7 @@ public class TrainerServiceImpl implements ITrainerService {
 		
 		logger.info("Trainer profile updated successfully for user: {}", userToUpdate.getUsername());
 
-        return new TrainerResponse(updatedTrainer);
+        return new TrainerProfileResponse(updatedTrainer);
 	}
 
 	@Override
