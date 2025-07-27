@@ -4,18 +4,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.epam.gym_crm.auth.AuthManager;
-import com.epam.gym_crm.dto.request.TraineeTrainingListRequest;
-import com.epam.gym_crm.dto.request.TrainerTrainingListRequest;
-import com.epam.gym_crm.dto.request.TrainingCreateRequest;
-import com.epam.gym_crm.dto.request.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.request.trainee.TraineeTrainingListRequest;
+import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
+import com.epam.gym_crm.dto.request.training.TrainingCreateRequest;
+import com.epam.gym_crm.dto.request.training.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse;
+import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
 import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
@@ -29,7 +29,6 @@ import com.epam.gym_crm.repository.TraineeRepository;
 import com.epam.gym_crm.repository.TrainerRepository;
 import com.epam.gym_crm.repository.TrainingRepository;
 import com.epam.gym_crm.repository.TrainingTypeRepository;
-import com.epam.gym_crm.repository.UserRepository;
 import com.epam.gym_crm.service.ITrainingService;
 
 @Service
@@ -45,7 +44,7 @@ public class TrainingServiceImpl implements ITrainingService {
 
 	public TrainingServiceImpl(TrainingRepository trainingRepository, TraineeRepository traineeRepository,
 			TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository,
-			UserRepository userRepository, AuthManager authManager, DataSource dataSource) {
+			 AuthManager authManager) {
 		this.trainingRepository = trainingRepository;
 		this.traineeRepository = traineeRepository;
 		this.trainerRepository = trainerRepository;
@@ -112,7 +111,7 @@ public class TrainingServiceImpl implements ITrainingService {
 
 	@Override
     @Transactional(readOnly = true)
-	public List<TrainingResponse> getTraineeTrainingsList(TraineeTrainingListRequest request) {
+	public List<TraineeTrainingInfoResponse> getTraineeTrainingsList(TraineeTrainingListRequest request) {
 		User currentUser = authManager.getCurrentUser();
 		logger.info("User '{}' attempting to retrieve trainings list for trainee '{}' with criteria: {}",
 				currentUser.getUsername(), request.getTraineeUsername(), request);
@@ -128,7 +127,7 @@ public class TrainingServiceImpl implements ITrainingService {
 			logger.warn("Trainee with username '{}' not found when trying to retrieve their trainings.",
 					request.getTraineeUsername());
 			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-					"Trainee with username " + request.getTraineeUsername() + " not found."));
+					"Trainee with username "  + request.getTraineeUsername() + " not found."));
 		});
 
 		if (!foundTrainee.getUser().isActive()) {
@@ -137,25 +136,25 @@ public class TrainingServiceImpl implements ITrainingService {
 					"Trainee " + request.getTraineeUsername() + " is not active. Cannot retrieve their trainings."));
 		}
 
-		List<TrainingResponse> filteredTrainingList = trainingRepository.findTraineeTrainingsByCriteria(
+		List<TraineeTrainingInfoResponse> filteredTraineeTrainingList = trainingRepository.findTraineeTrainingsByCriteria(
 				request.getTraineeUsername(), request.getFromDate(), request.getToDate(), request.getTrainerName(),
 				request.getTrainingTypeName());
 
-		if (filteredTrainingList.isEmpty()) {
+		if (filteredTraineeTrainingList.isEmpty()) {
 			logger.info("No trainings found for trainee '{}' with specified criteria for user '{}'.",
 					request.getTraineeUsername(), currentUser.getUsername());
 			return List.of();
 		}
 
-		logger.info("Successfully retrieved {} trainings for trainee '{}' for user '{}'.", filteredTrainingList.size(),
+		logger.info("Successfully retrieved {} trainings for trainee '{}' for user '{}'.", filteredTraineeTrainingList.size(),
 				request.getTraineeUsername(), currentUser.getUsername());
 
-		return filteredTrainingList;
+		return filteredTraineeTrainingList;
 	}
 
 	@Override
 	@Transactional(readOnly=true)
-	public List<TrainingResponse> getTrainerTrainingsList(TrainerTrainingListRequest request) {
+	public List<TrainerTrainingInfoResponse> getTrainerTrainingsList(TrainerTrainingListRequest request) {
 		User currentUser = authManager.getCurrentUser();
 		logger.info("User '{}' attempting to retrieve trainings list for trainer '{}' with criteria: {}",
 				currentUser.getUsername(), request.getTrainerUsername(), request);
@@ -180,20 +179,20 @@ public class TrainingServiceImpl implements ITrainingService {
 					"Trainer " + request.getTrainerUsername() + " is not active. Cannot retrieve their trainings."));
 		}
 
-		List<TrainingResponse> filteredTrainingList = trainingRepository.findTrainerTrainingsByCriteria(
-				request.getTrainerUsername(), request.getFromDate(), request.getToDate(), request.getTraineeName(),
-				request.getTrainingTypeName());
+		List<TrainerTrainingInfoResponse> filteredTrainerTrainingList = trainingRepository.findTrainerTrainingsByCriteria(
+				request.getTrainerUsername(), request.getFromDate(), request.getToDate(), request.getTraineeName()
+				);
 
-		if (filteredTrainingList.isEmpty()) {
+		if (filteredTrainerTrainingList.isEmpty()) {
 			logger.info("No trainings found for trainer '{}' with specified criteria for user '{}'.",
 					request.getTrainerUsername(), currentUser.getUsername());
 			return List.of();
 		}
 
-		logger.info("Successfully retrieved {} trainings for trainer '{}' for user '{}'.", filteredTrainingList.size(),
+		logger.info("Successfully retrieved {} trainings for trainer '{}' for user '{}'.", filteredTrainerTrainingList.size(),
 				request.getTrainerUsername(), currentUser.getUsername());
 
-		return filteredTrainingList;
+		return filteredTrainerTrainingList;
 
 	}
 
@@ -231,11 +230,11 @@ public class TrainingServiceImpl implements ITrainingService {
 		}
 
 		TrainingType trainingType = trainingTypeRepository
-				.findByTrainingTypeNameIgnoreCase(request.getTrainingTypeName()).orElseThrow(() -> {
-					logger.warn("Training Type with name '{}' not found for training creation by user '{}'.",
-							request.getTrainingTypeName(), currentUser.getUsername());
+				.findByTrainingTypeNameIgnoreCase(request.getTrainingName()).orElseThrow(() -> {
+					logger.warn("Training  with name '{}' not found for training creation by user '{}'.",
+							request.getTrainingName(), currentUser.getUsername());
 					return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-							"Training Type " + request.getTrainingTypeName() + " not found."));
+							"Training  " + request.getTrainingName() + " not found."));
 				});
 
 		Training newTraining = new Training();

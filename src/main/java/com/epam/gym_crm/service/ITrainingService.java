@@ -2,10 +2,12 @@ package com.epam.gym_crm.service;
 
 import java.util.List;
 
-import com.epam.gym_crm.dto.request.TraineeTrainingListRequest;
-import com.epam.gym_crm.dto.request.TrainerTrainingListRequest;
-import com.epam.gym_crm.dto.request.TrainingCreateRequest;
-import com.epam.gym_crm.dto.request.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.request.trainee.TraineeTrainingListRequest;
+import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
+import com.epam.gym_crm.dto.request.training.TrainingCreateRequest;
+import com.epam.gym_crm.dto.request.training.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse;
+import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
 import com.epam.gym_crm.dto.response.TrainingResponse;
 
 public interface ITrainingService {
@@ -14,9 +16,9 @@ public interface ITrainingService {
 
 	List<TrainingResponse> getAllTrainings();
     
-    List<TrainingResponse> getTraineeTrainingsList(TraineeTrainingListRequest request);
+    List<TraineeTrainingInfoResponse> getTraineeTrainingsList(TraineeTrainingListRequest request);
 
-    List<TrainingResponse> getTrainerTrainingsList(TrainerTrainingListRequest request);
+    List<TrainerTrainingInfoResponse> getTrainerTrainingsList(TrainerTrainingListRequest request);
     
     TrainingResponse createTraining(TrainingCreateRequest request);
 
