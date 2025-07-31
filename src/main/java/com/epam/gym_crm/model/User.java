@@ -1,5 +1,7 @@
 package com.epam.gym_crm.model;
 
+import java.io.Serializable;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,18 +20,21 @@ import lombok.Setter;
 @Table(name = "`user`")
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User  implements Serializable{
+
+	private static final long serialVersionUID = -2309186367973399735L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	 
-	@Column(name = "first_name",nullable = false)
+	@Column(name = "first_name",nullable = false, columnDefinition = "varchar(255)")
 	private String firstName;
 	 
-	@Column(name = "last_name",nullable =  false)
+	@Column(name = "last_name",nullable =  false, columnDefinition = "varchar(255)")
 	private String lastName;
 	
 	@Column(name = "username",nullable = false,unique = true)
