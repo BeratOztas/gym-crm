@@ -1,46 +1,46 @@
 package com.epam.gym_crm.repository;
 
-import com.epam.gym_crm.model.Training;
-import com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse;
-import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
+import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
+import com.epam.gym_crm.model.Training;
 
 @Repository
 public interface TrainingRepository extends JpaRepository<Training, Long> {
 
-    @Query("""
-            SELECT NEW com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse(
-                t.trainingName,
-                t.trainingDate,
-                tt.trainingTypeName,
-                t.trainingDuration,
-                CONCAT(tr.user.firstName, ' ', tr.user.lastName)
-            )
-            FROM Training t
-            JOIN t.trainee ts
-            JOIN t.trainer tr
-            JOIN t.trainingType tt
-            WHERE ts.user.username = :traineeUsername
-              AND (t.trainingDate >= COALESCE(:fromDate, t.trainingDate))
-              AND (t.trainingDate <= COALESCE(:toDate, t.trainingDate))
+    @Query(value = """
+            SELECT
+                t.training_name,
+                t.training_date,
+                tt.training_type_name,
+                t.training_duration,
+                (u_trainer.first_name || ' ' || u_trainer.last_name)
+            FROM training t
+            JOIN trainee ts ON ts.id = t.trainee_id
+            JOIN "user" u_trainee ON u_trainee.id = ts.user_id
+            JOIN trainer tr ON tr.id = t.trainer_id
+            JOIN "user" u_trainer ON u_trainer.id = tr.user_id
+            JOIN training_type tt ON tt.id = t.training_type_id
+            WHERE u_trainee.username = :traineeUsername
+              AND (:fromDate IS NULL OR t.training_date >= :fromDate)
+              AND (:toDate IS NULL OR t.training_date <= :toDate)
               AND (
                 :trainerName IS NULL OR
-                LOWER(tr.user.firstName) LIKE LOWER(CONCAT('%', :trainerName, '%')) OR
-                LOWER(tr.user.lastName) LIKE LOWER(CONCAT('%', :trainerName, '%'))
+                LOWER(u_trainer.first_name) LIKE LOWER(CONCAT('%', :trainerName, '%')) OR
+                LOWER(u_trainer.last_name) LIKE LOWER(CONCAT('%', :trainerName, '%'))
               )
               AND (
                 :trainingTypeName IS NULL OR
-                LOWER(tt.trainingTypeName) LIKE LOWER(CONCAT('%', :trainingTypeName, '%'))
+                LOWER(tt.training_type_name) LIKE LOWER(CONCAT('%', :trainingTypeName, '%'))
               )
-        """)
-    List<TraineeTrainingInfoResponse> findTraineeTrainingsByCriteria(
+        """, nativeQuery = true)
+    List<Object[]> findTraineeTrainingsByCriteria(
         @Param("traineeUsername") String traineeUsername,
         @Param("fromDate") LocalDate fromDate,
         @Param("toDate") LocalDate toDate,
@@ -48,31 +48,36 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
         @Param("trainingTypeName") String trainingTypeName
     );
 
-    @Query("""
-            SELECT NEW com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse(
-                t.trainingName,
-                t.trainingDate,
-                tt.trainingTypeName,
-                t.trainingDuration,
-                CONCAT(ts.user.firstName, ' ', ts.user.lastName)
-            )
-            FROM Training t
-            JOIN t.trainee ts
-            JOIN t.trainer tr
-            JOIN t.trainingType tt
-            WHERE tr.user.username = :trainerUsername
-              AND (t.trainingDate >= COALESCE(:fromDate, t.trainingDate))
-              AND (t.trainingDate <= COALESCE(:toDate, t.trainingDate))
+    @Query(value = """
+            SELECT
+                t.training_name,
+                t.training_date,
+                tt.training_type_name,
+                t.training_duration,
+                (u_trainee.first_name || ' ' || u_trainee.last_name)
+            FROM training t
+            JOIN trainee ts ON ts.id = t.trainee_id
+            JOIN "user" u_trainee ON u_trainee.id = ts.user_id
+            JOIN trainer tr ON tr.id = t.trainer_id
+            JOIN "user" u_trainer ON u_trainer.id = tr.user_id
+            JOIN training_type tt ON tt.id = t.training_type_id
+            WHERE u_trainer.username = :trainerUsername
+              AND (:fromDate IS NULL OR t.training_date >= :fromDate)
+              AND (:toDate IS NULL OR t.training_date <= :toDate)
               AND (
                 :traineeName IS NULL OR
-                LOWER(ts.user.firstName) LIKE LOWER(CONCAT('%', :traineeName, '%')) OR
-                LOWER(ts.user.lastName) LIKE LOWER(CONCAT('%', :traineeName, '%'))
+                LOWER(u_trainee.first_name) LIKE LOWER(CONCAT('%', :traineeName, '%')) OR
+                LOWER(u_trainee.last_name) LIKE LOWER(CONCAT('%', :traineeName, '%'))
               )
-        """)
-    List<TrainerTrainingInfoResponse> findTrainerTrainingsByCriteria(
+        """, nativeQuery = true)
+    List<Object[]> findTrainerTrainingsByCriteria(
         @Param("trainerUsername") String trainerUsername,
         @Param("fromDate") LocalDate fromDate,
         @Param("toDate") LocalDate toDate,
         @Param("traineeName") String traineeName
     );
+    
+    @Modifying 
+    @Query("DELETE FROM Training t WHERE t.trainee.id = :traineeId")
+    void deleteByTraineeId(@Param("traineeId") Long traineeId);
 }
