@@ -26,6 +26,5 @@ public class TrainingType {
 	@Size(min = 3, max = 50, message = "Training type name must be between 3 and 50 characters")
 	@Column(name = "training_type_name", nullable = false, unique = true)
 	private String trainingTypeName;
-	
 
 }

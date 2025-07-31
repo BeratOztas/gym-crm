@@ -29,6 +29,7 @@ public class TrainingTypeServiceImpl implements ITrainingTypeService {
 	@Override
 	@Transactional(readOnly = true)	
 	public List<TrainingType> getTrainingTypes() {
+		logger.info("Get TrainingType-Service Called."); 
 		User currentUser = authManager.getCurrentUser();
 		logger.info("User '{}' attempting to retrieve all training types.", currentUser.getUsername());
 		List<TrainingType> trainingTypes = trainingTypeRepository.findAll();
@@ -37,4 +38,5 @@ public class TrainingTypeServiceImpl implements ITrainingTypeService {
 		return trainingTypes;
 	}
 
+	
 }

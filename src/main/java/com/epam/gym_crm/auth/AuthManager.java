@@ -20,10 +20,6 @@ public class AuthManager {
 		currentUser.remove();
 	}
 
-	public void setCurrentUser(User user) {
-		currentUser.set(user);
-	}
-
 	public User getCurrentUser() {
 		checkAuthentication();
 		return currentUser.get();
