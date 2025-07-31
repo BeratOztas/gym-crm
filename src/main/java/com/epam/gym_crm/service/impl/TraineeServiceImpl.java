@@ -1,5 +1,7 @@
 package com.epam.gym_crm.service.impl;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -17,15 +19,20 @@ import com.epam.gym_crm.dto.request.trainee.TraineeCreateRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeUpdateRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeUpdateTrainersRequest;
 import com.epam.gym_crm.dto.response.TraineeProfileResponse;
+import com.epam.gym_crm.dto.response.TrainerInfoResponse;
+import com.epam.gym_crm.dto.response.UserRegistrationResponse;
 // Exception imports
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.Trainer;
+import com.epam.gym_crm.model.Training;
+import com.epam.gym_crm.model.TrainingType;
 import com.epam.gym_crm.model.User;
 import com.epam.gym_crm.repository.TraineeRepository;
 import com.epam.gym_crm.repository.TrainerRepository;
+import com.epam.gym_crm.repository.TrainingRepository;
 import com.epam.gym_crm.repository.UserRepository;
 import com.epam.gym_crm.service.IAuthenticationService;
 import com.epam.gym_crm.service.ITraineeService;
@@ -37,14 +44,16 @@ public class TraineeServiceImpl implements ITraineeService {
 
 	private final TraineeRepository traineeRepository;
 	private final TrainerRepository trainerRepository;
+	private final TrainingRepository trainingRepository;
 	private final IAuthenticationService authenticationService;
 	private final UserRepository userRepository;
 	private final AuthManager authManager;
 
 	public TraineeServiceImpl(TraineeRepository traineeRepository, IAuthenticationService authenticationService,
-			AuthManager authManager, UserRepository userRepository, TrainerRepository trainerRepository) {
+			AuthManager authManager, UserRepository userRepository, TrainerRepository trainerRepository,TrainingRepository trainingRepository) {
 		this.traineeRepository = traineeRepository;
 		this.trainerRepository = trainerRepository;
+		this.trainingRepository=trainingRepository;
 		this.authenticationService = authenticationService;
 		this.authManager = authManager;
 		this.userRepository = userRepository;
@@ -55,7 +64,7 @@ public class TraineeServiceImpl implements ITraineeService {
 	public TraineeProfileResponse findTraineeById(Long id) {
 
 		User currentUser = authManager.getCurrentUser();
-		
+
 		logger.info("User '{}' attempting to find Trainee profile by ID '{}'.", currentUser.getUsername(), id);
 
 		if (id == null || id <= 0) {
@@ -73,7 +82,7 @@ public class TraineeServiceImpl implements ITraineeService {
 					new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee not found with ID: " + id));
 		});
 		logger.info("Finding Trainee by ID={} -> Found: {}", id, true);
-		
+
 		return new TraineeProfileResponse(foundTrainee);
 	}
 
@@ -113,7 +122,8 @@ public class TraineeServiceImpl implements ITraineeService {
 
 		List<Trainee> trainees = traineeRepository.findAll();
 		logger.info("Retrieving all trainees -> Count: {}", trainees.size());
-		List<TraineeProfileResponse> returnList = trainees.stream().map(TraineeProfileResponse::new).collect(Collectors.toList());
+		List<TraineeProfileResponse> returnList = trainees.stream().map(TraineeProfileResponse::new)
+				.collect(Collectors.toList());
 
 		logger.info("Converted {} Trainee entities to TraineeResponse DTOs.", returnList.size());
 		return returnList;
@@ -121,14 +131,13 @@ public class TraineeServiceImpl implements ITraineeService {
 
 	@Override
 	@Transactional()
-	public TraineeProfileResponse createTrainee(TraineeCreateRequest request) {
+	public UserRegistrationResponse createTrainee(TraineeCreateRequest request) {
 		if (request == null) {
 			logger.error("Trainee can not be null");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainee can not be null"));
 		}
 
-		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName()
-				);
+		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName());
 
 		logger.info("Received new transient User object for Trainee: Username = {}", newUser.getUsername());
 
@@ -147,7 +156,7 @@ public class TraineeServiceImpl implements ITraineeService {
 
 		logger.info("Trainee profile created successfully for user: {}", newUser.getUsername());
 
-		return new TraineeProfileResponse(createdTrainee);
+		return new UserRegistrationResponse(newUser.getUsername(), newUser.getPassword());
 
 	}
 
@@ -207,76 +216,97 @@ public class TraineeServiceImpl implements ITraineeService {
 		return new TraineeProfileResponse(updatedTrainee);
 	}
 
+
 	@Override
 	@Transactional
-	public TraineeProfileResponse updateTraineeTrainersList(TraineeUpdateTrainersRequest request) {
-		User currentUser = authManager.getCurrentUser();
-		logger.info("User '{}' attempting to update trainers list for trainee '{}'. Requested trainers: {}.",
-				currentUser.getUsername(), request.getTraineeUsername(), request.getTrainerUsernames());
+	public List<TrainerInfoResponse> updateTraineeTrainersList(TraineeUpdateTrainersRequest request) {
+	    User currentUser = authManager.getCurrentUser();
+	    
+	    logger.info("User '{}' attempting to update trainers list for trainee '{}'. Requested trainers: {}.",
+	            currentUser.getUsername(), request.getTraineeUsername(), request.getTrainerUsernames());
 
-		if (request == null || request.getTraineeUsername() == null || request.getTraineeUsername().isBlank()) {
-			logger.error("Update trainers list request or trainee username cannot be null/empty.");
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-					"Trainee username must not be null or empty in the update trainers list request."));
-		}
+	    if (request == null || request.getTraineeUsername() == null || request.getTraineeUsername().isBlank()) {
+	        throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+	                "Trainee username must not be null or empty in the update trainers list request."));
+	    }
+	    if (!currentUser.getUsername().equals(request.getTraineeUsername())) {
+	        throw new BaseException(new ErrorMessage(MessageType.FORBIDDEN,
+	                "You are not authorized to update trainers list for other trainees."));
+	    }
+	    Trainee traineeToUpdate = traineeRepository.findByUserUsername(request.getTraineeUsername()).orElseThrow(() -> {
+	        return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+	                "Trainee with username " + request.getTraineeUsername() + " not found."));
+	    });
+	    if (!traineeToUpdate.getUser().isActive()) {
+	        throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
+	                "Trainee " + request.getTraineeUsername() + " is not active. Cannot update their trainers list."));
+	    }
 
-		if (!currentUser.getUsername().equals(request.getTraineeUsername())) {
-			logger.warn("Access Denied: User '{}' attempted to update trainers list for trainee '{}'.",
-					currentUser.getUsername(), request.getTraineeUsername());
-			throw new BaseException(new ErrorMessage(MessageType.FORBIDDEN,
-					"You are not authorized to update trainers list for other trainees."));
-		}
+	    // ----- Prepare New Trainers -----
+	    
+	    Set<Trainer> newTrainers = new HashSet<>();
+	    if (request.getTrainerUsernames() != null && !request.getTrainerUsernames().isEmpty()) {
+	        for (String trainerUsername : request.getTrainerUsernames()) {
+	            Trainer trainer = trainerRepository.findByUserUsername(trainerUsername).orElseThrow(() -> {
+	                return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+	                        "Trainer with username " + trainerUsername + " not found."));
+	            });
+	            if (!trainer.getUser().isActive()) {
+	                throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
+	                        "Trainer " + trainerUsername + " is not active. Cannot assign."));
+	            }
+	            newTrainers.add(trainer);
+	        }
+	    }
 
-		Trainee traineeToUpdate = traineeRepository.findByUserUsername(request.getTraineeUsername()).orElseThrow(() -> {
-			logger.warn("Trainee with username '{}' not found for updating trainers list.",
-					request.getTraineeUsername());
-			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-					"Trainee with username " + request.getTraineeUsername() + " not found."));
-		});
+	    // ----- UPDATE trainee,trainer relations -----
+	    
+	    traineeToUpdate.setTrainers(newTrainers);
+	    traineeRepository.save(traineeToUpdate);
+	    logger.info("Successfully updated trainee_trainer join table for trainee '{}'.",
+	            traineeToUpdate.getUser().getUsername());
 
-		if (!traineeToUpdate.getUser().isActive()) {
-			logger.warn("Trainee '{}' is not active. Cannot update their trainers list.", request.getTraineeUsername());
-			throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
-					"Trainee " + request.getTraineeUsername() + " is not active. Cannot update their trainers list."));
-		}
+	    // ------ UPDATE TRAINING DB -----
+	    
+	    // Delete old training for trainee
+	    
+	    trainingRepository.deleteByTraineeId(traineeToUpdate.getId());
+	    logger.info("Deleted all old training records for trainee '{}' to synchronize with new trainers list.",
+	            traineeToUpdate.getUser().getUsername());
 
-		Set<Trainer> newTrainers = new HashSet<>();
-		if (request.getTrainerUsernames() != null && !request.getTrainerUsernames().isEmpty()) {
-			for (String trainerUsername : request.getTrainerUsernames()) {
-				Trainer trainer = trainerRepository.findByUserUsername(trainerUsername).orElseThrow(() -> {
-					logger.warn("Trainer with username '{}' not found when updating trainers for trainee '{}'.",
-							trainerUsername, request.getTraineeUsername());
-					return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-							"Trainer with username " + trainerUsername + " not found."));
-				});
+	    // Create new trainigs for all new trainers  list
+	    
+	    for (Trainer trainer : newTrainers) {
+	        TrainingType trainingType = trainer.getSpecialization();
+	        
+	        Training autoCreatedTraining = new Training();
+	        autoCreatedTraining.setTrainee(traineeToUpdate);
+	        autoCreatedTraining.setTrainer(trainer);
+	        autoCreatedTraining.setTrainingType(trainingType);
+	        autoCreatedTraining.setTrainingName(trainingType.getTrainingTypeName());
+	        autoCreatedTraining.setTrainingDate(LocalDate.now());
+	        autoCreatedTraining.setTrainingDuration(60); // Varsayılan süre
+	        
+	        trainingRepository.save(autoCreatedTraining);
+	        logger.info("Created a new training record for trainee '{}' with trainer '{}'.",
+	                traineeToUpdate.getUser().getUsername(), trainer.getUser().getUsername());
+	    }
 
-				if (!trainer.getUser().isActive()) {
-					logger.warn("Trainer '{}' is not active. Cannot assign to trainee '{}'.", trainerUsername,
-							request.getTraineeUsername());
-					throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
-							"Trainer " + trainerUsername + " is not active. Cannot assign."));
-				}
-				newTrainers.add(trainer);
-			}
-		}
-
-		traineeToUpdate.setTrainers(newTrainers);
-		
-		Trainee updatedTrainee = traineeRepository.save(traineeToUpdate);
-
-		logger.info("Successfully updated trainers list for trainee '{}'. New trainer count: {} for user '{}'.",
-				updatedTrainee.getUser().getUsername(), newTrainers.size(), currentUser.getUsername());
-
-		return new TraineeProfileResponse(updatedTrainee);
+	    // ------ Response ------
+	    
+	    return new ArrayList<>(newTrainers).stream()
+	            .map(TrainerInfoResponse::new)
+	            .collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional()
 	public void activateDeactivateTrainee(UserActivationRequest request) {
+		
 		User currentUser = authManager.getCurrentUser();
 
 		logger.info("User '{}' attempting to change activation status for Trainee '{}' to '{}'.",
-				currentUser.getUsername(), request.getUsername(), request.isActive());
+				currentUser.getUsername(), request.getUsername(), request.getIsActive());
 
 		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
 			logger.error("Activation request or username must not be null/empty.");
@@ -289,23 +319,24 @@ public class TraineeServiceImpl implements ITraineeService {
 			logger.warn("Trainee profile not found for activation status change with username: {}",
 					request.getUsername());
 			throw new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-	                "Trainee with username '" + request.getUsername() + "' not found."));
+					"Trainee with username '" + request.getUsername() + "' not found."));
 		}
 
 		Trainee traineeToUpdate = optTrainee.get();
 		User userToUpdate = traineeToUpdate.getUser();
 
 		// Check state of isActive if already same don't change it
-		if (userToUpdate.isActive() == request.isActive()) {
+		
+		if (userToUpdate.isActive() == request.getIsActive()) {
 			logger.info("Trainee '{}' is already in the requested state (isActive: {}). No change needed.",
-					request.getUsername(), request.isActive());
+					request.getUsername(), request.getIsActive());
 			return;
 		}
 
-		userToUpdate.setActive(request.isActive());
+		userToUpdate.setActive(request.getIsActive());
 
 		User savedUser = userRepository.save(userToUpdate);
-		
+
 		traineeToUpdate.setUser(savedUser);
 
 		traineeRepository.save(traineeToUpdate);
@@ -318,6 +349,7 @@ public class TraineeServiceImpl implements ITraineeService {
 	@Override
 	@Transactional()
 	public void deleteTraineeById(Long id) {
+		
 		User currentUser = authManager.getCurrentUser();
 		if (id == null || id <= 0) {
 			logger.error("Trainee ID for deletion cannot be null or non-positive: {}", id);
