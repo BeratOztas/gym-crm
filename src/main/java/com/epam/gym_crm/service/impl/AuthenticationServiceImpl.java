@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.epam.gym_crm.auth.AuthManager;
 import com.epam.gym_crm.dto.request.ChangePasswordRequest;
@@ -16,6 +18,9 @@ import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.model.User;
 import com.epam.gym_crm.repository.UserRepository;
 import com.epam.gym_crm.service.IAuthenticationService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class AuthenticationServiceImpl implements IAuthenticationService {
@@ -55,8 +60,19 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 			throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED, "Invalid username or password."));
 		}
 
-		authManager.login(user);
-		logger.info("User logged in successfully: {}", username);
+		try {
+			HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder
+					.currentRequestAttributes()).getRequest();
+			HttpSession session = httpServletRequest.getSession(true);
+			session.setAttribute("currentUser", user);
+			logger.info("User logged in successfully: {}", username);
+
+		} catch (IllegalStateException e) {
+			logger.error(
+					"Failed to access HttpServletRequest. This method should be called within a web request context.",
+					e);
+			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Request context not found."));
+		}
 
 	}
 
@@ -152,4 +168,5 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 		logger.info("Password changed successfully for user: {}", username);
 
 	}
+
 }
