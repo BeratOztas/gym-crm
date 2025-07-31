@@ -20,7 +20,7 @@ public class TrainerProfileResponse {
     private String firstName;
     private String lastName;
     private String specialization;
-    private boolean isActive;
+    private Boolean isActive;
     private List<TraineeInfoResponse> traineesList;
 
     public TrainerProfileResponse(Trainer trainer) {

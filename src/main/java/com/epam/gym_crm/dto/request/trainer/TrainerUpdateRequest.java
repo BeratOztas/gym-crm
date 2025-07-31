@@ -27,5 +27,5 @@ public class TrainerUpdateRequest {
 	private String specialization; 
 
 	@NotNull(message = "Active status is required")
-	private boolean isActive;
+	private Boolean isActive;
 }

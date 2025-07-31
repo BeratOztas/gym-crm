@@ -32,5 +32,5 @@ public class TraineeUpdateRequest {
     private String address;
 
     @NotNull(message = "Active status is required") 
-    private boolean isActive;
+    private Boolean isActive;
 }

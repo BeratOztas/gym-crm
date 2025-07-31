@@ -15,5 +15,5 @@ public class UserActivationRequest {
 	private String username;
 	
 	@NotNull(message = "Activation status (isActive) cannot be null")
-	private boolean isActive;
+	private Boolean  isActive;
 }
