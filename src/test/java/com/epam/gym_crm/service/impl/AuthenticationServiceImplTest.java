@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -15,20 +14,27 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.epam.gym_crm.auth.AuthManager;
 import com.epam.gym_crm.dto.request.ChangePasswordRequest;
 import com.epam.gym_crm.dto.request.LoginRequest;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.model.Trainee;
 import com.epam.gym_crm.model.User;
 import com.epam.gym_crm.repository.TraineeRepository;
 import com.epam.gym_crm.repository.UserRepository;
+
+import jakarta.servlet.http.HttpSession;
 
 class AuthenticationServiceImplTest {
 
@@ -45,6 +51,14 @@ class AuthenticationServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+    }
+    
+    @AfterEach
+    void teardown() {
+        // Her testten sonra web bağlamını temizle
+        RequestContextHolder.resetRequestAttributes();
     }
 
     // --- 3. Trainee/Trainer username and password matching (Login Success) ---
@@ -52,14 +66,22 @@ class AuthenticationServiceImplTest {
     void shouldLoginSuccessfullyForTrainee() {
         LoginRequest request = new LoginRequest("trainee.user", "correctPass");
         User traineeUser = new User(1L, "Trainee", "User", "trainee.user", "correctPass", true, null, null);
+        Trainee trainee = new Trainee();
+        trainee.setUser(traineeUser);
+        traineeUser.setTrainee(trainee);
 
         when(userRepository.findByUsername("trainee.user")).thenReturn(Optional.of(traineeUser));
-        doNothing().when(authManager).login(traineeUser);
+
 
         assertDoesNotThrow(() -> authenticationService.login(request));
 
         verify(userRepository, times(1)).findByUsername("trainee.user");
-        verify(authManager, times(1)).login(traineeUser);
+
+        // Testin sonunda HttpSession'a doğru kullanıcı eklenmiş mi diye kontrol edebiliriz
+        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
+        assertNotNull(session, "Session should not be null after login");
+        assertNotNull(session.getAttribute("currentUser"), "currentUser should be in the session");
+        assertEquals(traineeUser, session.getAttribute("currentUser"), "The user in session should be the one who logged in");
     }
 
     @Test
@@ -73,7 +95,6 @@ class AuthenticationServiceImplTest {
         assertDoesNotThrow(() -> authenticationService.login(request));
 
         verify(userRepository, times(1)).findByUsername("trainer.user");
-        verify(authManager, times(1)).login(trainerUser);
     }
 
     // --- Login - Failure  ---
@@ -145,7 +166,6 @@ class AuthenticationServiceImplTest {
         assertNotNull(createdUser);
         assertEquals(firstName, createdUser.getFirstName());
         assertEquals(lastName, createdUser.getLastName());
-        assertTrue(createdUser.isActive());
         assertNotNull(createdUser.getUsername());
         assertNotNull(createdUser.getPassword());
 

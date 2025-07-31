@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.267" tests="15" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.controller.impl.RestTrainerControllerImplTest" time="0.026" tests="8" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -59,49 +59,36 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="shouldThrowBaseExceptionWhenLoginWithInactiveUser" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.205"/>
-  <testcase name="shouldThrowBaseExceptionWhenLoginWithNonExistentUser" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.003"/>
-  <testcase name="shouldThrowBaseExceptionWhenLoginWithWrongPassword" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.003"/>
-  <testcase name="shouldLogoutSuccessfully" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.004">
-    <system-out><![CDATA[20:44:04.288 [main] [NO-TX] INFO  c.e.g.s.i.AuthenticationServiceImpl - User logged out: logged.out
+  <testcase name="testFindTrainerByUsername_Failure_NotFound" classname="com.epam.gym_crm.controller.impl.RestTrainerControllerImplTest" time="0.005">
+    <system-out><![CDATA[20:44:03.998 [main] [NO-TX] INFO  c.e.g.c.i.RestTrainerControllerImpl - Request to find trainer by username: non.existent
 ]]></system-out>
   </testcase>
-  <testcase name="shouldChangePasswordSuccessfully" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.005">
-    <system-out><![CDATA[20:44:04.293 [main] [NO-TX] INFO  c.e.g.s.i.AuthenticationServiceImpl - Password changed successfully for user: test.user
+  <testcase name="testCreateTrainer_Success" classname="com.epam.gym_crm.controller.impl.RestTrainerControllerImplTest" time="0.002">
+    <system-out><![CDATA[20:44:04.001 [main] [NO-TX] INFO  c.e.g.c.i.RestTrainerControllerImpl - Request to create new trainer: Peter.Jones
 ]]></system-out>
   </testcase>
-  <testcase name="shouldThrowBaseExceptionWhenLoginRequestIsNull" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.002">
-    <system-out><![CDATA[20:44:04.295 [main] [NO-TX] ERROR c.e.g.s.i.AuthenticationServiceImpl - Login request DTO cannot be null.
+  <testcase name="testActivateDeactivateTrainer_Success" classname="com.epam.gym_crm.controller.impl.RestTrainerControllerImplTest" time="0.002">
+    <system-out><![CDATA[20:44:04.004 [main] [NO-TX] INFO  c.e.g.c.i.RestTrainerControllerImpl - Request to update status for trainer: Peter.Jones
 ]]></system-out>
   </testcase>
-  <testcase name="shouldThrowBaseExceptionWhenNewPasswordIsSameAsOldPassword" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.003">
-    <system-out><![CDATA[20:44:04.298 [main] [NO-TX] WARN  c.e.g.s.i.AuthenticationServiceImpl - Password change failed: New password cannot be the same as the old password for username: test.user
+  <testcase name="testUpdateTrainer_Failure_PathBodyMismatch" classname="com.epam.gym_crm.controller.impl.RestTrainerControllerImplTest" time="0.003">
+    <system-out><![CDATA[20:44:04.006 [main] [NO-TX] WARN  c.e.g.c.i.RestTrainerControllerImpl - Path-Body Mismatch: URL username 'Peter.Jones' does not match request body username 'Different.User'.
 ]]></system-out>
   </testcase>
-  <testcase name="shouldThrowBaseExceptionWhenChangePasswordForNonExistentUser" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.003">
-    <system-out><![CDATA[20:44:04.302 [main] [NO-TX] ERROR c.e.g.s.i.AuthenticationServiceImpl - Password change failed: User with username 'nonexistent.user' not found.
+  <testcase name="testUpdateTrainer_Success" classname="com.epam.gym_crm.controller.impl.RestTrainerControllerImplTest" time="0.002">
+    <system-out><![CDATA[20:44:04.010 [main] [NO-TX] INFO  c.e.g.c.i.RestTrainerControllerImpl - Request to update profile for trainer: Peter.Jones
 ]]></system-out>
   </testcase>
-  <testcase name="shouldCreateAndSaveUserSuccessfully" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.004"/>
-  <testcase name="shouldThrowBaseExceptionWhenChangePasswordWithInvalidOldPassword" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.002">
-    <system-out><![CDATA[20:44:04.309 [main] [NO-TX] WARN  c.e.g.s.i.AuthenticationServiceImpl - Password change failed: Invalid old password for username: test.user
+  <testcase name="testGetTrainerTrainingsList_Success" classname="com.epam.gym_crm.controller.impl.RestTrainerControllerImplTest" time="0.003">
+    <system-out><![CDATA[20:44:04.013 [main] [NO-TX] INFO  c.e.g.c.i.RestTrainerControllerImpl - Request to get trainings for trainer: Peter.Jones with filters
 ]]></system-out>
   </testcase>
-  <testcase name="shouldLoginSuccessfullyForTrainee" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.003">
-    <system-out><![CDATA[20:44:04.313 [main] [NO-TX] INFO  c.e.g.s.i.AuthenticationServiceImpl - User logged in successfully: trainee.user
+  <testcase name="testFindTrainerByUsername_Success" classname="com.epam.gym_crm.controller.impl.RestTrainerControllerImplTest" time="0.003">
+    <system-out><![CDATA[20:44:04.015 [main] [NO-TX] INFO  c.e.g.c.i.RestTrainerControllerImpl - Request to find trainer by username: Peter.Jones
 ]]></system-out>
   </testcase>
-  <testcase name="shouldLoginSuccessfullyForTrainer" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.004">
-    <system-out><![CDATA[20:44:04.317 [main] [NO-TX] INFO  c.e.g.s.i.AuthenticationServiceImpl - User logged in successfully: trainer.user
-]]></system-out>
-  </testcase>
-  <testcase name="shouldThrowBaseExceptionWhenChangePasswordRequestIsNull" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.003">
-    <system-out><![CDATA[20:44:04.320 [main] [NO-TX] ERROR c.e.g.s.i.AuthenticationServiceImpl - Change password request DTO cannot be null.
-]]></system-out>
-  </testcase>
-  <testcase name="shouldCreateAndSaveUserWithUniqueUsernameWhenBaseUsernameExists" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.007"/>
-  <testcase name="shouldThrowBaseExceptionWhenUnauthorizedUserChangesPasswordForAnotherUser" classname="com.epam.gym_crm.service.impl.AuthenticationServiceImplTest" time="0.007">
-    <system-out><![CDATA[20:44:04.336 [main] [NO-TX] ERROR c.e.g.s.i.AuthenticationServiceImpl - Unauthorized attempt to change password for user 'another.user' by current user 'current.user'.
+  <testcase name="testDeleteTrainerByUsername_Success" classname="com.epam.gym_crm.controller.impl.RestTrainerControllerImplTest" time="0.002">
+    <system-out><![CDATA[20:44:04.019 [main] [NO-TX] INFO  c.e.g.c.i.RestTrainerControllerImpl - Request to delete trainer: Peter.Jones
 ]]></system-out>
   </testcase>
 </testsuite>
