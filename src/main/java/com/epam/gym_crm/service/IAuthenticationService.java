@@ -8,9 +8,10 @@ public interface IAuthenticationService {
 
 	void login(LoginRequest request);
 
+	void changePassword(ChangePasswordRequest request);
+
 	void logout();
 
 	User createAndSaveUser(String firstName, String lastName);
 
-	void changePassword(ChangePasswordRequest request);
 }

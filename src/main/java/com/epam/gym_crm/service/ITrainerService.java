@@ -5,7 +5,9 @@ import java.util.List;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
 import com.epam.gym_crm.dto.request.trainer.TrainerCreateRequest;
 import com.epam.gym_crm.dto.request.trainer.TrainerUpdateRequest;
+import com.epam.gym_crm.dto.response.TrainerInfoResponse;
 import com.epam.gym_crm.dto.response.TrainerProfileResponse;
+import com.epam.gym_crm.dto.response.UserRegistrationResponse;
 
 public interface ITrainerService {
 
@@ -15,9 +17,9 @@ public interface ITrainerService {
 
 	List<TrainerProfileResponse> getAllTrainers();
 	
-	List<TrainerProfileResponse> getUnassignedTrainersForTrainee(String traineeUsername);
+	List<TrainerInfoResponse> getUnassignedTrainersForTrainee(String traineeUsername);
 
-	TrainerProfileResponse createTrainer(TrainerCreateRequest request);
+	UserRegistrationResponse createTrainer(TrainerCreateRequest request);
 
 	TrainerProfileResponse updateTrainer(TrainerUpdateRequest request);
 

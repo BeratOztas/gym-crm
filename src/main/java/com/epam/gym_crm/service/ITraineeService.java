@@ -7,6 +7,8 @@ import com.epam.gym_crm.dto.request.trainee.TraineeCreateRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeUpdateRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeUpdateTrainersRequest;
 import com.epam.gym_crm.dto.response.TraineeProfileResponse;
+import com.epam.gym_crm.dto.response.TrainerInfoResponse;
+import com.epam.gym_crm.dto.response.UserRegistrationResponse;
 
 public interface ITraineeService {
 
@@ -16,11 +18,11 @@ public interface ITraineeService {
 
 	List<TraineeProfileResponse> getAllTrainees();
 
-	TraineeProfileResponse createTrainee(TraineeCreateRequest request);
+	UserRegistrationResponse createTrainee(TraineeCreateRequest request);
 
 	TraineeProfileResponse updateTrainee(TraineeUpdateRequest trainee);
 	
-	TraineeProfileResponse updateTraineeTrainersList(TraineeUpdateTrainersRequest request);
+	List<TrainerInfoResponse> updateTraineeTrainersList(TraineeUpdateTrainersRequest request);
 	
 	void activateDeactivateTrainee(UserActivationRequest request);
 

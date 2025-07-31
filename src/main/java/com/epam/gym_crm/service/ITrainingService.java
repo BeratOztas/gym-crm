@@ -16,9 +16,9 @@ public interface ITrainingService {
 
 	List<TrainingResponse> getAllTrainings();
     
-    List<TraineeTrainingInfoResponse> getTraineeTrainingsList(TraineeTrainingListRequest request);
+    List<TraineeTrainingInfoResponse> getTraineeTrainingsList(String username,TraineeTrainingListRequest request);
 
-    List<TrainerTrainingInfoResponse> getTrainerTrainingsList(TrainerTrainingListRequest request);
+    List<TrainerTrainingInfoResponse> getTrainerTrainingsList(String username,TrainerTrainingListRequest request);
     
     TrainingResponse createTraining(TrainingCreateRequest request);
 
