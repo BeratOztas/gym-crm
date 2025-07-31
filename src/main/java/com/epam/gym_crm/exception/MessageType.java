@@ -6,13 +6,13 @@ public enum MessageType {
 	RESOURCE_NOT_FOUND("1001", "Resource not found."),
 	UNAUTHORIZED("401","User authentication required"),
 	ENTITY_NOT_FOUND("1010","Entity Not Found."),
+	PATH_BODY_MISMATCH("1012", "URL path variable does not match the request body identifier."),
 	FORBIDDEN("403","You are not authorized."),
 	INVALID_STATE("1011","User is not active"),
 	VALIDATION_ERROR("1003", "Validation failed."),
 	INVALID_ARGUMENT("1002", "Invalid parameter provided."),
 	DUPLICATE_USERNAME("1004", "Username already exists."),
 	ASSOCIATION_ERROR("1005", "Related resource not found or invalid.");
-
 	private String code;
 	private String message;
 
