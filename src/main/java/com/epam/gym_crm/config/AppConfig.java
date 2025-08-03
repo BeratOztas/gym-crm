@@ -29,7 +29,7 @@ import jakarta.persistence.EntityManagerFactory;
 @Configuration
 @ComponentScan(basePackages = {"com.epam.gym_crm ","org.springdoc"})
 @PropertySource("classpath:application.properties")
-@EnableJpaRepositories(basePackages = "com.epam.gym_crm.repository")
+@EnableJpaRepositories(basePackages = "com.epam.gym_crm.db.repository")
 @EnableAspectJAutoProxy
 @EnableTransactionManagement
 public class AppConfig {
@@ -72,7 +72,7 @@ public class AppConfig {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
 		emf.setDataSource(dataSource());
-		emf.setPackagesToScan("com.epam.gym_crm.entity");
+		emf.setPackagesToScan("com.epam.gym_crm.db.entity");
 		emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
 		Properties props = new Properties();
