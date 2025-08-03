@@ -1,4 +1,4 @@
-package com.epam.gym_crm.controller.impl;
+package com.epam.gym_crm.controller;
 
 import java.util.List;
 
@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.epam.gym_crm.controller.ApiResponse;
-import com.epam.gym_crm.controller.IRestTraineeController;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeCreateRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeTrainingListRequest;
@@ -38,58 +36,51 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/trainees")
-public class RestTraineeControllerImpl implements IRestTraineeController {
+public class RestTraineeController {
 
-	private static final Logger logger = LoggerFactory.getLogger(RestTraineeControllerImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(RestTraineeController.class);
 
 	private final ITraineeService traineeService;
 	private final ITrainerService trainerService;
 	private final ITrainingService trainingService;
 
-	public RestTraineeControllerImpl(ITraineeService traineeService, ITrainerService trainerService,
+	public RestTraineeController(ITraineeService traineeService, ITrainerService trainerService,
 			ITrainingService trainingService) {
 		this.traineeService = traineeService;
 		this.trainerService = trainerService;
 		this.trainingService = trainingService;
 	}
 
-	@Override
 	@GetMapping("/{username}")
-	public ResponseEntity<ApiResponse<TraineeProfileResponse>> findTraineeByUsername(@PathVariable String username) {
+	public ResponseEntity<TraineeProfileResponse> findTraineeByUsername(@PathVariable String username) {
 		logger.info("Request to find trainee by username: {}", username);
-		return ResponseEntity.ok(ApiResponse.ok(traineeService.findTraineeByUsername(username)));
+		return ResponseEntity.ok(traineeService.findTraineeByUsername(username));
 	}
 
-	@Override
 	@GetMapping("/{username}/unassigned-trainers")
-	public ResponseEntity<ApiResponse<List<TrainerInfoResponse>>> getUnassignedTrainersForTrainee(
+	public ResponseEntity<List<TrainerInfoResponse>> getUnassignedTrainersForTrainee(
 			@PathVariable("username") String traineeUsername) {
 		logger.info("Request to get unassigned trainers for trainee: {}", traineeUsername);
-		return ResponseEntity.ok(ApiResponse.ok(trainerService.getUnassignedTrainersForTrainee(traineeUsername)));
+		return ResponseEntity.ok(trainerService.getUnassignedTrainersForTrainee(traineeUsername));
 	}
 
-	@Override
 	@GetMapping("/{username}/trainings")
-	public ResponseEntity<ApiResponse<List<TraineeTrainingInfoResponse>>> getTraineeTrainingsList(
-			@PathVariable  String username,
+	public ResponseEntity<List<TraineeTrainingInfoResponse>> getTraineeTrainingsList(@PathVariable String username,
 			@Valid TraineeTrainingListRequest request) {
 
 		logger.info("Request to get trainings for trainee: {} with filters", username);
-		return ResponseEntity.ok(ApiResponse.ok(trainingService.getTraineeTrainingsList(username, request)));
+		return ResponseEntity.ok(trainingService.getTraineeTrainingsList(username, request));
 	}
 
-	@Override
 	@PostMapping
-	public ResponseEntity<ApiResponse<UserRegistrationResponse>> createTrainee(
-			@RequestBody @Valid TraineeCreateRequest request) {
+	public ResponseEntity<UserRegistrationResponse> createTrainee(@RequestBody @Valid TraineeCreateRequest request) {
 		logger.info("Request to create new trainee: {}.{}", request.getFirstName(), request.getLastName());
 		UserRegistrationResponse response = traineeService.createTrainee(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(response));
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@Override
 	@PutMapping("/{username}")
-	public ResponseEntity<ApiResponse<TraineeProfileResponse>> updateTrainee(@PathVariable String username,
+	public ResponseEntity<TraineeProfileResponse> updateTrainee(@PathVariable String username,
 			@RequestBody @Valid TraineeUpdateRequest request) {
 		if (!username.equals(request.getUsername())) {
 			logger.warn("Path-Body Mismatch: URL username '{}' does not match request body username '{}'.", username,
@@ -98,13 +89,12 @@ public class RestTraineeControllerImpl implements IRestTraineeController {
 					"URL username and request body username must match."));
 		}
 		logger.info("Request to update profile for trainee: {}", username);
-		return ResponseEntity.ok(ApiResponse.ok(traineeService.updateTrainee(request)));
+		return ResponseEntity.ok(traineeService.updateTrainee(request));
 	}
 
-	@Override
 	@PutMapping("/{username}/trainers")
-	public ResponseEntity<ApiResponse<List<TrainerInfoResponse>>> updateTraineeTrainersList(
-			@PathVariable String username, @RequestBody @Valid TraineeUpdateTrainersRequest request) {
+	public ResponseEntity<List<TrainerInfoResponse>> updateTraineeTrainersList(@PathVariable String username,
+			@RequestBody @Valid TraineeUpdateTrainersRequest request) {
 
 		if (!username.equals(request.getTraineeUsername())) {
 			logger.warn("Path-Body Mismatch: URL username '{}' does not match request body username '{}'.", username,
@@ -114,12 +104,11 @@ public class RestTraineeControllerImpl implements IRestTraineeController {
 		}
 
 		logger.info("Request to update trainers list for trainee: {}", username);
-		return ResponseEntity.ok(ApiResponse.ok(traineeService.updateTraineeTrainersList(request)));
+		return ResponseEntity.ok(traineeService.updateTraineeTrainersList(request));
 	}
 
-	@Override
 	@PatchMapping("/{username}/status")
-	public ResponseEntity<ApiResponse<?>> activateDeactivateTrainee(@PathVariable String username,
+	public ResponseEntity<?> activateDeactivateTrainee(@PathVariable String username,
 			@RequestBody @Valid UserActivationRequest request) {
 
 		if (!username.equals(request.getUsername())) {
@@ -131,12 +120,11 @@ public class RestTraineeControllerImpl implements IRestTraineeController {
 
 		logger.info("Request to update status for trainee: {}", username);
 		traineeService.activateDeactivateTrainee(request);
-		return ResponseEntity.ok(ApiResponse.ok("Trainee status updated successfully."));
+		return ResponseEntity.ok("Trainee status updated successfully.");
 	}
 
-	@Override
 	@DeleteMapping("/{username}")
-	public ResponseEntity<ApiResponse<?>> deleteTraineeByUsername(@PathVariable String username) {
+	public ResponseEntity<?> deleteTraineeByUsername(@PathVariable String username) {
 
 		logger.info("Request to delete trainee: {}", username);
 		traineeService.deleteTraineeByUsername(username);

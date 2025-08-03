@@ -1,4 +1,4 @@
-package com.epam.gym_crm.controller.impl;
+package com.epam.gym_crm.controller;
 
 import java.util.List;
 
@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.epam.gym_crm.controller.ApiResponse;
-import com.epam.gym_crm.controller.IRestTrainerController;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
 import com.epam.gym_crm.dto.request.trainer.TrainerCreateRequest;
 import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
@@ -35,45 +33,41 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/trainers")
-public class RestTrainerControllerImpl implements IRestTrainerController {
+public class RestTrainerController  {
 
-	private static final Logger logger = LoggerFactory.getLogger(RestTrainerControllerImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(RestTrainerController.class);
 
 	private final ITrainerService trainerService;
 	private final ITrainingService trainingService;
 
-	public RestTrainerControllerImpl(ITrainerService trainerService, ITrainingService trainingService) {
+	public RestTrainerController(ITrainerService trainerService, ITrainingService trainingService) {
 		this.trainerService = trainerService;
 		this.trainingService = trainingService;
 	}
 
-	@Override
 	@GetMapping("/{username}")
-	public ResponseEntity<ApiResponse<TrainerProfileResponse>> findTrainerByUsername(@PathVariable String username) {
+	public ResponseEntity<TrainerProfileResponse> findTrainerByUsername(@PathVariable String username) {
 		logger.info("Request to find trainer by username: {}", username);
-		return ResponseEntity.ok(ApiResponse.ok(trainerService.findTrainerByUsername(username)));
+		return ResponseEntity.ok(trainerService.findTrainerByUsername(username));
 	}
 
-	@Override
 	@GetMapping("/{username}/trainings")
-	public ResponseEntity<ApiResponse<List<TrainerTrainingInfoResponse>>> getTrainerTrainingsList(
+	public ResponseEntity<List<TrainerTrainingInfoResponse>> getTrainerTrainingsList(
 			@PathVariable String username, @Valid TrainerTrainingListRequest request) {
 		logger.info("Request to get trainings for trainer: {} with filters", username);
-		return ResponseEntity.ok(ApiResponse.ok(trainingService.getTrainerTrainingsList(username,request)));
+		return ResponseEntity.ok(trainingService.getTrainerTrainingsList(username,request));
 	}
 
-	@Override
 	@PostMapping
-	public ResponseEntity<ApiResponse<UserRegistrationResponse>> createTrainer(
+	public ResponseEntity<UserRegistrationResponse> createTrainer(
 			@RequestBody @Valid TrainerCreateRequest request) {
 		logger.info("Request to create new trainer: {}.{}", request.getFirstName(), request.getLastName());
 		UserRegistrationResponse response = trainerService.createTrainer(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(response));
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@Override
 	@PutMapping("/{username}")
-	public ResponseEntity<ApiResponse<TrainerProfileResponse>> updateTrainer(@PathVariable String username,
+	public ResponseEntity<TrainerProfileResponse> updateTrainer(@PathVariable String username,
 			@RequestBody @Valid TrainerUpdateRequest request) {
 		if (!username.equals(request.getUsername())) {
 			logger.warn("Path-Body Mismatch: URL username '{}' does not match request body username '{}'.", username,
@@ -82,12 +76,11 @@ public class RestTrainerControllerImpl implements IRestTrainerController {
 					"URL username and request body username must match."));
 		}
 		logger.info("Request to update profile for trainer: {}", username);
-		return ResponseEntity.ok(ApiResponse.ok(trainerService.updateTrainer(request)));
+		return ResponseEntity.ok(trainerService.updateTrainer(request));
 	}
 
-	@Override
 	@PatchMapping("/{username}/status")
-	public ResponseEntity<ApiResponse<?>> activateDeactivateTrainer(@PathVariable String username,
+	public ResponseEntity<?> activateDeactivateTrainer(@PathVariable String username,
 			@RequestBody @Valid UserActivationRequest request) {
 		if (!username.equals(request.getUsername())) {
 			logger.warn("Path-Body Mismatch: URL username '{}' does not match request body username '{}'.", username,
@@ -97,12 +90,11 @@ public class RestTrainerControllerImpl implements IRestTrainerController {
 		}
 		logger.info("Request to update status for trainer: {}", username);
 		trainerService.activateDeactivateTrainer(request);
-		return ResponseEntity.ok(ApiResponse.ok("Trainer status updated successfully."));
+		return ResponseEntity.ok("Trainer status updated successfully.");
 	}
 
-	@Override
 	@DeleteMapping("/{username}")
-	public ResponseEntity<ApiResponse<?>> deleteTrainerByUsername(@PathVariable String username) {
+	public ResponseEntity<?> deleteTrainerByUsername(@PathVariable String username) {
 		logger.info("Request to delete trainer: {}", username);
 		trainerService.deleteTrainerByUsername(username);
 		return ResponseEntity.noContent().build();
