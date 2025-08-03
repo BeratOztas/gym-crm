@@ -39,7 +39,7 @@ public class RestAuthenticationController {
 		authenticationService.login(loginRequest);
 
 		logger.info("Login successful for user: {}", username);
-		return ResponseEntity.ok("Login successful.");
+		return ResponseEntity.ok("Login successful for user: "+ username);
 	}
 
 	@PutMapping("/change-password")
@@ -50,7 +50,7 @@ public class RestAuthenticationController {
 		authenticationService.changePassword(changePasswordRequest);
 		logger.info("Password changed successfully for user: {}", changePasswordRequest.getUsername());
 
-		return ResponseEntity.ok("Password changed successfully");
+		return ResponseEntity.ok("Password changed successfully for user: "+ changePasswordRequest.getUsername());
 	}
 
 	@PostMapping("/logout")
