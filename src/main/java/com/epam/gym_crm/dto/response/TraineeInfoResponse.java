@@ -1,6 +1,6 @@
 package com.epam.gym_crm.dto.response;
 
-import com.epam.gym_crm.model.Trainee;
+import com.epam.gym_crm.db.entity.Trainee;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

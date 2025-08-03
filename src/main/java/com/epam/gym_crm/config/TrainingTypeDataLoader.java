@@ -10,8 +10,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.epam.gym_crm.model.TrainingType;
-import com.epam.gym_crm.repository.TrainingTypeRepository;
+import com.epam.gym_crm.db.entity.TrainingType;
+import com.epam.gym_crm.db.repository.TrainingTypeRepository;
 
 @Component 
 public class TrainingTypeDataLoader implements ApplicationListener<ContextRefreshedEvent> {

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -26,9 +27,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.EntityManagerFactory;
 
 @Configuration
-@ComponentScan(basePackages = "com.epam.gym_crm")
+@ComponentScan(basePackages = {"com.epam.gym_crm ","org.springdoc"})
 @PropertySource("classpath:application.properties")
-@EnableJpaRepositories(basePackages = "com.epam.gym_crm")
+@EnableJpaRepositories(basePackages = "com.epam.gym_crm.repository")
 @EnableAspectJAutoProxy
 @EnableTransactionManagement
 public class AppConfig {
@@ -71,7 +72,7 @@ public class AppConfig {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
 		emf.setDataSource(dataSource());
-		emf.setPackagesToScan("com.epam.gym_crm.model");
+		emf.setPackagesToScan("com.epam.gym_crm.entity");
 		emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
 		Properties props = new Properties();
@@ -82,6 +83,11 @@ public class AppConfig {
 
 		emf.setJpaProperties(props);
 		return emf;
+	}
+
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+		return new PropertySourcesPlaceholderConfigurer();
 	}
 
 	@Bean
@@ -101,6 +107,5 @@ public class AppConfig {
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		return mapper;
 	}
-
 
 }

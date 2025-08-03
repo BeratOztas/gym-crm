@@ -1,4 +1,4 @@
-package com.epam.gym_crm.repository;
+package com.epam.gym_crm.db.repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.epam.gym_crm.model.Training;
+import com.epam.gym_crm.db.entity.Training;
 
 @Repository
 public interface TrainingRepository extends JpaRepository<Training, Long> {

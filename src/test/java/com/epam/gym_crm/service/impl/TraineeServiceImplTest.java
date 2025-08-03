@@ -31,6 +31,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.epam.gym_crm.auth.AuthManager;
+import com.epam.gym_crm.db.entity.Trainee;
+import com.epam.gym_crm.db.entity.Trainer;
+import com.epam.gym_crm.db.entity.Training;
+import com.epam.gym_crm.db.entity.TrainingType;
+import com.epam.gym_crm.db.entity.User;
+import com.epam.gym_crm.db.repository.TraineeRepository;
+import com.epam.gym_crm.db.repository.TrainerRepository;
+import com.epam.gym_crm.db.repository.TrainingRepository;
+import com.epam.gym_crm.db.repository.UserRepository;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeCreateRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeUpdateRequest;
@@ -41,15 +50,6 @@ import com.epam.gym_crm.dto.response.UserRegistrationResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.model.Trainee;
-import com.epam.gym_crm.model.Trainer;
-import com.epam.gym_crm.model.Training;
-import com.epam.gym_crm.model.TrainingType;
-import com.epam.gym_crm.model.User;
-import com.epam.gym_crm.repository.TraineeRepository;
-import com.epam.gym_crm.repository.TrainerRepository;
-import com.epam.gym_crm.repository.TrainingRepository;
-import com.epam.gym_crm.repository.UserRepository;
 import com.epam.gym_crm.service.IAuthenticationService;
 
 @ExtendWith(MockitoExtension.class)

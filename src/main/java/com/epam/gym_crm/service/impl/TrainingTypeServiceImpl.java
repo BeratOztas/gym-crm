@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.epam.gym_crm.auth.AuthManager;
-import com.epam.gym_crm.model.TrainingType;
-import com.epam.gym_crm.model.User;
-import com.epam.gym_crm.repository.TrainingTypeRepository;
+import com.epam.gym_crm.db.entity.TrainingType;
+import com.epam.gym_crm.db.entity.User;
+import com.epam.gym_crm.db.repository.TrainingTypeRepository;
 import com.epam.gym_crm.service.ITrainingTypeService;
 
 @Service

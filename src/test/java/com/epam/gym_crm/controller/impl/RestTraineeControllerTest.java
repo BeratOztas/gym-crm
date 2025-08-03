@@ -1,7 +1,6 @@
 package com.epam.gym_crm.controller.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -22,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.epam.gym_crm.controller.ApiResponse;
+import com.epam.gym_crm.controller.RestTraineeController;
 import com.epam.gym_crm.dto.request.trainee.TraineeCreateRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeUpdateRequest;
 import com.epam.gym_crm.dto.request.trainee.TraineeUpdateTrainersRequest;
@@ -37,7 +36,7 @@ import com.epam.gym_crm.service.ITrainerService;
 import com.epam.gym_crm.service.ITrainingService;
 
 @ExtendWith(MockitoExtension.class)
-class RestTraineeControllerImplTest {
+class RestTraineeControllerTest {
 
     @Mock
     private ITraineeService traineeService;
@@ -47,7 +46,7 @@ class RestTraineeControllerImplTest {
     private ITrainingService trainingService;
 
     @InjectMocks
-    private RestTraineeControllerImpl traineeController;
+    private RestTraineeController traineeController;
 
     // --- createTrainee Testleri ---
 
@@ -60,11 +59,12 @@ class RestTraineeControllerImplTest {
         when(traineeService.createTrainee(request)).thenReturn(registrationResponse);
 
         // Act
-        ResponseEntity<ApiResponse<UserRegistrationResponse>> response = traineeController.createTrainee(request);
+        ResponseEntity<UserRegistrationResponse> response = traineeController.createTrainee(request);
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(registrationResponse, response.getBody().getPayload());
+        // Doğrudan DTO'yu kontrol et
+        assertEquals(registrationResponse, response.getBody());
         verify(traineeService, times(1)).createTrainee(request);
     }
 
@@ -74,15 +74,16 @@ class RestTraineeControllerImplTest {
     void testFindTraineeByUsername_Success() {
         // Arrange
         String username = "John.Doe";
-        TraineeProfileResponse profileResponse = new TraineeProfileResponse(); // İçini doldurmaya gerek yok
+        TraineeProfileResponse profileResponse = new TraineeProfileResponse();
         when(traineeService.findTraineeByUsername(username)).thenReturn(profileResponse);
 
         // Act
-        ResponseEntity<ApiResponse<TraineeProfileResponse>> response = traineeController.findTraineeByUsername(username);
+        ResponseEntity<TraineeProfileResponse> response = traineeController.findTraineeByUsername(username);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(profileResponse, response.getBody().getPayload());
+        // Doğrudan DTO'yu kontrol et
+        assertEquals(profileResponse, response.getBody());
         verify(traineeService, times(1)).findTraineeByUsername(username);
     }
 
@@ -111,11 +112,12 @@ class RestTraineeControllerImplTest {
         when(traineeService.updateTrainee(request)).thenReturn(profileResponse);
 
         // Act
-        ResponseEntity<ApiResponse<TraineeProfileResponse>> response = traineeController.updateTrainee(username, request);
+        ResponseEntity<TraineeProfileResponse> response = traineeController.updateTrainee(username, request);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(profileResponse, response.getBody().getPayload());
+        // Doğrudan DTO'yu kontrol et
+        assertEquals(profileResponse, response.getBody());
         verify(traineeService, times(1)).updateTrainee(request);
     }
 
@@ -131,7 +133,6 @@ class RestTraineeControllerImplTest {
             traineeController.updateTrainee(urlUsername, request);
         });
         assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
-        // Servisin hiç çağrılmadığını doğrula
         verify(traineeService, never()).updateTrainee(any());
     }
 
@@ -144,11 +145,12 @@ class RestTraineeControllerImplTest {
         doNothing().when(traineeService).deleteTraineeByUsername(username);
 
         // Act
-        ResponseEntity<ApiResponse<?>> response = traineeController.deleteTraineeByUsername(username);
+        ResponseEntity<?> response = traineeController.deleteTraineeByUsername(username);
 
         // Assert
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertNull(response.getBody());
+        
+        assertEquals(null, response.getBody());
         verify(traineeService, times(1)).deleteTraineeByUsername(username);
     }
 
@@ -162,11 +164,12 @@ class RestTraineeControllerImplTest {
         when(trainerService.getUnassignedTrainersForTrainee(username)).thenReturn(trainerList);
 
         // Act
-        ResponseEntity<ApiResponse<List<TrainerInfoResponse>>> response = traineeController.getUnassignedTrainersForTrainee(username);
+        ResponseEntity<List<TrainerInfoResponse>> response = traineeController.getUnassignedTrainersForTrainee(username);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(trainerList, response.getBody().getPayload());
+        // Doğrudan liste kontrolü
+        assertEquals(trainerList, response.getBody());
         verify(trainerService, times(1)).getUnassignedTrainersForTrainee(username);
     }
     
@@ -179,11 +182,12 @@ class RestTraineeControllerImplTest {
         when(traineeService.updateTraineeTrainersList(request)).thenReturn(trainerList);
         
         // Act
-        ResponseEntity<ApiResponse<List<TrainerInfoResponse>>> response = traineeController.updateTraineeTrainersList(username, request);
+        ResponseEntity<List<TrainerInfoResponse>> response = traineeController.updateTraineeTrainersList(username, request);
         
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(trainerList, response.getBody().getPayload());
+        // Doğrudan liste kontrolü
+        assertEquals(trainerList, response.getBody());
         verify(traineeService, times(1)).updateTraineeTrainersList(request);
     }
 }

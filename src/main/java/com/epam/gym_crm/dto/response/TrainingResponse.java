@@ -2,7 +2,7 @@ package com.epam.gym_crm.dto.response;
 
 import java.time.LocalDate;
 
-import com.epam.gym_crm.model.Training;
+import com.epam.gym_crm.db.entity.Training;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

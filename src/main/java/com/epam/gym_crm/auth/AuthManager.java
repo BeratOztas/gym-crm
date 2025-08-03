@@ -2,10 +2,10 @@ package com.epam.gym_crm.auth;
 
 import org.springframework.stereotype.Component;
 
+import com.epam.gym_crm.db.entity.User;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.model.User;
 
 @Component
 public class AuthManager {

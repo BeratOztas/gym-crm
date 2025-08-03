@@ -1,4 +1,4 @@
-package com.epam.gym_crm.repository;
+package com.epam.gym_crm.db.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.epam.gym_crm.model.Trainer;
+import com.epam.gym_crm.db.entity.Trainer;
 
 @Repository
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {

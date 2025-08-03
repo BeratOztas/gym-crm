@@ -10,13 +10,13 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.epam.gym_crm.auth.AuthManager;
+import com.epam.gym_crm.db.entity.User;
+import com.epam.gym_crm.db.repository.UserRepository;
 import com.epam.gym_crm.dto.request.ChangePasswordRequest;
 import com.epam.gym_crm.dto.request.LoginRequest;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.model.User;
-import com.epam.gym_crm.repository.UserRepository;
 import com.epam.gym_crm.service.IAuthenticationService;
 
 import jakarta.servlet.http.HttpServletRequest;

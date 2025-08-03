@@ -1,4 +1,4 @@
-package com.epam.gym_crm.model;
+package com.epam.gym_crm.db.entity;
 
 import java.io.Serializable;
 

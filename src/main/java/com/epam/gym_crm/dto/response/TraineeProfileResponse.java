@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.epam.gym_crm.model.Trainee;
-import com.epam.gym_crm.model.User;
+import com.epam.gym_crm.db.entity.Trainee;
+import com.epam.gym_crm.db.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

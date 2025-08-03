@@ -1,12 +1,13 @@
 package com.epam.gym_crm.controller.impl;
 
-import com.epam.gym_crm.controller.ApiResponse;
-import com.epam.gym_crm.dto.request.ChangePasswordRequest;
-import com.epam.gym_crm.dto.request.LoginRequest;
-import com.epam.gym_crm.exception.BaseException;
-import com.epam.gym_crm.exception.ErrorMessage;
-import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.service.IAuthenticationService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,17 +16,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.epam.gym_crm.controller.RestAuthenticationController;
+import com.epam.gym_crm.dto.request.ChangePasswordRequest;
+import com.epam.gym_crm.dto.request.LoginRequest;
+import com.epam.gym_crm.exception.BaseException;
+import com.epam.gym_crm.exception.ErrorMessage;
+import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.service.IAuthenticationService;
 
 @ExtendWith(MockitoExtension.class)
-class RestAuthenticationControllerImplTest {
+class RestAuthenticationControllerTest {
 
     @Mock
     private IAuthenticationService authenticationService;
 
     @InjectMocks
-    private RestAuthenticationControllerImpl authController;
+    private RestAuthenticationController authController;
 
     // --- Login Testleri ---
 
@@ -34,15 +40,17 @@ class RestAuthenticationControllerImplTest {
         String username = "test.user";
         String password = "password123";
         doNothing().when(authenticationService).login(any(LoginRequest.class));
-        ResponseEntity<ApiResponse<String>> response = authController.login(username, password);
+        
+        ResponseEntity<String> response = authController.login(username, password);
+        
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Login successful.", response.getBody().getPayload());
+        // Doğrudan String yanıtını kontrol et
+        assertEquals("Login successful.", response.getBody());
         verify(authenticationService, times(1)).login(any(LoginRequest.class));
     }
 
     @Test
     void testLogin_Failure_ServiceThrowsException() {
-        // Arrange
         String username = "wrong.user";
         String password = "wrongpassword";
         ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.UNAUTHORIZED, "Invalid credentials");
@@ -50,7 +58,6 @@ class RestAuthenticationControllerImplTest {
         doThrow(new BaseException(expectedErrorMessage))
             .when(authenticationService).login(any(LoginRequest.class));
 
-        // Act & Assert
         BaseException exception = assertThrows(BaseException.class, () -> {
             authController.login(username, password);
         });
@@ -64,15 +71,17 @@ class RestAuthenticationControllerImplTest {
     void testChangePassword_Success() {
         ChangePasswordRequest request = new ChangePasswordRequest("test.user", "oldPass", "newPass");
         doNothing().when(authenticationService).changePassword(request);
-        ResponseEntity<ApiResponse<String>> response = authController.changePassword(request);
+        
+        ResponseEntity<String> response = authController.changePassword(request);
+        
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Password changed successfully", response.getBody().getPayload());
+        // Doğrudan String yanıtını kontrol et
+        assertEquals("Password changed successfully", response.getBody());
         verify(authenticationService, times(1)).changePassword(request);
     }
 
     @Test
     void testChangePassword_Failure_InvalidOldPassword() {
-        // Arrange
         ChangePasswordRequest request = new ChangePasswordRequest("test.user", "wrongOldPass", "newPass");
         ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.UNAUTHORIZED, "Invalid old password.");
 
@@ -90,9 +99,12 @@ class RestAuthenticationControllerImplTest {
     @Test
     void testLogout_Success() {
         doNothing().when(authenticationService).logout();
-        ResponseEntity<ApiResponse<String>> response = authController.logout();
+        
+        ResponseEntity<String> response = authController.logout();
+        
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Logout successful", response.getBody().getPayload());
+        // Doğrudan String yanıtını kontrol et
+        assertEquals("Logout successful", response.getBody());
         verify(authenticationService, times(1)).logout();
     }
 }

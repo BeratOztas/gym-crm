@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -26,10 +25,6 @@ import io.swagger.v3.oas.models.info.License;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = { 
-		"com.epam.gym_crm.controller",
-		"com.epam.gym_crm.filter",
-		"com.epam.gym_crm.handler" })
 public class WebConfig implements WebMvcConfigurer {
 
 	private final ObjectMapper objectMapper;

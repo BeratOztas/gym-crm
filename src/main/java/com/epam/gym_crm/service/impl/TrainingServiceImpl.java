@@ -11,6 +11,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.epam.gym_crm.auth.AuthManager;
+import com.epam.gym_crm.db.entity.Trainee;
+import com.epam.gym_crm.db.entity.Trainer;
+import com.epam.gym_crm.db.entity.Training;
+import com.epam.gym_crm.db.entity.TrainingType;
+import com.epam.gym_crm.db.entity.User;
+import com.epam.gym_crm.db.repository.TraineeRepository;
+import com.epam.gym_crm.db.repository.TrainerRepository;
+import com.epam.gym_crm.db.repository.TrainingRepository;
+import com.epam.gym_crm.db.repository.TrainingTypeRepository;
 import com.epam.gym_crm.dto.request.trainee.TraineeTrainingListRequest;
 import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
 import com.epam.gym_crm.dto.request.training.TrainingCreateRequest;
@@ -21,15 +30,6 @@ import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.model.Trainee;
-import com.epam.gym_crm.model.Trainer;
-import com.epam.gym_crm.model.Training;
-import com.epam.gym_crm.model.TrainingType;
-import com.epam.gym_crm.model.User;
-import com.epam.gym_crm.repository.TraineeRepository;
-import com.epam.gym_crm.repository.TrainerRepository;
-import com.epam.gym_crm.repository.TrainingRepository;
-import com.epam.gym_crm.repository.TrainingTypeRepository;
 import com.epam.gym_crm.service.ITrainingService;
 
 @Service

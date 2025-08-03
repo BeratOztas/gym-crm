@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.epam.gym_crm.entity.TrainingType;
+import com.epam.gym_crm.db.entity.TrainingType;
 import com.epam.gym_crm.service.ITrainingTypeService;
 
 @RestController

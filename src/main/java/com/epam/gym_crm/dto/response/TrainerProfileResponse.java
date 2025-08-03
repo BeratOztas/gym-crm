@@ -3,9 +3,9 @@ package com.epam.gym_crm.dto.response;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.epam.gym_crm.model.Trainer;
-import com.epam.gym_crm.model.TrainingType;
-import com.epam.gym_crm.model.User;
+import com.epam.gym_crm.db.entity.Trainer;
+import com.epam.gym_crm.db.entity.TrainingType;
+import com.epam.gym_crm.db.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

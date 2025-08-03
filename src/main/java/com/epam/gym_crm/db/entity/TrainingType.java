@@ -1,4 +1,4 @@
-package com.epam.gym_crm.model;
+package com.epam.gym_crm.db.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,8 +1,8 @@
 package com.epam.gym_crm.service;
 
+import com.epam.gym_crm.db.entity.User;
 import com.epam.gym_crm.dto.request.ChangePasswordRequest;
 import com.epam.gym_crm.dto.request.LoginRequest;
-import com.epam.gym_crm.model.User;
 
 public interface IAuthenticationService {
 

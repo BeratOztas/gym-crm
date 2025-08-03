@@ -1,6 +1,27 @@
 package com.epam.gym_crm.controller.impl;
 
-import com.epam.gym_crm.controller.ApiResponse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import com.epam.gym_crm.controller.RestTrainerController;
 import com.epam.gym_crm.dto.request.UserActivationRequest;
 import com.epam.gym_crm.dto.request.trainer.TrainerCreateRequest;
 import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
@@ -13,22 +34,9 @@ import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
 import com.epam.gym_crm.service.ITrainerService;
 import com.epam.gym_crm.service.ITrainingService;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RestTrainerControllerImplTest {
+class RestTrainerControllerTest {
 
     @Mock
     private ITrainerService trainerService;
@@ -36,7 +44,7 @@ class RestTrainerControllerImplTest {
     private ITrainingService trainingService;
 
     @InjectMocks
-    private RestTrainerControllerImpl trainerController;
+    private RestTrainerController trainerController;
 
     // --- createTrainer Testleri ---
 
@@ -49,11 +57,12 @@ class RestTrainerControllerImplTest {
         when(trainerService.createTrainer(request)).thenReturn(registrationResponse);
 
         // Act
-        ResponseEntity<ApiResponse<UserRegistrationResponse>> response = trainerController.createTrainer(request);
+        ResponseEntity<UserRegistrationResponse> response = trainerController.createTrainer(request);
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(registrationResponse, response.getBody().getPayload());
+        // Doğrudan DTO'yu kontrol et
+        assertEquals(registrationResponse, response.getBody());
         verify(trainerService, times(1)).createTrainer(request);
     }
 
@@ -67,11 +76,12 @@ class RestTrainerControllerImplTest {
         when(trainerService.findTrainerByUsername(username)).thenReturn(profileResponse);
 
         // Act
-        ResponseEntity<ApiResponse<TrainerProfileResponse>> response = trainerController.findTrainerByUsername(username);
+        ResponseEntity<TrainerProfileResponse> response = trainerController.findTrainerByUsername(username);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(profileResponse, response.getBody().getPayload());
+        // Doğrudan DTO'yu kontrol et
+        assertEquals(profileResponse, response.getBody());
         verify(trainerService, times(1)).findTrainerByUsername(username);
     }
 
@@ -100,11 +110,12 @@ class RestTrainerControllerImplTest {
         when(trainerService.updateTrainer(request)).thenReturn(profileResponse);
 
         // Act
-        ResponseEntity<ApiResponse<TrainerProfileResponse>> response = trainerController.updateTrainer(username, request);
+        ResponseEntity<TrainerProfileResponse> response = trainerController.updateTrainer(username, request);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(profileResponse, response.getBody().getPayload());
+        // Doğrudan DTO'yu kontrol et
+        assertEquals(profileResponse, response.getBody());
         verify(trainerService, times(1)).updateTrainer(request);
     }
 
@@ -120,7 +131,7 @@ class RestTrainerControllerImplTest {
             trainerController.updateTrainer(urlUsername, request);
         });
         assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
-        // Servisin hiç çağrılmadığını doğrula
+        
         verify(trainerService, never()).updateTrainer(any());
     }
 
@@ -134,11 +145,12 @@ class RestTrainerControllerImplTest {
         doNothing().when(trainerService).activateDeactivateTrainer(request);
 
         // Act
-        ResponseEntity<ApiResponse<?>> response = trainerController.activateDeactivateTrainer(username, request);
+        ResponseEntity<?> response = trainerController.activateDeactivateTrainer(username, request);
         
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Trainer status updated successfully.", response.getBody().getPayload());
+        // Doğrudan String yanıtını kontrol et
+        assertEquals("Trainer status updated successfully.", response.getBody());
         verify(trainerService, times(1)).activateDeactivateTrainer(request);
     }
     
@@ -151,11 +163,12 @@ class RestTrainerControllerImplTest {
         doNothing().when(trainerService).deleteTrainerByUsername(username);
 
         // Act
-        ResponseEntity<ApiResponse<?>> response = trainerController.deleteTrainerByUsername(username);
+        ResponseEntity<?> response = trainerController.deleteTrainerByUsername(username);
 
         // Assert
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
+        
         verify(trainerService, times(1)).deleteTrainerByUsername(username);
     }
 
@@ -171,11 +184,12 @@ class RestTrainerControllerImplTest {
         when(trainingService.getTrainerTrainingsList(username, request)).thenReturn(trainingList);
 
         // Act
-        ResponseEntity<ApiResponse<List<TrainerTrainingInfoResponse>>> response = trainerController.getTrainerTrainingsList(username, request);
+        ResponseEntity<List<TrainerTrainingInfoResponse>> response = trainerController.getTrainerTrainingsList(username, request);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(trainingList, response.getBody().getPayload());
+        // Doğrudan DTO listesini kontrol et
+        assertEquals(trainingList, response.getBody());
         verify(trainingService, times(1)).getTrainerTrainingsList(username, request);
     }
 }

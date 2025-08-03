@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.epam.gym_crm.auth.AuthManager;
-import com.epam.gym_crm.model.User;
+import com.epam.gym_crm.db.entity.User;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
