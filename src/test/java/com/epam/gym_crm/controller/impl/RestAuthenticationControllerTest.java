@@ -40,12 +40,15 @@ class RestAuthenticationControllerTest {
         String username = "test.user";
         String password = "password123";
         doNothing().when(authenticationService).login(any(LoginRequest.class));
-        
+
         ResponseEntity<String> response = authController.login(username, password);
-        
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan String yanıtını kontrol et
-        assertEquals("Login successful.", response.getBody());
+        
+        // Beklenen mesajı, controller'ın döndürdüğü dinamik mesajla eşleştir
+        String expectedMessage = "Login successful for user: " + username;
+        assertEquals(expectedMessage, response.getBody());
+        
         verify(authenticationService, times(1)).login(any(LoginRequest.class));
     }
 
@@ -69,14 +72,20 @@ class RestAuthenticationControllerTest {
 
     @Test
     void testChangePassword_Success() {
-        ChangePasswordRequest request = new ChangePasswordRequest("test.user", "oldPass", "newPass");
+        // Arrange
+        String username = "test.user"; 
+        ChangePasswordRequest request = new ChangePasswordRequest(username, "oldPass", "newPass");
         doNothing().when(authenticationService).changePassword(request);
         
+        // Act
         ResponseEntity<String> response = authController.changePassword(request);
         
+        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan String yanıtını kontrol et
-        assertEquals("Password changed successfully", response.getBody());
+        
+        String expectedMessage = "Password changed successfully for user: " + username;
+        assertEquals(expectedMessage, response.getBody());
+        
         verify(authenticationService, times(1)).changePassword(request);
     }
 

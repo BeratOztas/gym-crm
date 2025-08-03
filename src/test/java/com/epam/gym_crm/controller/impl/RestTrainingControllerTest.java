@@ -42,19 +42,20 @@ class RestTrainingControllerTest {
 
 	@Test
 	void testCreateTraining_Success() {
-		// Arrange
-		TrainingCreateRequest request = new TrainingCreateRequest("Trainee.User", "Trainer.User", "Cardio",
-				LocalDate.now(), 60);
-		doNothing().when(trainingService).createTraining(request); // createTraining metodu artık bir şey döndürmüyor
+	    // Arrange
+	    TrainingCreateRequest request = new TrainingCreateRequest("Trainee.User", "Trainer.User", "Cardio", LocalDate.now(), 60);
+	    TrainingResponse trainingResponse = new TrainingResponse(); 
+	    
+	    when(trainingService.createTraining(request)).thenReturn(trainingResponse);
 
-		// Act
-		ResponseEntity<?> response = trainingController.createTraining(request);
+	    // Act
+	    ResponseEntity<?> response = trainingController.createTraining(request);
 
-		// Assert
-		assertEquals(HttpStatus.CREATED, response.getStatusCode());
-		// Doğrudan String yanıtını kontrol et
-		assertEquals("Training created successfully.", response.getBody());
-		verify(trainingService, times(1)).createTraining(request);
+	    // Assert
+	    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+	    // Doğrudan String yanıtını kontrol et
+	    assertEquals("Training created successfully.", response.getBody());
+	    verify(trainingService, times(1)).createTraining(request);
 	}
 
 	// --- getTrainingById Testleri ---
