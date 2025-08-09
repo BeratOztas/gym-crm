@@ -5,7 +5,7 @@ spring:
   # Db Settings
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gym
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gym&stringtype=unspecified
     username: postgres
     password: 1
     
@@ -26,3 +26,15 @@ logging:
     com.epam.gym_crm: INFO
     org.springframework: WARN
     org.hibernate: WARN
+
+# LogoutAspect'in dinamik konfigürasyonu
+app:
+  logout:
+    pointcut:
+      base-package: com.epam.gym_crm.service.impl
+      excluded-methods:
+        - "AuthenticationServiceImpl.login"
+        - "AuthenticationServiceImpl.logout"
+        - "AuthenticationServiceImpl.createAndSaveUser"
+        - "TraineeServiceImpl.createTrainee"
+        - "TrainerServiceImpl.createTrainer"

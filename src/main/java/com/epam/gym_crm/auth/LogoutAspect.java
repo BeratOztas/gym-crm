@@ -25,12 +25,7 @@ public class LogoutAspect {
 		this.authManager = authManager;
 	}
 
-	@Pointcut("execution(* com.epam.gym_crm.service.impl.*ServiceImpl.*(..)) "
-			+ "&& !execution(* com.epam.gym_crm.service.impl.AuthenticationServiceImpl.login(..)) "
-			+ "&& !execution(* com.epam.gym_crm.service.impl.AuthenticationServiceImpl.logout(..)) "
-			+ "&& !execution(* com.epam.gym_crm.service.impl.AuthenticationServiceImpl.createAndSaveUser(..)) "
-			+ "&& !execution(* com.epam.gym_crm.service.impl.TraineeServiceImpl.createTrainee(..)) "
-			+ "&& !execution(* com.epam.gym_crm.service.impl.TrainerServiceImpl.createTrainer(..))")
+	@Pointcut("com.epam.gym_crm.config.AopConfig.logoutPointcut()")
 	public void protectedServiceMethods() {
 		// Empty method for define
 	}
