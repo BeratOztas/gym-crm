@@ -1,6 +1,5 @@
 package com.epam.gym_crm.service.impl;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,7 +23,9 @@ import com.epam.gym_crm.dto.request.trainee.TraineeTrainingListRequest;
 import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
 import com.epam.gym_crm.dto.request.training.TrainingCreateRequest;
 import com.epam.gym_crm.dto.request.training.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.response.TraineeTrainingInfoProjection;
 import com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse;
+import com.epam.gym_crm.dto.response.TrainerTrainingInfoProjection;
 import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
 import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.exception.BaseException;
@@ -112,7 +113,8 @@ public class TrainingServiceImpl implements ITrainingService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TraineeTrainingInfoResponse> getTraineeTrainingsList(String username,TraineeTrainingListRequest request) {
+	public List<TraineeTrainingInfoResponse> getTraineeTrainingsList(String username,
+			TraineeTrainingListRequest request) {
 		User currentUser = authManager.getCurrentUser();
 		logger.info("User '{}' attempting to retrieve trainings list for trainee '{}' with criteria: {}",
 				currentUser.getUsername(), username, request);
@@ -125,10 +127,9 @@ public class TrainingServiceImpl implements ITrainingService {
 		}
 
 		Trainee foundTrainee = traineeRepository.findByUserUsername(username).orElseThrow(() -> {
-			logger.warn("Trainee with username '{}' not found when trying to retrieve their trainings.",
-					username);
+			logger.warn("Trainee with username '{}' not found when trying to retrieve their trainings.", username);
 			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-					"Trainee with username " +username + " not found."));
+					"Trainee with username " + username + " not found."));
 		});
 
 		if (!foundTrainee.getUser().isActive()) {
@@ -137,36 +138,35 @@ public class TrainingServiceImpl implements ITrainingService {
 					"Trainee " + username + " is not active. Cannot retrieve their trainings."));
 		}
 
-		List<Object[]> results = trainingRepository
-                .findTraineeTrainingsByCriteria(username, request.getFromDate(),
-                        request.getToDate(), request.getTrainerName(), request.getTrainingTypeName());
+		List<TraineeTrainingInfoProjection> responseList = trainingRepository
+				.findTraineeTrainingsByCriteria(username, request.getFromDate(), request.getToDate(),
+						request.getTrainerName(), request.getTrainingTypeName());
 
-        if (results.isEmpty()) {
-            logger.info("No trainings found for trainee '{}' with specified criteria.", username);
-            return List.of();
-        }
+        List<TraineeTrainingInfoResponse> filteredTraineeTrainingList = responseList.stream()
+                .map(projection -> new TraineeTrainingInfoResponse(
+                        projection.getTrainingName(),
+                        projection.getTrainingDate(),
+                        projection.getTrainingType(),
+                        projection.getTrainingDuration(),
+                        projection.getTrainerName()
+                ))
+                .collect(Collectors.toList());
+		
 
-        // to DTO converter
-        
-        List<TraineeTrainingInfoResponse> filteredTraineeTrainingList = results.stream()
-            .map(row -> new TraineeTrainingInfoResponse(
-                (String) row[0], // training_name
-                ((Date) row[1]).toLocalDate(), // training_date
-                (String) row[2], // training_type_name
-                (Integer) row[3], // training_duration
-                (String) row[4]  // trainerName
-            ))
-            .collect(Collectors.toList());
+		if (filteredTraineeTrainingList.isEmpty()) {
+			logger.info("No trainings found for trainee '{}' with specified criteria.", username);
+		} else {
+			logger.info("Successfully retrieved {} trainings for trainee '{}'.", filteredTraineeTrainingList.size(),
+					username);
+		}
 
-        logger.info("Successfully retrieved and converted {} trainings for trainee '{}'.",
-                filteredTraineeTrainingList.size(), username);
-
-        return filteredTraineeTrainingList;
+		return filteredTraineeTrainingList;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TrainerTrainingInfoResponse> getTrainerTrainingsList(String username, TrainerTrainingListRequest request) {
+	public List<TrainerTrainingInfoResponse> getTrainerTrainingsList(String username,
+			TrainerTrainingListRequest request) {
 		User currentUser = authManager.getCurrentUser();
 		logger.info("User '{}' attempting to retrieve trainings list for trainer '{}' with criteria: {}",
 				currentUser.getUsername(), username, request);
@@ -179,8 +179,7 @@ public class TrainingServiceImpl implements ITrainingService {
 		}
 
 		Trainer foundTrainer = trainerRepository.findByUserUsername(username).orElseThrow(() -> {
-			logger.warn("Trainer with username '{}' not found when trying to retrieve their trainings.",
-					username);
+			logger.warn("Trainer with username '{}' not found when trying to retrieve their trainings.", username);
 			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
 					"Trainer with username " + username + " not found."));
 		});
@@ -191,32 +190,28 @@ public class TrainingServiceImpl implements ITrainingService {
 					"Trainer " + username + " is not active. Cannot retrieve their trainings."));
 		}
 
-		List<Object[]> results = trainingRepository
+		List<TrainerTrainingInfoProjection> responseList = trainingRepository
                 .findTrainerTrainingsByCriteria(username, request.getFromDate(),
                         request.getToDate(), request.getTraineeName());
-
-        if (results.isEmpty()) {
-            logger.info("No trainings found for trainer '{}' with specified criteria.", username);
-            return List.of();
-        }
-
-        // to DTO converter
         
-        List<TrainerTrainingInfoResponse> filteredTrainerTrainingList = results.stream()
-            .map(row -> new TrainerTrainingInfoResponse(
-                (String) row[0], // training_name
-                ((Date) row[1]).toLocalDate(), // training_date
-                (String) row[2], // training_type_name
-                (Integer) row[3], // training_duration
-                (String) row[4]  // traineeName
-            ))
-            .collect(Collectors.toList());
+        List<TrainerTrainingInfoResponse> filteredTrainerTrainingList = responseList.stream()
+                .map(projection -> new TrainerTrainingInfoResponse(
+                        projection.getTrainingName(),
+                        projection.getTrainingDate(),
+                        projection.getTrainingType(),
+                        projection.getTrainingDuration(),
+                        projection.getTraineeName()
+                ))
+                .collect(Collectors.toList());
+        
+		if (filteredTrainerTrainingList.isEmpty()) {
+			logger.info("No trainings found for trainer '{}' with specified criteria.", username);
+		} else {
+			logger.info("Successfully retrieved {} trainings for trainer '{}'.", filteredTrainerTrainingList.size(),
+					username);
+		}
 
-        logger.info("Successfully retrieved and converted {} trainings for trainer '{}'.",
-                filteredTrainerTrainingList.size(), username);
-
-        return filteredTrainerTrainingList;
-
+		return filteredTrainerTrainingList;
 	}
 
 	@Override

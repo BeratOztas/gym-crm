@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,7 +40,9 @@ import com.epam.gym_crm.dto.request.trainee.TraineeTrainingListRequest;
 import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
 import com.epam.gym_crm.dto.request.training.TrainingCreateRequest;
 import com.epam.gym_crm.dto.request.training.TrainingUpdateRequest;
+import com.epam.gym_crm.dto.response.TraineeTrainingInfoProjection;
 import com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse;
+import com.epam.gym_crm.dto.response.TrainerTrainingInfoProjection;
 import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
 import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.exception.BaseException;
@@ -262,55 +263,76 @@ class TrainingServiceImplTest {
 	// --- 14. Get Trainee Trainings List ---
 
 	@Test
-    void shouldGetTraineeTrainingsListSuccessfully() {
-        // Given
-        String username = testTraineeUser.getUsername();
-        TraineeTrainingListRequest request = new TraineeTrainingListRequest(
-            LocalDate.of(2023, 1, 1),
-            LocalDate.of(2023, 12, 31),
-            testTrainer.getUser().getFirstName(),
-            testTrainingType.getTrainingTypeName()
-        );
+	void shouldGetTraineeTrainingsListSuccessfully() {
+	    // --- BÖLÜM 1: GIVEN (Ön Koşullar) ---
+	    String username = testTraineeUser.getUsername();
+	    TraineeTrainingListRequest request = new TraineeTrainingListRequest(
+	        LocalDate.of(2023, 1, 1),
+	        LocalDate.of(2023, 12, 31),
+	        testTrainer.getUser().getFirstName(),
+	        testTrainingType.getTrainingTypeName()
+	    );
 
-        // Hatanın kaynağı burası. Testin başında doğru kullanıcıyı mock'lamalısınız.
-        when(authManager.getCurrentUser()).thenReturn(testTraineeUser);
-        
-        when(traineeRepository.findByUserUsername(username)).thenReturn(Optional.of(testTrainee));
+	    // --- BÖLÜM 2: WHEN (Davranış) ---
+	    when(authManager.getCurrentUser()).thenReturn(testTraineeUser);
+	    when(traineeRepository.findByUserUsername(username)).thenReturn(Optional.of(testTrainee));
 
-        List<Object[]> mockResponseObjects = Arrays.asList(
-            new Object[]{"Yoga", Date.valueOf(LocalDate.of(2023, 5, 10)), testTrainingType.getTrainingTypeName(), 60, testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName()},
-            new Object[]{"Pilates", Date.valueOf(LocalDate.of(2023, 6, 15)), testTrainingType.getTrainingTypeName(), 45, testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName()}
-        );
+	    // Artık repository metodu bir 'TraineeTrainingInfoProjection' listesi döndürüyor
+	    List<TraineeTrainingInfoProjection> mockProjections = Arrays.asList(
+	        new TraineeTrainingInfoProjection() {
+	            @Override
+	            public String getTrainingName() { return "Yoga"; }
+	            @Override
+	            public LocalDate getTrainingDate() { return LocalDate.of(2023, 5, 10); }
+	            @Override
+	            public String getTrainingType() { return testTrainingType.getTrainingTypeName(); }
+	            @Override
+	            public Integer getTrainingDuration() { return 60; }
+	            @Override
+	            public String getTrainerName() { return testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName(); }
+	        },
+	        new TraineeTrainingInfoProjection() {
+	            @Override
+	            public String getTrainingName() { return "Pilates"; }
+	            @Override
+	            public LocalDate getTrainingDate() { return LocalDate.of(2023, 6, 15); }
+	            @Override
+	            public String getTrainingType() { return testTrainingType.getTrainingTypeName(); }
+	            @Override
+	            public Integer getTrainingDuration() { return 45; }
+	            @Override
+	            public String getTrainerName() { return testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName(); }
+	        }
+	    );
 
-        when(trainingRepository.findTraineeTrainingsByCriteria(
-                username,
-                request.getFromDate(),
-                request.getToDate(),
-                request.getTrainerName(),
-                request.getTrainingTypeName()))
-            .thenReturn(mockResponseObjects);
+	    when(trainingRepository.findTraineeTrainingsByCriteria(
+	            username,
+	            request.getFromDate(),
+	            request.getToDate(),
+	            request.getTrainerName(),
+	            request.getTrainingTypeName()))
+	        .thenReturn(mockProjections);
 
-        // When
-        List<TraineeTrainingInfoResponse> result = trainingService.getTraineeTrainingsList(username, request);
+	    List<TraineeTrainingInfoResponse> result = trainingService.getTraineeTrainingsList(username, request);
 
-        // Then
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertEquals(2, result.size());
-        assertEquals("Yoga", result.get(0).getTrainingName());
-        assertEquals("Pilates", result.get(1).getTrainingName());
-        assertEquals(testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName(), result.get(0).getTrainerName());
-        assertEquals(testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName(), result.get(1).getTrainerName());
+	    // --- BÖLÜM 3: THEN (Doğrulama) ---
+	    assertNotNull(result);
+	    assertFalse(result.isEmpty());
+	    assertEquals(2, result.size());
+	    assertEquals("Yoga", result.get(0).getTrainingName());
+	    assertEquals("Pilates", result.get(1).getTrainingName());
+	    assertEquals(testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName(), result.get(0).getTrainerName());
+	    assertEquals(testTrainer.getUser().getFirstName() + " " + testTrainer.getUser().getLastName(), result.get(1).getTrainerName());
 
-        verify(authManager).getCurrentUser();
-        verify(traineeRepository).findByUserUsername(username);
-        verify(trainingRepository).findTraineeTrainingsByCriteria(
-                username,
-                request.getFromDate(),
-                request.getToDate(),
-                request.getTrainerName(),
-                request.getTrainingTypeName());
-    }
+	    verify(authManager).getCurrentUser();
+	    verify(traineeRepository).findByUserUsername(username);
+	    verify(trainingRepository).findTraineeTrainingsByCriteria(
+	            username,
+	            request.getFromDate(),
+	            request.getToDate(),
+	            request.getTrainerName(),
+	            request.getTrainingTypeName());
+	}
 
 
     @Test
@@ -392,7 +414,7 @@ class TrainingServiceImplTest {
 
     @Test
     void shouldGetTrainerTrainingsListSuccessfully() {
-
+        // --- BÖLÜM 1: GIVEN (Ön Koşullar) ---
         String trainerUsername = testTrainer.getUser().getUsername();
         TrainerTrainingListRequest request = new TrainerTrainingListRequest(
             LocalDate.of(2023, 1, 1),
@@ -400,14 +422,37 @@ class TrainingServiceImplTest {
             testTrainee.getUser().getFirstName()
         );
 
-        
-        when(authManager.getCurrentUser()).thenReturn(testTrainer.getUser()); // Correct user for authorization
-
+        // --- BÖLÜM 2: WHEN (Davranış) ---
+        when(authManager.getCurrentUser()).thenReturn(testTrainer.getUser()); // Yetkilendirme için doğru kullanıcı
         when(trainerRepository.findByUserUsername(trainerUsername)).thenReturn(Optional.of(testTrainer));
 
-        List<Object[]> mockDatabaseResult = Arrays.asList(
-            new Object[]{"Strength", Date.valueOf(LocalDate.of(2023, 5, 10)), testTrainingType.getTrainingTypeName(), 60, testTrainee.getUser().getFirstName() + " " + testTrainee.getUser().getLastName()},
-            new Object[]{"Cardio", Date.valueOf(LocalDate.of(2023, 6, 15)), testTrainingType.getTrainingTypeName(), 45, testTrainee.getUser().getFirstName() + " " + testTrainee.getUser().getLastName()}
+        // Artık repository metodu bir 'TrainerTrainingInfoProjection' listesi döndürüyor
+        List<TrainerTrainingInfoProjection> mockProjections = Arrays.asList(
+            // Anonymous inner class ile mock projeksiyon objesi oluşturma
+            new TrainerTrainingInfoProjection() {
+                @Override
+                public String getTrainingName() { return "Strength"; }
+                @Override
+                public LocalDate getTrainingDate() { return LocalDate.of(2023, 5, 10); }
+                @Override
+                public String getTrainingType() { return testTrainingType.getTrainingTypeName(); }
+                @Override
+                public Integer getTrainingDuration() { return 60; }
+                @Override
+                public String getTraineeName() { return testTrainee.getUser().getFirstName() + " " + testTrainee.getUser().getLastName(); }
+            },
+            new TrainerTrainingInfoProjection() {
+                @Override
+                public String getTrainingName() { return "Cardio"; }
+                @Override
+                public LocalDate getTrainingDate() { return LocalDate.of(2023, 6, 15); }
+                @Override
+                public String getTrainingType() { return testTrainingType.getTrainingTypeName(); }
+                @Override
+                public Integer getTrainingDuration() { return 45; }
+                @Override
+                public String getTraineeName() { return testTrainee.getUser().getFirstName() + " " + testTrainee.getUser().getLastName(); }
+            }
         );
 
         when(trainingRepository.findTrainerTrainingsByCriteria(
@@ -415,12 +460,11 @@ class TrainingServiceImplTest {
                 request.getFromDate(),
                 request.getToDate(),
                 request.getTraineeName()
-            )).thenReturn(mockDatabaseResult);
-
+            )).thenReturn(mockProjections);
 
         List<TrainerTrainingInfoResponse> result = trainingService.getTrainerTrainingsList(trainerUsername, request);
 
-        // --- BÖLÜM 3: ASSERT (Doğrulama) ---
+        // --- BÖLÜM 3: THEN (Doğrulama) ---
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("Strength", result.get(0).getTrainingName());
@@ -428,7 +472,6 @@ class TrainingServiceImplTest {
         assertEquals(testTrainee.getUser().getFirstName() + " " + testTrainee.getUser().getLastName(), result.get(0).getTraineeName());
         assertEquals(testTrainee.getUser().getFirstName() + " " + testTrainee.getUser().getLastName(), result.get(1).getTraineeName());
 
-        // 3b. Mock'ların beklendiği gibi çağrılıp çağrılmadığını kontrol et.
         verify(authManager, times(1)).getCurrentUser();
         verify(trainerRepository, times(1)).findByUserUsername(trainerUsername);
         verify(trainingRepository, times(1)).findTrainerTrainingsByCriteria(

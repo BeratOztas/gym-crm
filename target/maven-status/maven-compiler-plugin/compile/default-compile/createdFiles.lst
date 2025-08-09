@@ -1,5 +1,6 @@
 com\epam\gym_crm\dto\response\TraineeProfileResponse.class
 com\epam\gym_crm\service\impl\TraineeServiceImpl.class
+com\epam\gym_crm\config\SwaggerConfig.class
 com\epam\gym_crm\config\TrainingTypeDataLoader.class
 com\epam\gym_crm\controller\RestTrainingController.class
 com\epam\gym_crm\dto\request\trainer\TrainerRequest.class
@@ -49,15 +50,19 @@ com\epam\gym_crm\dto\request\trainee\TraineeTrainingListRequest.class
 com\epam\gym_crm\filter\SessionManagementFilter.class
 com\epam\gym_crm\dto\response\TrainerProfileResponse.class
 com\epam\gym_crm\controller\RestTrainingTypeController.class
+com\epam\gym_crm\dto\response\TraineeTrainingInfoProjection.class
 com\epam\gym_crm\dto\response\UserRegistrationResponse.class
 com\epam\gym_crm\dto\request\trainee\TraineeRequest.class
+com\epam\gym_crm\config\LogoutAspectProperties.class
 com\epam\gym_crm\db\entity\TrainingType.class
 com\epam\gym_crm\dto\response\TrainerTrainingInfoResponse.class
 com\epam\gym_crm\db\repository\TrainingRepository.class
 com\epam\gym_crm\service\ITrainingService.class
 META-INF\maven\com.epam\gym-crm\pom.properties
+com\epam\gym_crm\config\AopConfig.class
 com\epam\gym_crm\auth\AuthManager.class
 com\epam\gym_crm\dto\request\LoginRequest.class
 com\epam\gym_crm\db\entity\User.class
 com\epam\gym_crm\db\repository\TrainerRepository.class
 com\epam\gym_crm\dto\request\ChangePasswordRequest.class
+com\epam\gym_crm\dto\response\TrainerTrainingInfoProjection.class

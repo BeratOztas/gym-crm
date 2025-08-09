@@ -1,6 +1,9 @@
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\auth\AuthManager.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\auth\LogoutAspect.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\config\AopConfig.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\config\AppConfig.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\config\LogoutAspectProperties.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\config\SwaggerConfig.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\config\TrainingTypeDataLoader.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\controller\RestAuthenticationController.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\controller\RestTraineeController.java
@@ -33,9 +36,11 @@ C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\reque
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\request\UserActivationRequest.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\TraineeInfoResponse.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\TraineeProfileResponse.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\TraineeTrainingInfoProjection.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\TraineeTrainingInfoResponse.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\TrainerInfoResponse.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\TrainerProfileResponse.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\TrainerTrainingInfoProjection.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\TrainerTrainingInfoResponse.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\TrainingResponse.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\dto\response\UserRegistrationResponse.java
