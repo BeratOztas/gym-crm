@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: gym-crm
+  
+  # Db Settings
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gym
+    username: postgres
+    password: 1
+    
+  # JPA And Hibernate Settings
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Logs
+logging:
+  level:
+    root: WARN
+    com.epam.gym_crm: INFO
+    org.springframework: WARN
+    org.hibernate: WARN

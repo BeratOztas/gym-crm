@@ -1,4 +1,4 @@
-package com.epam.gym_crm.controller.impl;
+package com.epam.gym_crm.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.epam.gym_crm.controller.RestAuthenticationController;
 import com.epam.gym_crm.dto.request.ChangePasswordRequest;
 import com.epam.gym_crm.dto.request.LoginRequest;
 import com.epam.gym_crm.exception.BaseException;

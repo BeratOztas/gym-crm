@@ -1,103 +1,33 @@
 package com.epam.gym_crm.config;
 
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.annotation.Value;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.epam.gym_crm.handler.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import jakarta.persistence.EntityManagerFactory;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 
 @Configuration
-@ComponentScan(basePackages = {"com.epam.gym_crm ","org.springdoc"})
-@PropertySource("classpath:application.properties")
-@EnableJpaRepositories(basePackages = "com.epam.gym_crm.db.repository")
-@EnableAspectJAutoProxy
-@EnableTransactionManagement
 public class AppConfig {
 
-	@Value("${db.driver}")
-	private String driver;
-
-	@Value("${db.url}")
-	private String url;
-
-	@Value("${db.username}")
-	private String username;
-
-	@Value("${db.password}")
-	private String password;
-
-	@Value("${hibernate.dialect}")
-	private String dialect;
-
-	@Value("${hibernate.show_sql}")
-	private String showSql;
-
-	@Value("${hibernate.format_sql}")
-	private String formatSql;
-
-	@Value("${hibernate.hbm2ddl.auto}")
-	private String hbm2ddlAuto;
-
 	@Bean
-	public DataSource dataSource() {
-		DriverManagerDataSource ds = new DriverManagerDataSource();
-		ds.setDriverClassName(driver);
-		ds.setUrl(url);
-		ds.setUsername(username);
-		ds.setPassword(password);
-		return ds;
+	public OpenAPI customOpenAPI() {
+		return new OpenAPI().openapi("3.0.1")
+				.info(new Info().title("Gym CRM API (OpenAPI 3)").version("1.0.0")
+						.description("Spring Boot REST API Documents.")
+						.contact(new Contact().name("Berat").email("berat.oztas.dev@gmail.com"))
+						.license(new License().name("Apache 2.0").url("http://springdoc.org")));
 	}
 
 	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-		LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
-		emf.setDataSource(dataSource());
-		emf.setPackagesToScan("com.epam.gym_crm.db.entity");
-		emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-
-		Properties props = new Properties();
-		props.setProperty("hibernate.dialect", dialect);
-		props.setProperty("hibernate.show_sql", showSql);
-		props.setProperty("hibernate.format_sql", formatSql);
-		props.setProperty("hibernate.hbm2ddl.auto", hbm2ddlAuto);
-
-		emf.setJpaProperties(props);
-		return emf;
-	}
-
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
-		return new PropertySourcesPlaceholderConfigurer();
-	}
-
-	@Bean
-	public GlobalExceptionHandler globalExceptionHandler() {
-		return new GlobalExceptionHandler();
-	}
-
-	@Bean
-	public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
-		return new JpaTransactionManager(emf);
+	public GroupedOpenApi publicApi() {
+		return GroupedOpenApi.builder().group("gym-crm-public").pathsToMatch("/api/**").build();
 	}
 
 	@Bean

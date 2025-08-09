@@ -19,7 +19,6 @@ com\epam\gym_crm\service\impl\AuthenticationServiceImpl.class
 META-INF\maven\com.epam\gym-crm\pom.xml
 com\epam\gym_crm\db\repository\TraineeRepository.class
 com\epam\gym_crm\service\ITrainingTypeService.class
-com\epam\gym_crm\config\WebConfig.class
 com\epam\gym_crm\dto\request\trainer\TrainerCreateRequest.class
 com\epam\gym_crm\dto\response\TraineeInfoResponse.class
 com\epam\gym_crm\db\entity\Training.class
@@ -42,7 +41,6 @@ com\epam\gym_crm\exception\BaseException.class
 com\epam\gym_crm\handler\Exception.class
 com\epam\gym_crm\service\impl\TrainingTypeServiceImpl.class
 com\epam\gym_crm\config\AppConfig.class
-com\epam\gym_crm\config\WebAppInitializer.class
 com\epam\gym_crm\controller\RestAuthenticationController.class
 com\epam\gym_crm\controller\RestTraineeController.class
 com\epam\gym_crm\dto\request\trainer\TrainerTrainingListRequest.class
