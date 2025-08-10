@@ -56,7 +56,7 @@ C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\handler\G
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\monitoring\health\DatabaseHealthIndicator.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\monitoring\health\DiskSpaceHealthIndicator.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\monitoring\health\InitialDataHealthIndicator.java
-C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\monitoring\metrics\AppMetrics.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\monitoring\metric\AppMetrics.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\service\IAuthenticationService.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\service\impl\AuthenticationServiceImpl.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\service\impl\TraineeServiceImpl.java

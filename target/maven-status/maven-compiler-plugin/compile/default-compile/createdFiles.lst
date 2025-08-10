@@ -1,5 +1,6 @@
 com\epam\gym_crm\dto\response\TraineeProfileResponse.class
 com\epam\gym_crm\service\impl\TraineeServiceImpl.class
+com\epam\gym_crm\monitoring\metric\AppMetrics.class
 com\epam\gym_crm\config\SwaggerConfig.class
 com\epam\gym_crm\config\TrainingTypeDataLoader.class
 com\epam\gym_crm\controller\RestTrainingController.class
@@ -15,7 +16,6 @@ com\epam\gym_crm\monitoring\health\InitialDataHealthIndicator.class
 com\epam\gym_crm\handler\ApiError.class
 META-INF\MANIFEST.MF
 com\epam\gym_crm\GymCrmApplication.class
-com\epam\gym_crm\monitoring\metrics\AppMetrics.class
 com\epam\gym_crm\controller\RestTrainerController.class
 com\epam\gym_crm\dto\request\training\TrainingCreateRequest.class
 com\epam\gym_crm\service\impl\AuthenticationServiceImpl.class

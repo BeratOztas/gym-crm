@@ -3,7 +3,11 @@ com\epam\gym_crm\service\impl\TrainingServiceImplTest$2.class
 com\epam\gym_crm\service\impl\TraineeServiceImplTest.class
 com\epam\gym_crm\controller\RestTrainingTypeControllerTest.class
 com\epam\gym_crm\service\impl\TrainerServiceImplTest.class
+com\epam\gym_crm\monitoring\health\DatabaseHealthIndicatorTest.class
 com\epam\gym_crm\controller\RestTraineeControllerTest.class
+com\epam\gym_crm\monitoring\health\DiskSpaceHealthIndicatorTest.class
+com\epam\gym_crm\monitoring\metric\AppMetricsTest.class
+com\epam\gym_crm\monitoring\health\InitialDataHealthIndicatorTest.class
 com\epam\gym_crm\service\impl\TrainingServiceImplTest$1.class
 com\epam\gym_crm\controller\RestTrainerControllerTest.class
 com\epam\gym_crm\service\impl\AuthenticationServiceImplTest.class

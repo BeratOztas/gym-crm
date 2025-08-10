@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.controller.RestTrainingControllerTest" time="0.016" tests="6" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.monitoring.health.InitialDataHealthIndicatorTest" time="0.091" tests="3" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -59,28 +59,7 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="testCreateTraining_Success" classname="com.epam.gym_crm.controller.RestTrainingControllerTest" time="0.002">
-    <system-out><![CDATA[05:18:37.274 [main] [NO-TX] INFO  c.e.g.c.RestTrainingController - Request to create a new training for trainee: Trainee.User
-]]></system-out>
-  </testcase>
-  <testcase name="testGetTrainingById_Success" classname="com.epam.gym_crm.controller.RestTrainingControllerTest" time="0.001">
-    <system-out><![CDATA[05:18:37.276 [main] [NO-TX] INFO  c.e.g.c.RestTrainingController - Request to find training by ID: 1
-]]></system-out>
-  </testcase>
-  <testcase name="testGetTrainingById_Failure_NotFound" classname="com.epam.gym_crm.controller.RestTrainingControllerTest" time="0.002">
-    <system-out><![CDATA[05:18:37.278 [main] [NO-TX] INFO  c.e.g.c.RestTrainingController - Request to find training by ID: 99
-]]></system-out>
-  </testcase>
-  <testcase name="testUpdateTraining_Success" classname="com.epam.gym_crm.controller.RestTrainingControllerTest" time="0.001">
-    <system-out><![CDATA[05:18:37.281 [main] [NO-TX] INFO  c.e.g.c.RestTrainingController - Request to update training with ID: 1
-]]></system-out>
-  </testcase>
-  <testcase name="testUpdateTraining_Failure_PathBodyMismatch" classname="com.epam.gym_crm.controller.RestTrainingControllerTest" time="0.003">
-    <system-out><![CDATA[05:18:37.284 [main] [NO-TX] WARN  c.e.g.c.RestTrainingController - Path-Body Mismatch: URL ID '1' does not match request body ID '2'.
-]]></system-out>
-  </testcase>
-  <testcase name="testDeleteTrainingById_Success" classname="com.epam.gym_crm.controller.RestTrainingControllerTest" time="0.002">
-    <system-out><![CDATA[05:18:37.286 [main] [NO-TX] INFO  c.e.g.c.RestTrainingController - Request to delete training with ID: 1
-]]></system-out>
-  </testcase>
+  <testcase name="testHealth_whenRepositoryThrowsException_shouldReturnDown" classname="com.epam.gym_crm.monitoring.health.InitialDataHealthIndicatorTest" time="0.085"/>
+  <testcase name="testHealth_whenDataIsAvailable_shouldReturnUp" classname="com.epam.gym_crm.monitoring.health.InitialDataHealthIndicatorTest" time="0.001"/>
+  <testcase name="testHealth_whenDataIsMissing_shouldReturnDown" classname="com.epam.gym_crm.monitoring.health.InitialDataHealthIndicatorTest" time="0.001"/>
 </testsuite>
