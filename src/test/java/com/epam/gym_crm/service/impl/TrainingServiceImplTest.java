@@ -46,7 +46,7 @@ import com.epam.gym_crm.dto.response.TrainerTrainingInfoProjection;
 import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
 import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.exception.BaseException;
-import com.epam.gym_crm.monitoring.metrics.AppMetrics;
+import com.epam.gym_crm.monitoring.metric.AppMetrics;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingServiceImplTest {

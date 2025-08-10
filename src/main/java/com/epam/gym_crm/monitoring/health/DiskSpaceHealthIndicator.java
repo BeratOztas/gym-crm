@@ -10,8 +10,16 @@ import java.io.File;
 public class DiskSpaceHealthIndicator implements HealthIndicator {
 
     private static final long THRESHOLD_BYTES = 1 * 1024 * 1024 * 1024;
-    private final File path = new File("."); 
+    private final File path;
 
+    public DiskSpaceHealthIndicator() {
+        this(new File("."));
+    }
+    
+    DiskSpaceHealthIndicator(File path) {
+        this.path = path;
+    }
+    
     @Override
     public Health health() {
         long freeSpace = path.getFreeSpace();

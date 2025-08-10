@@ -50,7 +50,7 @@ import com.epam.gym_crm.dto.response.UserRegistrationResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.monitoring.metrics.AppMetrics;
+import com.epam.gym_crm.monitoring.metric.AppMetrics;
 import com.epam.gym_crm.service.IAuthenticationService;
 
 @ExtendWith(MockitoExtension.class)

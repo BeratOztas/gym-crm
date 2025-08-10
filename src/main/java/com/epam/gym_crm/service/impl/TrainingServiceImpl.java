@@ -31,7 +31,7 @@ import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.monitoring.metrics.AppMetrics;
+import com.epam.gym_crm.monitoring.metric.AppMetrics;
 import com.epam.gym_crm.service.ITrainingService;
 
 import io.micrometer.core.annotation.Timed;

@@ -28,7 +28,9 @@ public class InitialDataHealthIndicator implements HealthIndicator {
 						.withDetail("error", "Critical initial data (Training Types) is missing!").build();
 			}
 		} catch (Exception e) {
-			return Health.down(e).withDetail("error", "Failed to check training types data.").build();
+			 return Health.down(e)
+		                .withDetail("message", "Failed to check training types data.") 
+		                .build();
 		}
 	}
 }

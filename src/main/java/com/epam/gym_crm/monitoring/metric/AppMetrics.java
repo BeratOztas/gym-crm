@@ -1,4 +1,4 @@
-package com.epam.gym_crm.monitoring.metrics;
+package com.epam.gym_crm.monitoring.metric;
 
 import org.springframework.stereotype.Component;
 
