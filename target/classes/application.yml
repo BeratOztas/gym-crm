@@ -5,7 +5,7 @@ spring:
   # Db Settings
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gym&stringtype=unspecified
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gym
     username: postgres
     password: 1
     
@@ -27,8 +27,9 @@ logging:
     org.springframework: WARN
     org.hibernate: WARN
 
-# LogoutAspect'in dinamik konfigürasyonu
+# LogoutAspect properties
 app:
+  # --- LogoutAspect için Pointcut Tanımları ---
   logout:
     pointcut:
       base-package: com.epam.gym_crm.service.impl
@@ -38,3 +39,21 @@ app:
         - "AuthenticationServiceImpl.createAndSaveUser"
         - "TraineeServiceImpl.createTrainee"
         - "TrainerServiceImpl.createTrainer"
+  
+  # --- Security Settings ---
+  security:
+    login:
+      # Max Failure Attempts
+      max-attempts: 3
+      # Lockout duration
+      lockout-duration-minutes: 5
+
+# Actuator Settings
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus" 
+  endpoint:
+    health:
+      show-details: "always"

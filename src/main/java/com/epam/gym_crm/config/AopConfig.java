@@ -25,7 +25,6 @@ public class AopConfig {
 
         String finalPointcutExpression = baseExecution + " && !" + "(" + excludedExecution + ")";
         
-        System.out.println("Dinamik AOP Pointcut İfadesi: " + finalPointcutExpression);
 
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         pointcut.setExpression(finalPointcutExpression);

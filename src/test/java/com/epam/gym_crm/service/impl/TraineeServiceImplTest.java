@@ -50,6 +50,7 @@ import com.epam.gym_crm.dto.response.UserRegistrationResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.monitoring.metrics.AppMetrics;
 import com.epam.gym_crm.service.IAuthenticationService;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,6 +71,9 @@ class TraineeServiceImplTest {
 
 	@InjectMocks
 	private TraineeServiceImpl traineeService;
+	
+	@Mock 
+	private AppMetrics appMetrics;
 
 	private User testUser;
 	private Trainee testTrainee;
@@ -119,7 +123,7 @@ class TraineeServiceImplTest {
 		activationRequest.setIsActive(false);
 
 		this.traineeService = new TraineeServiceImpl(traineeRepository, authenticationService, authManager,
-				userRepository, trainerRepository, trainingRepository);
+				userRepository, trainerRepository, trainingRepository,appMetrics);
 
 		testUser = new User(1L, "Test", "User", "test.user", "pass123", true, null, null);
 		testTrainee = new Trainee(10L, LocalDate.of(2000, 1, 1), "Some Address", testUser, new HashSet<>(),

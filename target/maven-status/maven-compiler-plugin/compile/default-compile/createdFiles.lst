@@ -11,9 +11,11 @@ com\epam\gym_crm\db\repository\TrainingTypeRepository.class
 com\epam\gym_crm\dto\response\TraineeTrainingInfoResponse.class
 com\epam\gym_crm\filter\RequestLoggingFilter.class
 com\epam\gym_crm\service\ITraineeService.class
+com\epam\gym_crm\monitoring\health\InitialDataHealthIndicator.class
 com\epam\gym_crm\handler\ApiError.class
 META-INF\MANIFEST.MF
 com\epam\gym_crm\GymCrmApplication.class
+com\epam\gym_crm\monitoring\metrics\AppMetrics.class
 com\epam\gym_crm\controller\RestTrainerController.class
 com\epam\gym_crm\dto\request\training\TrainingCreateRequest.class
 com\epam\gym_crm\service\impl\AuthenticationServiceImpl.class
@@ -42,10 +44,12 @@ com\epam\gym_crm\exception\BaseException.class
 com\epam\gym_crm\handler\Exception.class
 com\epam\gym_crm\service\impl\TrainingTypeServiceImpl.class
 com\epam\gym_crm\config\AppConfig.class
+com\epam\gym_crm\monitoring\health\DiskSpaceHealthIndicator.class
 com\epam\gym_crm\controller\RestAuthenticationController.class
 com\epam\gym_crm\controller\RestTraineeController.class
 com\epam\gym_crm\dto\request\trainer\TrainerTrainingListRequest.class
 com\epam\gym_crm\handler\GlobalExceptionHandler.class
+com\epam\gym_crm\monitoring\health\DatabaseHealthIndicator.class
 com\epam\gym_crm\dto\request\trainee\TraineeTrainingListRequest.class
 com\epam\gym_crm\filter\SessionManagementFilter.class
 com\epam\gym_crm\dto\response\TrainerProfileResponse.class

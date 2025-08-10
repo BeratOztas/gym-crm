@@ -46,6 +46,7 @@ import com.epam.gym_crm.dto.response.TrainerTrainingInfoProjection;
 import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
 import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.exception.BaseException;
+import com.epam.gym_crm.monitoring.metrics.AppMetrics;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingServiceImplTest {
@@ -62,6 +63,9 @@ class TrainingServiceImplTest {
 	private AuthManager authManager;
 	@Mock
 	private UserRepository userRepository;
+	
+	@Mock
+	private AppMetrics appMetrics;
 
 	private TrainingServiceImpl trainingService;
 
@@ -73,7 +77,7 @@ class TrainingServiceImplTest {
 
 	@BeforeEach
 	void setUp() {
-		this.trainingService = new TrainingServiceImpl(trainingRepository, traineeRepository, trainerRepository, trainingTypeRepository, authManager);
+		this.trainingService = new TrainingServiceImpl(trainingRepository, traineeRepository, trainerRepository, trainingTypeRepository, authManager,appMetrics);
 		
 		// Oturum açan test kullanıcısı
 		testUser = new User(1L, "Test", "User", "test.user", "pass123", true, null, null);

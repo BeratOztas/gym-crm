@@ -30,8 +30,11 @@ import com.epam.gym_crm.dto.response.UserRegistrationResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.monitoring.metrics.AppMetrics;
 import com.epam.gym_crm.service.IAuthenticationService;
 import com.epam.gym_crm.service.ITrainerService;
+
+import io.micrometer.core.annotation.Timed;
 
 @Service
 public class TrainerServiceImpl implements ITrainerService {
@@ -45,10 +48,11 @@ public class TrainerServiceImpl implements ITrainerService {
 	private final TraineeRepository traineeRepository;
 	private final AuthManager authManager;
 	private final UserRepository userRepository;
+	private final AppMetrics appMetrics;
 
 	public TrainerServiceImpl(IAuthenticationService authenticationService, TrainerRepository trainerRepository,
 			TrainingTypeRepository trainingTypeRepository, AuthManager authManager, UserRepository userRepository,
-			TrainingRepository trainingRepository, TraineeRepository traineeRepository) {
+			TrainingRepository trainingRepository, TraineeRepository traineeRepository,AppMetrics appMetrics) {
 		this.authenticationService = authenticationService;
 		this.trainerRepository = trainerRepository;
 		this.trainingTypeRepository = trainingTypeRepository;
@@ -56,6 +60,7 @@ public class TrainerServiceImpl implements ITrainerService {
 		this.userRepository = userRepository;
 		this.trainingRepository = trainingRepository;
 		this.traineeRepository = traineeRepository;
+		this.appMetrics=appMetrics;
 	}
 
 	@Override
@@ -169,6 +174,7 @@ public class TrainerServiceImpl implements ITrainerService {
 
 	@Override
 	@Transactional()
+	@Timed(value = "gym_crm_api_duration_seconds", extraTags = { "endpoint", "create_trainer" })
 	public UserRegistrationResponse createTrainer(TrainerCreateRequest request) {
 		if (request == null) {
 			logger.error("Trainer must not be null");
@@ -197,6 +203,8 @@ public class TrainerServiceImpl implements ITrainerService {
 		}
 
 		logger.info("Trainer profile created successfully for user: {}", newUser.getUsername());
+		
+		appMetrics.incrementTrainerCreation();
 
 		return new UserRegistrationResponse(newUser.getUsername(), newUser.getPassword());
 

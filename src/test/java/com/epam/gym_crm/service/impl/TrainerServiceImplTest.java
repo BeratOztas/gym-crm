@@ -43,6 +43,7 @@ import com.epam.gym_crm.dto.response.TrainerInfoResponse;
 import com.epam.gym_crm.dto.response.TrainerProfileResponse;
 import com.epam.gym_crm.dto.response.UserRegistrationResponse;
 import com.epam.gym_crm.exception.BaseException;
+import com.epam.gym_crm.monitoring.metrics.AppMetrics;
 import com.epam.gym_crm.service.IAuthenticationService;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,6 +66,9 @@ class TrainerServiceImplTest {
 
 	@InjectMocks
 	private TrainerServiceImpl trainerService;
+
+	@Mock
+	private AppMetrics appMetrics;
 
 	private User testUser;
 	private Trainer testTrainer;
@@ -89,6 +93,17 @@ class TrainerServiceImplTest {
 		testTrainer.setUser(testUser);
 		testTrainer.setSpecialization(testSpecialization);
 		testTrainer.setTrainings(new HashSet<>());
+		
+		trainerService = new TrainerServiceImpl(
+		        authenticationService,
+		        trainerRepository,
+		        trainingTypeRepository,
+		        authManager,
+		        userRepository,
+		        trainingRepository,
+		        traineeRepository,
+		        appMetrics
+		    );
 	}
 
 	// --- 1. findTrainerById(Long id) ---
@@ -182,7 +197,7 @@ class TrainerServiceImplTest {
 				exceptionNull.getMessage());
 
 		verify(authManager).getCurrentUser();
-		
+
 		verifyNoInteractions(trainerRepository);
 
 		// Tekrar NullPointerException yerine BaseException fırlatılmasını bekliyoruz.
@@ -248,7 +263,7 @@ class TrainerServiceImplTest {
 		// Given
 		when(authManager.getCurrentUser()).thenReturn(testUser);
 
-		when(trainerRepository.findAll()).thenReturn(List.of()); 
+		when(trainerRepository.findAll()).thenReturn(List.of());
 
 		// When
 		List<TrainerProfileResponse> responseList = trainerService.getAllTrainers();
@@ -262,70 +277,70 @@ class TrainerServiceImplTest {
 
 //  --- 4. getUnassignedTrainersForTrainee(String traineeUsername) ---
 	@Test
-    void shouldGetUnassignedTrainersForTraineeSuccessfully() {
-        // Given
-        String traineeUsername = "Test.Trainee";
-        User traineeUser = new User(2L, "Test", "Trainee", traineeUsername, "pass", true, null, null);
-        Trainee trainee = new Trainee(2L, null, null, traineeUser, new HashSet<>(), new HashSet<>());
+	void shouldGetUnassignedTrainersForTraineeSuccessfully() {
+		// Given
+		String traineeUsername = "Test.Trainee";
+		User traineeUser = new User(2L, "Test", "Trainee", traineeUsername, "pass", true, null, null);
+		Trainee trainee = new Trainee(2L, null, null, traineeUser, new HashSet<>(), new HashSet<>());
 
-        // Aktif olan tüm antrenörler
-        Trainer assignedTrainer = new Trainer();
-        assignedTrainer.setId(1L);
-        User assignedUser = new User(1L, "Assigned", "One", "Assigned.One", "pass", true, null, null);
-        assignedTrainer.setUser(assignedUser);
-        assignedTrainer.setSpecialization(testSpecialization);
-        assignedTrainer.setTrainings(new HashSet<>());
-        
-        Trainer unassignedTrainer1 = new Trainer();
-        unassignedTrainer1.setId(3L);
-        User unassignedUser1 = new User(3L, "Unassigned", "One", "Unassigned.One", "pass", true, null, null);
-        unassignedTrainer1.setUser(unassignedUser1);
-        unassignedTrainer1.setSpecialization(testSpecialization);
-        unassignedTrainer1.setTrainings(new HashSet<>());
+		// Aktif olan tüm antrenörler
+		Trainer assignedTrainer = new Trainer();
+		assignedTrainer.setId(1L);
+		User assignedUser = new User(1L, "Assigned", "One", "Assigned.One", "pass", true, null, null);
+		assignedTrainer.setUser(assignedUser);
+		assignedTrainer.setSpecialization(testSpecialization);
+		assignedTrainer.setTrainings(new HashSet<>());
 
-        Trainer unassignedTrainer2 = new Trainer();
-        unassignedTrainer2.setId(4L);
-        User unassignedUser2 = new User(4L, "Unassigned", "Two", "Unassigned.Two", "pass", true, null, null);
-        unassignedTrainer2.setUser(unassignedUser2);
-        unassignedTrainer2.setSpecialization(testSpecialization);
-        unassignedTrainer2.setTrainings(new HashSet<>());
+		Trainer unassignedTrainer1 = new Trainer();
+		unassignedTrainer1.setId(3L);
+		User unassignedUser1 = new User(3L, "Unassigned", "One", "Unassigned.One", "pass", true, null, null);
+		unassignedTrainer1.setUser(unassignedUser1);
+		unassignedTrainer1.setSpecialization(testSpecialization);
+		unassignedTrainer1.setTrainings(new HashSet<>());
 
-        List<Trainer> allActiveTrainers = Arrays.asList(assignedTrainer, unassignedTrainer1, unassignedTrainer2);
+		Trainer unassignedTrainer2 = new Trainer();
+		unassignedTrainer2.setId(4L);
+		User unassignedUser2 = new User(4L, "Unassigned", "Two", "Unassigned.Two", "pass", true, null, null);
+		unassignedTrainer2.setUser(unassignedUser2);
+		unassignedTrainer2.setSpecialization(testSpecialization);
+		unassignedTrainer2.setTrainings(new HashSet<>());
 
-        // Trainee'ye atanmış antrenörler (sadece 'assignedTrainer' atanmış)
-        trainee.setTrainers(new HashSet<>(Arrays.asList(assignedTrainer)));
+		List<Trainer> allActiveTrainers = Arrays.asList(assignedTrainer, unassignedTrainer1, unassignedTrainer2);
 
-        when(authManager.getCurrentUser()).thenReturn(traineeUser);
-        when(traineeRepository.findByUserUsername(traineeUsername)).thenReturn(Optional.of(trainee));
-        
-        // Yeni metot çağrısı mock'lanıyor
-        when(trainerRepository.findByUserIsActive(true)).thenReturn(allActiveTrainers);
+		// Trainee'ye atanmış antrenörler (sadece 'assignedTrainer' atanmış)
+		trainee.setTrainers(new HashSet<>(Arrays.asList(assignedTrainer)));
 
-        // When
-        List<TrainerInfoResponse> result = trainerService.getUnassignedTrainersForTrainee(traineeUsername);
+		when(authManager.getCurrentUser()).thenReturn(traineeUser);
+		when(traineeRepository.findByUserUsername(traineeUsername)).thenReturn(Optional.of(trainee));
 
-        // Then
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        
-        // Atanmamış antrenörlerin listesinde atanmış olanın olmadığından emin ol
-        List<String> resultUsernames = result.stream()
-                .map(TrainerInfoResponse::getUsername)
-                .collect(Collectors.toList());
-        
-        assertTrue(resultUsernames.contains("Unassigned.One"));
-        assertTrue(resultUsernames.contains("Unassigned.Two"));
-        assertFalse(resultUsernames.contains("Assigned.One"));
+		// Yeni metot çağrısı mock'lanıyor
+		when(trainerRepository.findByUserIsActive(true)).thenReturn(allActiveTrainers);
 
-        verify(authManager).getCurrentUser();
-        verify(traineeRepository).findByUserUsername(traineeUsername);
-        
-        // Yeni metot çağrısının yapıldığını doğrula
-        verify(trainerRepository).findByUserIsActive(true);
-        
-        // Artık var olmayan metot çağrısını doğrulama
-        // verify(trainerRepository, never()).findActiveTrainersNotAssignedToTrainee(anyString());
-    }
+		// When
+		List<TrainerInfoResponse> result = trainerService.getUnassignedTrainersForTrainee(traineeUsername);
+
+		// Then
+		assertNotNull(result);
+		assertEquals(2, result.size());
+
+		// Atanmamış antrenörlerin listesinde atanmış olanın olmadığından emin ol
+		List<String> resultUsernames = result.stream().map(TrainerInfoResponse::getUsername)
+				.collect(Collectors.toList());
+
+		assertTrue(resultUsernames.contains("Unassigned.One"));
+		assertTrue(resultUsernames.contains("Unassigned.Two"));
+		assertFalse(resultUsernames.contains("Assigned.One"));
+
+		verify(authManager).getCurrentUser();
+		verify(traineeRepository).findByUserUsername(traineeUsername);
+
+		// Yeni metot çağrısının yapıldığını doğrula
+		verify(trainerRepository).findByUserIsActive(true);
+
+		// Artık var olmayan metot çağrısını doğrulama
+		// verify(trainerRepository,
+		// never()).findActiveTrainersNotAssignedToTrainee(anyString());
+	}
 
 	@Test
 	void shouldThrowExceptionWhenGetUnassignedTrainersForInactiveTrainee() {

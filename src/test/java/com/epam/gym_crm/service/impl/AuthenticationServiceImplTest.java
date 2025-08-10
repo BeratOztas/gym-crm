@@ -33,306 +33,326 @@ import com.epam.gym_crm.dto.request.ChangePasswordRequest;
 import com.epam.gym_crm.dto.request.LoginRequest;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.monitoring.metrics.AppMetrics;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 class AuthenticationServiceImplTest {
 
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private AuthManager authManager;
-    @Mock
-    private TraineeRepository traineeRepository; 
+	@Mock
+	private UserRepository userRepository;
+	@Mock
+	private AuthManager authManager;
+	@Mock
+	private TraineeRepository traineeRepository;
 
-    @InjectMocks
-    private AuthenticationServiceImpl authenticationService;
+	@Mock
+	private HttpServletRequest httpServletRequest;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-    }
-    
-    @AfterEach
-    void teardown() {
-        // Her testten sonra web bağlamını temizle
-        RequestContextHolder.resetRequestAttributes();
-    }
+	@InjectMocks
+	private AuthenticationServiceImpl authenticationService;
 
-    // --- 3. Trainee/Trainer username and password matching (Login Success) ---
-    @Test
-    void shouldLoginSuccessfullyForTrainee() {
-        LoginRequest request = new LoginRequest("trainee.user", "correctPass");
-        User traineeUser = new User(1L, "Trainee", "User", "trainee.user", "correctPass", true, null, null);
-        Trainee trainee = new Trainee();
-        trainee.setUser(traineeUser);
-        traineeUser.setTrainee(trainee);
+	@Mock
+    private HttpSession session;
+	@Mock
+	private AppMetrics appMetrics;
 
-        when(userRepository.findByUsername("trainee.user")).thenReturn(Optional.of(traineeUser));
+	@BeforeEach
+	void setUp() {
+		MockitoAnnotations.openMocks(this);
+		when(httpServletRequest.getSession(true)).thenReturn(session);
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+	}
 
+	@AfterEach
+	void teardown() {
+		// Her testten sonra web bağlamını temizle
+		RequestContextHolder.resetRequestAttributes();
+	}
 
-        assertDoesNotThrow(() -> authenticationService.login(request));
+	// --- 3. Trainee/Trainer username and password matching (Login Success) ---
+	@Test
+	void shouldLoginSuccessfullyForTrainee() {
+		LoginRequest request = new LoginRequest("trainee.user", "correctPass");
+		User traineeUser = new User(1L, "Trainee", "User", "trainee.user", "correctPass", true, null, null);
+		Trainee trainee = new Trainee();
+		trainee.setUser(traineeUser);
+		traineeUser.setTrainee(trainee);
 
-        verify(userRepository, times(1)).findByUsername("trainee.user");
+		when(userRepository.findByUsername("trainee.user")).thenReturn(Optional.of(traineeUser));
 
-        // Testin sonunda HttpSession'a doğru kullanıcı eklenmiş mi diye kontrol edebiliriz
-        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
-        assertNotNull(session, "Session should not be null after login");
-        assertNotNull(session.getAttribute("currentUser"), "currentUser should be in the session");
-        assertEquals(traineeUser, session.getAttribute("currentUser"), "The user in session should be the one who logged in");
-    }
+		assertDoesNotThrow(() -> authenticationService.login(request));
 
-    @Test
-    void shouldLoginSuccessfullyForTrainer() {
-        LoginRequest request = new LoginRequest("trainer.user", "correctPass");
-        User trainerUser = new User(2L, "Trainer", "User", "trainer.user", "correctPass", true, null, null);
+		verify(userRepository, times(1)).findByUsername("trainee.user");
 
-        when(userRepository.findByUsername("trainer.user")).thenReturn(Optional.of(trainerUser));
-        doNothing().when(authManager).login(trainerUser);
+		// Testin sonunda HttpSession'a doğru kullanıcı eklenmiş mi diye kontrol
+		// edebiliriz
+		HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
+				.getSession(false);
+		assertNotNull(session, "Session should not be null after login");
+		assertNotNull(session.getAttribute("currentUser"), "currentUser should be in the session");
+		assertEquals(traineeUser, session.getAttribute("currentUser"),
+				"The user in session should be the one who logged in");
+	}
 
-        assertDoesNotThrow(() -> authenticationService.login(request));
+	@Test
+	void shouldLoginSuccessfullyForTrainer() {
+		LoginRequest request = new LoginRequest("trainer.user", "correctPass");
+		User trainerUser = new User(2L, "Trainer", "User", "trainer.user", "correctPass", true, null, null);
 
-        verify(userRepository, times(1)).findByUsername("trainer.user");
-    }
+		when(userRepository.findByUsername("trainer.user")).thenReturn(Optional.of(trainerUser));
+		doNothing().when(authManager).login(trainerUser);
 
-    // --- Login - Failure  ---
-    @Test
-    void shouldThrowBaseExceptionWhenLoginWithWrongPassword() {
-        LoginRequest request = new LoginRequest("test.user", "wrongPass");
-        User user = new User(3L, "Test", "User", "test.user", "correctPass", true, null, null);
+		assertDoesNotThrow(() -> authenticationService.login(request));
 
-        when(userRepository.findByUsername("test.user")).thenReturn(Optional.of(user));
+		verify(userRepository, times(1)).findByUsername("trainer.user");
+	}
 
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authenticationService.login(request));
+	// --- Login - Failure ---
+	@Test
+	void shouldThrowBaseExceptionWhenLoginWithWrongPassword() {
+		LoginRequest request = new LoginRequest("test.user", "wrongPass");
+		User user = new User(3L, "Test", "User", "test.user", "correctPass", true, null, null);
 
-        assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : Invalid username or password.", exception.getMessage());
-        verify(userRepository, times(1)).findByUsername("test.user");
-        verify(authManager, never()).login(any(User.class));
-    }
+		when(userRepository.findByUsername("test.user")).thenReturn(Optional.of(user));
 
-    @Test
-    void shouldThrowBaseExceptionWhenLoginWithNonExistentUser() {
-        LoginRequest request = new LoginRequest("nonexistent.user", "somePass");
+		BaseException exception = assertThrows(BaseException.class, () -> authenticationService.login(request));
 
-        when(userRepository.findByUsername("nonexistent.user")).thenReturn(Optional.empty());
+		assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : Invalid username or password.",
+				exception.getMessage());
+		verify(userRepository, times(1)).findByUsername("test.user");
+		verify(authManager, never()).login(any(User.class));
+	}
 
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authenticationService.login(request));
+	@Test
+	void shouldThrowBaseExceptionWhenLoginWithNonExistentUser() {
+		LoginRequest request = new LoginRequest("nonexistent.user", "somePass");
 
-        assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : Invalid username or password.", exception.getMessage());
-        verify(userRepository, times(1)).findByUsername("nonexistent.user");
-        verify(authManager, never()).login(any(User.class));
-    }
+		when(userRepository.findByUsername("nonexistent.user")).thenReturn(Optional.empty());
 
-    @Test
-    void shouldThrowBaseExceptionWhenLoginWithInactiveUser() {
-        LoginRequest request = new LoginRequest("inactive.user", "somePass");
-        User inactiveUser = new User(4L, "Inactive", "User", "inactive.user", "somePass", false, null, null);
+		BaseException exception = assertThrows(BaseException.class, () -> authenticationService.login(request));
 
-        when(userRepository.findByUsername("inactive.user")).thenReturn(Optional.of(inactiveUser));
+		assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : Invalid username or password.",
+				exception.getMessage());
+		verify(userRepository, times(1)).findByUsername("nonexistent.user");
+		verify(authManager, never()).login(any(User.class));
+	}
 
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authenticationService.login(request));
+	@Test
+	void shouldThrowBaseExceptionWhenLoginWithInactiveUser() {
+		LoginRequest request = new LoginRequest("inactive.user", "somePass");
+		User inactiveUser = new User(4L, "Inactive", "User", "inactive.user", "somePass", false, null, null);
 
-        assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : User account is inactive.", exception.getMessage());
-        verify(userRepository, times(1)).findByUsername("inactive.user");
-        verify(authManager, never()).login(any(User.class));
-    }
+		when(userRepository.findByUsername("inactive.user")).thenReturn(Optional.of(inactiveUser));
 
-    @Test
-    void shouldThrowBaseExceptionWhenLoginRequestIsNull() {
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authenticationService.login(null));
+		BaseException exception = assertThrows(BaseException.class, () -> authenticationService.login(request));
 
-        assertEquals(MessageType.INVALID_ARGUMENT.getMessage() + " : Login request DTO cannot be null.", exception.getMessage());
-        verify(userRepository, never()).findByUsername(anyString());
-        verify(authManager, never()).login(any(User.class));
-    }
+		assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : User account is inactive.", exception.getMessage());
+		verify(userRepository, times(1)).findByUsername("inactive.user");
+		verify(authManager, never()).login(any(User.class));
+	}
 
-    // --- createAndSaveUser ---
-    @Test
-    void shouldCreateAndSaveUserSuccessfully() {
-        String firstName = "New";
-        String lastName = "User";
+	@Test
+	void shouldThrowBaseExceptionWhenLoginRequestIsNull() {
+		BaseException exception = assertThrows(BaseException.class, () -> authenticationService.login(null));
 
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
-        
+		assertEquals(MessageType.INVALID_ARGUMENT.getMessage() + " : Login request DTO cannot be null.",
+				exception.getMessage());
+		verify(userRepository, never()).findByUsername(anyString());
+		verify(authManager, never()).login(any(User.class));
+	}
 
-        User createdUser = authenticationService.createAndSaveUser(firstName, lastName);
+	// --- createAndSaveUser ---
+	@Test
+	void shouldCreateAndSaveUserSuccessfully() {
+		String firstName = "New";
+		String lastName = "User";
 
-        assertNotNull(createdUser);
-        assertEquals(firstName, createdUser.getFirstName());
-        assertEquals(lastName, createdUser.getLastName());
-        assertNotNull(createdUser.getUsername());
-        assertNotNull(createdUser.getPassword());
+		when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
-        verify(userRepository, times(1)).findByUsername(anyString()); // generateUniqueUsername için
-        verify(userRepository, never()).save(any(User.class)); // FIX: save() çağrılmadığını doğrula
-    }
+		User createdUser = authenticationService.createAndSaveUser(firstName, lastName);
 
-    @Test
-    void shouldCreateAndSaveUserWithUniqueUsernameWhenBaseUsernameExists() {
-        String firstName = "Existing";
-        String lastName = "User";
-        String baseUsername = "Existing.User";
-        String firstUniqueUsername = "Existing.User1";
+		assertNotNull(createdUser);
+		assertEquals(firstName, createdUser.getFirstName());
+		assertEquals(lastName, createdUser.getLastName());
+		assertNotNull(createdUser.getUsername());
+		assertNotNull(createdUser.getPassword());
 
-        when(userRepository.findByUsername(baseUsername)).thenReturn(Optional.of(new User()));
-        when(userRepository.findByUsername(firstUniqueUsername)).thenReturn(Optional.empty());
+		verify(userRepository, times(1)).findByUsername(anyString()); // generateUniqueUsername için
+		verify(userRepository, never()).save(any(User.class)); // FIX: save() çağrılmadığını doğrula
+	}
 
-        
-        User createdUser = authenticationService.createAndSaveUser(firstName, lastName);
+	@Test
+	void shouldCreateAndSaveUserWithUniqueUsernameWhenBaseUsernameExists() {
+		String firstName = "Existing";
+		String lastName = "User";
+		String baseUsername = "Existing.User";
+		String firstUniqueUsername = "Existing.User1";
 
-        assertNotNull(createdUser);
-        assertEquals(firstUniqueUsername, createdUser.getUsername());
-        verify(userRepository, times(1)).findByUsername(baseUsername);
-        verify(userRepository, times(1)).findByUsername(firstUniqueUsername);
-        verify(userRepository, never()).save(any(User.class)); // FIX: save() çağrılmadığını doğrula
-    }
+		when(userRepository.findByUsername(baseUsername)).thenReturn(Optional.of(new User()));
+		when(userRepository.findByUsername(firstUniqueUsername)).thenReturn(Optional.empty());
 
+		User createdUser = authenticationService.createAndSaveUser(firstName, lastName);
 
-    // --- 7. Trainee password change & 8. Trainer password change ---
-    @Test
-    void shouldChangePasswordSuccessfully() {
-        ChangePasswordRequest request = new ChangePasswordRequest("test.user", "oldPass", "newPass");
-        User user = new User(1L, "Test", "User", "test.user", "oldPass", true, null, null);
+		assertNotNull(createdUser);
+		assertEquals(firstUniqueUsername, createdUser.getUsername());
+		verify(userRepository, times(1)).findByUsername(baseUsername);
+		verify(userRepository, times(1)).findByUsername(firstUniqueUsername);
+		verify(userRepository, never()).save(any(User.class)); // FIX: save() çağrılmadığını doğrula
+	}
 
-        // When authManager.getCurrentUser() is called, it will internally call checkAuthentication().
-        // We only need to mock what getCurrentUser() returns.
-        when(authManager.getCurrentUser()).thenReturn(user);
-        when(userRepository.findByUsername("test.user")).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(user);
+	// --- 7. Trainee password change & 8. Trainer password change ---
+	@Test
+	void shouldChangePasswordSuccessfully() {
+		ChangePasswordRequest request = new ChangePasswordRequest("test.user", "oldPass", "newPass");
+		User user = new User(1L, "Test", "User", "test.user", "oldPass", true, null, null);
 
-        assertDoesNotThrow(() -> authenticationService.changePassword(request));
+		// When authManager.getCurrentUser() is called, it will internally call
+		// checkAuthentication().
+		// We only need to mock what getCurrentUser() returns.
+		when(authManager.getCurrentUser()).thenReturn(user);
+		when(userRepository.findByUsername("test.user")).thenReturn(Optional.of(user));
+		when(userRepository.save(any(User.class))).thenReturn(user);
 
-        // We should no longer verify checkAuthentication() directly, as it's called internally by getCurrentUser().
-        verify(authManager, never()).checkAuthentication(); // Confirm it's NOT directly called
-        verify(authManager, times(1)).getCurrentUser(); // This is the direct call we expect
-        verify(userRepository, times(1)).findByUsername("test.user");
-        verify(userRepository, times(1)).save(user);
-        assertEquals("newPass", user.getPassword());
-    }
+		assertDoesNotThrow(() -> authenticationService.changePassword(request));
 
-    @Test
-    void shouldThrowBaseExceptionWhenChangePasswordWithInvalidOldPassword() {
-        ChangePasswordRequest request = new ChangePasswordRequest("test.user", "wrongOldPass", "newPass");
-        User user = new User(1L, "Test", "User", "test.user", "correctOldPass", true, null, null);
+		// We should no longer verify checkAuthentication() directly, as it's called
+		// internally by getCurrentUser().
+		verify(authManager, never()).checkAuthentication(); // Confirm it's NOT directly called
+		verify(authManager, times(1)).getCurrentUser(); // This is the direct call we expect
+		verify(userRepository, times(1)).findByUsername("test.user");
+		verify(userRepository, times(1)).save(user);
+		assertEquals("newPass", user.getPassword());
+	}
 
-        // When authManager.getCurrentUser() is called, it will internally call checkAuthentication().
-        when(authManager.getCurrentUser()).thenReturn(user);
-        when(userRepository.findByUsername("test.user")).thenReturn(Optional.of(user));
+	@Test
+	void shouldThrowBaseExceptionWhenChangePasswordWithInvalidOldPassword() {
+		ChangePasswordRequest request = new ChangePasswordRequest("test.user", "wrongOldPass", "newPass");
+		User user = new User(1L, "Test", "User", "test.user", "correctOldPass", true, null, null);
 
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authenticationService.changePassword(request));
+		// When authManager.getCurrentUser() is called, it will internally call
+		// checkAuthentication().
+		when(authManager.getCurrentUser()).thenReturn(user);
+		when(userRepository.findByUsername("test.user")).thenReturn(Optional.of(user));
 
-        assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : Invalid old password.", exception.getMessage());
-        
-        // We should no longer verify checkAuthentication() directly.
-        verify(authManager, never()).checkAuthentication(); // Confirm it's NOT directly called
-        verify(authManager, times(1)).getCurrentUser(); // This is the direct call we expect
-        verify(userRepository, times(1)).findByUsername("test.user");
-        verify(userRepository, never()).save(any(User.class)); // User is not saved in this error scenario
-    }
+		BaseException exception = assertThrows(BaseException.class,
+				() -> authenticationService.changePassword(request));
 
-    @Test
-    void shouldThrowBaseExceptionWhenChangePasswordForNonExistentUser() {
-        ChangePasswordRequest request = new ChangePasswordRequest("nonexistent.user", "oldPass", "newPass");
-        User currentUser = new User(10L, "Current", "User", "current.user", "pass", true, null, null);
+		assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : Invalid old password.", exception.getMessage());
 
-        // When authManager.getCurrentUser() is called, it will internally call checkAuthentication().
-        when(authManager.getCurrentUser()).thenReturn(currentUser);
-        when(userRepository.findByUsername("nonexistent.user")).thenReturn(Optional.empty());
+		// We should no longer verify checkAuthentication() directly.
+		verify(authManager, never()).checkAuthentication(); // Confirm it's NOT directly called
+		verify(authManager, times(1)).getCurrentUser(); // This is the direct call we expect
+		verify(userRepository, times(1)).findByUsername("test.user");
+		verify(userRepository, never()).save(any(User.class)); // User is not saved in this error scenario
+	}
 
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authenticationService.changePassword(request));
+	@Test
+	void shouldThrowBaseExceptionWhenChangePasswordForNonExistentUser() {
+		ChangePasswordRequest request = new ChangePasswordRequest("nonexistent.user", "oldPass", "newPass");
+		User currentUser = new User(10L, "Current", "User", "current.user", "pass", true, null, null);
 
-        assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : Invalid credentials or user not found.", exception.getMessage());
-        
-        // We should no longer verify checkAuthentication() directly.
-        verify(authManager, never()).checkAuthentication(); // Confirm it's NOT directly called
-        verify(authManager, times(1)).getCurrentUser(); // This is the direct call we expect
-        verify(userRepository, times(1)).findByUsername("nonexistent.user");
-        verify(userRepository, never()).save(any(User.class)); // User is not saved in this error scenario
-    }
+		// When authManager.getCurrentUser() is called, it will internally call
+		// checkAuthentication().
+		when(authManager.getCurrentUser()).thenReturn(currentUser);
+		when(userRepository.findByUsername("nonexistent.user")).thenReturn(Optional.empty());
 
-    @Test
-    void shouldThrowBaseExceptionWhenUnauthorizedUserChangesPasswordForAnotherUser() {
-        ChangePasswordRequest request = new ChangePasswordRequest("another.user", "oldPass", "newPass");
-        User currentUser = new User(10L, "Current", "User", "current.user", "pass", true, null, null);
-        User anotherUser = new User(11L, "Another", "User", "another.user", "oldPass", true, null, null);
+		BaseException exception = assertThrows(BaseException.class,
+				() -> authenticationService.changePassword(request));
 
-        // When authManager.getCurrentUser() is called (now only once by the service method)
-        when(authManager.getCurrentUser()).thenReturn(currentUser);
-        when(userRepository.findByUsername("another.user")).thenReturn(Optional.of(anotherUser));
+		assertEquals(MessageType.UNAUTHORIZED.getMessage() + " : Invalid credentials or user not found.",
+				exception.getMessage());
 
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authenticationService.changePassword(request));
+		// We should no longer verify checkAuthentication() directly.
+		verify(authManager, never()).checkAuthentication(); // Confirm it's NOT directly called
+		verify(authManager, times(1)).getCurrentUser(); // This is the direct call we expect
+		verify(userRepository, times(1)).findByUsername("nonexistent.user");
+		verify(userRepository, never()).save(any(User.class)); // User is not saved in this error scenario
+	}
 
-        assertEquals(MessageType.FORBIDDEN.getMessage() + " : You are not authorized to change this user's password.", exception.getMessage());
-        
-        // Now, we expect getCurrentUser() to be called exactly once by the service method.
-        verify(authManager, times(1)).getCurrentUser(); 
-        verify(authManager, never()).checkAuthentication(); // checkAuthentication is not directly called by service method, and not by stubbed getCurrentUser.
-        
-        verify(userRepository, times(1)).findByUsername("another.user");
-        verify(userRepository, never()).save(any(User.class));
-    }
+	@Test
+	void shouldThrowBaseExceptionWhenUnauthorizedUserChangesPasswordForAnotherUser() {
+		ChangePasswordRequest request = new ChangePasswordRequest("another.user", "oldPass", "newPass");
+		User currentUser = new User(10L, "Current", "User", "current.user", "pass", true, null, null);
+		User anotherUser = new User(11L, "Another", "User", "another.user", "oldPass", true, null, null);
 
-    @Test
-    void shouldThrowBaseExceptionWhenNewPasswordIsSameAsOldPassword() {
-        ChangePasswordRequest request = new ChangePasswordRequest("test.user", "samePass", "samePass");
-        User user = new User(1L, "Test", "User", "test.user", "samePass", true, null, null);
+		// When authManager.getCurrentUser() is called (now only once by the service
+		// method)
+		when(authManager.getCurrentUser()).thenReturn(currentUser);
+		when(userRepository.findByUsername("another.user")).thenReturn(Optional.of(anotherUser));
 
-        // When authManager.getCurrentUser() is called, it will internally call checkAuthentication().
-        when(authManager.getCurrentUser()).thenReturn(user);
-        when(userRepository.findByUsername("test.user")).thenReturn(Optional.of(user));
+		BaseException exception = assertThrows(BaseException.class,
+				() -> authenticationService.changePassword(request));
 
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authenticationService.changePassword(request));
+		assertEquals(MessageType.FORBIDDEN.getMessage() + " : You are not authorized to change this user's password.",
+				exception.getMessage());
 
-        assertEquals(MessageType.INVALID_ARGUMENT.getMessage() + " : New password cannot be the same as the old password.", exception.getMessage());
-        
-        // We should no longer verify checkAuthentication() directly.
-        verify(authManager, never()).checkAuthentication(); 
-        verify(authManager, times(1)).getCurrentUser(); 
-        verify(userRepository, times(1)).findByUsername("test.user");
-        verify(userRepository, never()).save(any(User.class)); // User is not saved in this error scenario
-    }
+		// Now, we expect getCurrentUser() to be called exactly once by the service
+		// method.
+		verify(authManager, times(1)).getCurrentUser();
+		verify(authManager, never()).checkAuthentication(); // checkAuthentication is not directly called by service
+															// method, and not by stubbed getCurrentUser.
 
-    @Test
-    void shouldThrowBaseExceptionWhenChangePasswordRequestIsNull() {
-    
-        when(authManager.getCurrentUser()).thenReturn(new User()); 
+		verify(userRepository, times(1)).findByUsername("another.user");
+		verify(userRepository, never()).save(any(User.class));
+	}
 
-        BaseException exception = assertThrows(BaseException.class,
-                () -> authenticationService.changePassword(null));
+	@Test
+	void shouldThrowBaseExceptionWhenNewPasswordIsSameAsOldPassword() {
+		ChangePasswordRequest request = new ChangePasswordRequest("test.user", "samePass", "samePass");
+		User user = new User(1L, "Test", "User", "test.user", "samePass", true, null, null);
 
-        assertEquals(MessageType.INVALID_ARGUMENT.getMessage() + " : Change password request DTO cannot be null.", exception.getMessage());
-        
-        verify(authManager, times(1)).getCurrentUser(); 
-      
-        verify(authManager, never()).checkAuthentication(); 
-        
-        verify(userRepository, never()).findByUsername(anyString());
-        verify(userRepository, never()).save(any(User.class));
-    }
+		// When authManager.getCurrentUser() is called, it will internally call
+		// checkAuthentication().
+		when(authManager.getCurrentUser()).thenReturn(user);
+		when(userRepository.findByUsername("test.user")).thenReturn(Optional.of(user));
 
-    @Test
-    void shouldLogoutSuccessfully() {
-        User currentUser = new User(1L, "Logged", "Out", "logged.out", "pass", true, null, null);
-        
-        when(authManager.getCurrentUser()).thenReturn(currentUser);
-        doNothing().when(authManager).logout();
+		BaseException exception = assertThrows(BaseException.class,
+				() -> authenticationService.changePassword(request));
 
-        assertDoesNotThrow(() -> authenticationService.logout());
+		assertEquals(
+				MessageType.INVALID_ARGUMENT.getMessage() + " : New password cannot be the same as the old password.",
+				exception.getMessage());
 
-      
-        verify(authManager, never()).checkAuthentication(); 
+		// We should no longer verify checkAuthentication() directly.
+		verify(authManager, never()).checkAuthentication();
+		verify(authManager, times(1)).getCurrentUser();
+		verify(userRepository, times(1)).findByUsername("test.user");
+		verify(userRepository, never()).save(any(User.class)); // User is not saved in this error scenario
+	}
 
-        verify(authManager, times(1)).getCurrentUser(); 
-        verify(authManager, times(1)).logout(); 
-    }
+	@Test
+	void shouldThrowBaseExceptionWhenChangePasswordRequestIsNull() {
+
+		when(authManager.getCurrentUser()).thenReturn(new User());
+
+		BaseException exception = assertThrows(BaseException.class, () -> authenticationService.changePassword(null));
+
+		assertEquals(MessageType.INVALID_ARGUMENT.getMessage() + " : Change password request DTO cannot be null.",
+				exception.getMessage());
+
+		verify(authManager, times(1)).getCurrentUser();
+
+		verify(authManager, never()).checkAuthentication();
+
+		verify(userRepository, never()).findByUsername(anyString());
+		verify(userRepository, never()).save(any(User.class));
+	}
+
+	@Test
+	void shouldLogoutSuccessfully() {
+		User currentUser = new User(1L, "Logged", "Out", "logged.out", "pass", true, null, null);
+
+		when(authManager.getCurrentUser()).thenReturn(currentUser);
+		doNothing().when(authManager).logout();
+
+		assertDoesNotThrow(() -> authenticationService.logout());
+
+		verify(authManager, never()).checkAuthentication();
+
+		verify(authManager, times(1)).getCurrentUser();
+		verify(authManager, times(1)).logout();
+	}
 }

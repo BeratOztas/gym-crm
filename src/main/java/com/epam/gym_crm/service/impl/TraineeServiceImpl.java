@@ -34,8 +34,11 @@ import com.epam.gym_crm.dto.response.UserRegistrationResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.monitoring.metrics.AppMetrics;
 import com.epam.gym_crm.service.IAuthenticationService;
 import com.epam.gym_crm.service.ITraineeService;
+
+import io.micrometer.core.annotation.Timed;
 
 @Service
 public class TraineeServiceImpl implements ITraineeService {
@@ -48,15 +51,18 @@ public class TraineeServiceImpl implements ITraineeService {
 	private final IAuthenticationService authenticationService;
 	private final UserRepository userRepository;
 	private final AuthManager authManager;
+	private final AppMetrics appMetrics;
 
 	public TraineeServiceImpl(TraineeRepository traineeRepository, IAuthenticationService authenticationService,
-			AuthManager authManager, UserRepository userRepository, TrainerRepository trainerRepository,TrainingRepository trainingRepository) {
+			AuthManager authManager, UserRepository userRepository, TrainerRepository trainerRepository,
+			TrainingRepository trainingRepository,AppMetrics appMetrics) {
 		this.traineeRepository = traineeRepository;
 		this.trainerRepository = trainerRepository;
-		this.trainingRepository=trainingRepository;
+		this.trainingRepository = trainingRepository;
 		this.authenticationService = authenticationService;
 		this.authManager = authManager;
 		this.userRepository = userRepository;
+		this.appMetrics=appMetrics;
 	}
 
 	@Override
@@ -131,6 +137,7 @@ public class TraineeServiceImpl implements ITraineeService {
 
 	@Override
 	@Transactional()
+	@Timed(value = "gym_crm_api_duration_seconds", extraTags = { "endpoint", "create_trainee" })
 	public UserRegistrationResponse createTrainee(TraineeCreateRequest request) {
 		if (request == null) {
 			logger.error("Trainee can not be null");
@@ -155,6 +162,8 @@ public class TraineeServiceImpl implements ITraineeService {
 		}
 
 		logger.info("Trainee profile created successfully for user: {}", newUser.getUsername());
+		
+		appMetrics.incrementTraineeCreation();
 
 		return new UserRegistrationResponse(newUser.getUsername(), newUser.getPassword());
 
@@ -216,93 +225,90 @@ public class TraineeServiceImpl implements ITraineeService {
 		return new TraineeProfileResponse(updatedTrainee);
 	}
 
-
 	@Override
 	@Transactional
 	public List<TrainerInfoResponse> updateTraineeTrainersList(TraineeUpdateTrainersRequest request) {
-	    User currentUser = authManager.getCurrentUser();
-	    
-	    logger.info("User '{}' attempting to update trainers list for trainee '{}'. Requested trainers: {}.",
-	            currentUser.getUsername(), request.getTraineeUsername(), request.getTrainerUsernames());
+		User currentUser = authManager.getCurrentUser();
 
-	    if (request == null || request.getTraineeUsername() == null || request.getTraineeUsername().isBlank()) {
-	        throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
-	                "Trainee username must not be null or empty in the update trainers list request."));
-	    }
-	    if (!currentUser.getUsername().equals(request.getTraineeUsername())) {
-	        throw new BaseException(new ErrorMessage(MessageType.FORBIDDEN,
-	                "You are not authorized to update trainers list for other trainees."));
-	    }
-	    Trainee traineeToUpdate = traineeRepository.findByUserUsername(request.getTraineeUsername()).orElseThrow(() -> {
-	        return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-	                "Trainee with username " + request.getTraineeUsername() + " not found."));
-	    });
-	    if (!traineeToUpdate.getUser().isActive()) {
-	        throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
-	                "Trainee " + request.getTraineeUsername() + " is not active. Cannot update their trainers list."));
-	    }
+		logger.info("User '{}' attempting to update trainers list for trainee '{}'. Requested trainers: {}.",
+				currentUser.getUsername(), request.getTraineeUsername(), request.getTrainerUsernames());
 
-	    // ----- Prepare New Trainers -----
-	    
-	    Set<Trainer> newTrainers = new HashSet<>();
-	    if (request.getTrainerUsernames() != null && !request.getTrainerUsernames().isEmpty()) {
-	        for (String trainerUsername : request.getTrainerUsernames()) {
-	            Trainer trainer = trainerRepository.findByUserUsername(trainerUsername).orElseThrow(() -> {
-	                return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-	                        "Trainer with username " + trainerUsername + " not found."));
-	            });
-	            if (!trainer.getUser().isActive()) {
-	                throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
-	                        "Trainer " + trainerUsername + " is not active. Cannot assign."));
-	            }
-	            newTrainers.add(trainer);
-	        }
-	    }
+		if (request == null || request.getTraineeUsername() == null || request.getTraineeUsername().isBlank()) {
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
+					"Trainee username must not be null or empty in the update trainers list request."));
+		}
+		if (!currentUser.getUsername().equals(request.getTraineeUsername())) {
+			throw new BaseException(new ErrorMessage(MessageType.FORBIDDEN,
+					"You are not authorized to update trainers list for other trainees."));
+		}
+		Trainee traineeToUpdate = traineeRepository.findByUserUsername(request.getTraineeUsername()).orElseThrow(() -> {
+			return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+					"Trainee with username " + request.getTraineeUsername() + " not found."));
+		});
+		if (!traineeToUpdate.getUser().isActive()) {
+			throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
+					"Trainee " + request.getTraineeUsername() + " is not active. Cannot update their trainers list."));
+		}
 
-	    // ----- UPDATE trainee,trainer relations -----
-	    
-	    traineeToUpdate.setTrainers(newTrainers);
-	    traineeRepository.save(traineeToUpdate);
-	    logger.info("Successfully updated trainee_trainer join table for trainee '{}'.",
-	            traineeToUpdate.getUser().getUsername());
+		// ----- Prepare New Trainers -----
 
-	    // ------ UPDATE TRAINING DB -----
-	    
-	    // Delete old training for trainee
-	    
-	    trainingRepository.deleteByTraineeId(traineeToUpdate.getId());
-	    logger.info("Deleted all old training records for trainee '{}' to synchronize with new trainers list.",
-	            traineeToUpdate.getUser().getUsername());
+		Set<Trainer> newTrainers = new HashSet<>();
+		if (request.getTrainerUsernames() != null && !request.getTrainerUsernames().isEmpty()) {
+			for (String trainerUsername : request.getTrainerUsernames()) {
+				Trainer trainer = trainerRepository.findByUserUsername(trainerUsername).orElseThrow(() -> {
+					return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
+							"Trainer with username " + trainerUsername + " not found."));
+				});
+				if (!trainer.getUser().isActive()) {
+					throw new BaseException(new ErrorMessage(MessageType.INVALID_STATE,
+							"Trainer " + trainerUsername + " is not active. Cannot assign."));
+				}
+				newTrainers.add(trainer);
+			}
+		}
 
-	    // Create new trainigs for all new trainers  list
-	    
-	    for (Trainer trainer : newTrainers) {
-	        TrainingType trainingType = trainer.getSpecialization();
-	        
-	        Training autoCreatedTraining = new Training();
-	        autoCreatedTraining.setTrainee(traineeToUpdate);
-	        autoCreatedTraining.setTrainer(trainer);
-	        autoCreatedTraining.setTrainingType(trainingType);
-	        autoCreatedTraining.setTrainingName(trainingType.getTrainingTypeName());
-	        autoCreatedTraining.setTrainingDate(LocalDate.now());
-	        autoCreatedTraining.setTrainingDuration(60); // Varsayılan süre
-	        
-	        trainingRepository.save(autoCreatedTraining);
-	        logger.info("Created a new training record for trainee '{}' with trainer '{}'.",
-	                traineeToUpdate.getUser().getUsername(), trainer.getUser().getUsername());
-	    }
+		// ----- UPDATE trainee,trainer relations -----
 
-	    // ------ Response ------
-	    
-	    return new ArrayList<>(newTrainers).stream()
-	            .map(TrainerInfoResponse::new)
-	            .collect(Collectors.toList());
+		traineeToUpdate.setTrainers(newTrainers);
+		traineeRepository.save(traineeToUpdate);
+		logger.info("Successfully updated trainee_trainer join table for trainee '{}'.",
+				traineeToUpdate.getUser().getUsername());
+
+		// ------ UPDATE TRAINING DB -----
+
+		// Delete old training for trainee
+
+		trainingRepository.deleteByTraineeId(traineeToUpdate.getId());
+		logger.info("Deleted all old training records for trainee '{}' to synchronize with new trainers list.",
+				traineeToUpdate.getUser().getUsername());
+
+		// Create new trainigs for all new trainers list
+
+		for (Trainer trainer : newTrainers) {
+			TrainingType trainingType = trainer.getSpecialization();
+
+			Training autoCreatedTraining = new Training();
+			autoCreatedTraining.setTrainee(traineeToUpdate);
+			autoCreatedTraining.setTrainer(trainer);
+			autoCreatedTraining.setTrainingType(trainingType);
+			autoCreatedTraining.setTrainingName(trainingType.getTrainingTypeName());
+			autoCreatedTraining.setTrainingDate(LocalDate.now());
+			autoCreatedTraining.setTrainingDuration(60); // Varsayılan süre
+
+			trainingRepository.save(autoCreatedTraining);
+			logger.info("Created a new training record for trainee '{}' with trainer '{}'.",
+					traineeToUpdate.getUser().getUsername(), trainer.getUser().getUsername());
+		}
+
+		// ------ Response ------
+
+		return new ArrayList<>(newTrainers).stream().map(TrainerInfoResponse::new).collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional()
 	public void activateDeactivateTrainee(UserActivationRequest request) {
-		
+
 		User currentUser = authManager.getCurrentUser();
 
 		logger.info("User '{}' attempting to change activation status for Trainee '{}' to '{}'.",
@@ -326,7 +332,7 @@ public class TraineeServiceImpl implements ITraineeService {
 		User userToUpdate = traineeToUpdate.getUser();
 
 		// Check state of isActive if already same don't change it
-		
+
 		if (userToUpdate.isActive() == request.getIsActive()) {
 			logger.info("Trainee '{}' is already in the requested state (isActive: {}). No change needed.",
 					request.getUsername(), request.getIsActive());
@@ -349,7 +355,7 @@ public class TraineeServiceImpl implements ITraineeService {
 	@Override
 	@Transactional()
 	public void deleteTraineeById(Long id) {
-		
+
 		User currentUser = authManager.getCurrentUser();
 		if (id == null || id <= 0) {
 			logger.error("Trainee ID for deletion cannot be null or non-positive: {}", id);

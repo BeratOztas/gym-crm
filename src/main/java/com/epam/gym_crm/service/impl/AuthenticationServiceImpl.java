@@ -17,8 +17,10 @@ import com.epam.gym_crm.dto.request.LoginRequest;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.monitoring.metrics.AppMetrics;
 import com.epam.gym_crm.service.IAuthenticationService;
 
+import io.micrometer.core.annotation.Timed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -33,13 +35,16 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 	private final UserRepository userRepository;
 	private final AuthManager authManager;
+	private final AppMetrics appMetrics;
 
-	public AuthenticationServiceImpl(UserRepository userRepository, AuthManager authManager) {
+	public AuthenticationServiceImpl(UserRepository userRepository, AuthManager authManager,AppMetrics appMetrics) {
 		this.userRepository = userRepository;
 		this.authManager = authManager;
+		this.appMetrics = appMetrics;
 	}
 
 	@Override
+	@Timed(value = "gym_crm_api_duration_seconds", extraTags = { "endpoint", "login" })
 	public void login(LoginRequest request) {
 		if (request == null) {
 			logger.error("Login request DTO cannot be null.");
@@ -61,13 +66,18 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 		}
 
 		try {
+			//Login Success
 			HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder
 					.currentRequestAttributes()).getRequest();
 			HttpSession session = httpServletRequest.getSession(true);
 			session.setAttribute("currentUser", user);
 			logger.info("User logged in successfully: {}", username);
 
-		} catch (IllegalStateException e) {
+			appMetrics.incrementLoginSuccess();
+		} catch (BaseException e) {
+			appMetrics.incrementLoginFailure();
+			throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Invalid username or password."));
+		}catch (IllegalStateException e) {
 			logger.error(
 					"Failed to access HttpServletRequest. This method should be called within a web request context.",
 					e);

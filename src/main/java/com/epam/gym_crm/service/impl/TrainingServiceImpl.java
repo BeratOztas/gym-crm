@@ -31,7 +31,10 @@ import com.epam.gym_crm.dto.response.TrainingResponse;
 import com.epam.gym_crm.exception.BaseException;
 import com.epam.gym_crm.exception.ErrorMessage;
 import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.monitoring.metrics.AppMetrics;
 import com.epam.gym_crm.service.ITrainingService;
+
+import io.micrometer.core.annotation.Timed;
 
 @Service
 public class TrainingServiceImpl implements ITrainingService {
@@ -43,15 +46,17 @@ public class TrainingServiceImpl implements ITrainingService {
 	private final TrainerRepository trainerRepository;
 	private final TrainingTypeRepository trainingTypeRepository;
 	private final AuthManager authManager;
+	private final AppMetrics appMetrics;
 
 	public TrainingServiceImpl(TrainingRepository trainingRepository, TraineeRepository traineeRepository,
 			TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository,
-			AuthManager authManager) {
+			AuthManager authManager,AppMetrics appMetrics) {
 		this.trainingRepository = trainingRepository;
 		this.traineeRepository = traineeRepository;
 		this.trainerRepository = trainerRepository;
 		this.trainingTypeRepository = trainingTypeRepository;
 		this.authManager = authManager;
+		this.appMetrics=appMetrics;
 	}
 
 	@Override
@@ -216,6 +221,7 @@ public class TrainingServiceImpl implements ITrainingService {
 
 	@Override
 	@Transactional
+	@Timed(value = "gym_crm_api_duration_seconds", extraTags = { "endpoint", "create_training" })
 	public TrainingResponse createTraining(TrainingCreateRequest request) {
 		User currentUser = authManager.getCurrentUser();
 		logger.info("User '{}' attempting to create a new training, Training creation request: {}",
@@ -277,6 +283,7 @@ public class TrainingServiceImpl implements ITrainingService {
 		logger.info("Training '{}' created successfully with ID: {} by user '{}'.", savedTraining.getTrainingName(),
 				savedTraining.getId(), currentUser.getUsername());
 
+		appMetrics.incrementTrainingCreation();
 		return new TrainingResponse(savedTraining);
 
 	}
