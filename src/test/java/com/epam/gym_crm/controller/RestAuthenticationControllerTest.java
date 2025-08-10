@@ -16,12 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.epam.gym_crm.dto.request.ChangePasswordRequest;
-import com.epam.gym_crm.dto.request.LoginRequest;
-import com.epam.gym_crm.exception.BaseException;
-import com.epam.gym_crm.exception.ErrorMessage;
-import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.service.IAuthenticationService;
+import com.epam.gym_crm.api.controller.RestAuthenticationController;
+import com.epam.gym_crm.api.dto.request.ChangePasswordRequest;
+import com.epam.gym_crm.api.dto.request.LoginRequest;
+import com.epam.gym_crm.domain.exception.BaseException;
+import com.epam.gym_crm.domain.exception.ErrorMessage;
+import com.epam.gym_crm.domain.exception.MessageType;
+import com.epam.gym_crm.domain.service.IAuthenticationService;
 
 @ExtendWith(MockitoExtension.class)
 class RestAuthenticationControllerTest {

@@ -24,15 +24,16 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.epam.gym_crm.api.dto.request.ChangePasswordRequest;
+import com.epam.gym_crm.api.dto.request.LoginRequest;
 import com.epam.gym_crm.auth.AuthManager;
 import com.epam.gym_crm.db.entity.Trainee;
 import com.epam.gym_crm.db.entity.User;
 import com.epam.gym_crm.db.repository.TraineeRepository;
 import com.epam.gym_crm.db.repository.UserRepository;
-import com.epam.gym_crm.dto.request.ChangePasswordRequest;
-import com.epam.gym_crm.dto.request.LoginRequest;
-import com.epam.gym_crm.exception.BaseException;
-import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.domain.exception.BaseException;
+import com.epam.gym_crm.domain.exception.MessageType;
+import com.epam.gym_crm.domain.service.impl.AuthenticationServiceImpl;
 import com.epam.gym_crm.monitoring.metric.AppMetrics;
 
 import jakarta.servlet.http.HttpServletRequest;

@@ -9,9 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.epam.gym_crm.exception.BaseException;
-import com.epam.gym_crm.exception.ErrorMessage;
-import com.epam.gym_crm.exception.MessageType;
+import com.epam.gym_crm.domain.exception.BaseException;
+import com.epam.gym_crm.domain.exception.ErrorMessage;
+import com.epam.gym_crm.domain.exception.MessageType;
 
 @Aspect
 @Component

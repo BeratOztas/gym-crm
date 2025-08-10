@@ -1,0 +1,18 @@
+package com.epam.gym_crm.api.dto.response;
+
+import java.time.LocalDate;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TraineeTrainingInfoResponse {
+    private String trainingName;
+    private LocalDate trainingDate;
+    private String trainingType;
+    private Integer trainingDuration;
+    private String trainerName; 
+}

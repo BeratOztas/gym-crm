@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.224" tests="36" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.235" tests="36" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -15,7 +15,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="TR"/>
     <property name="sun.boot.library.path" value="C:\sts-4.26.0.RELEASE\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.4.v20240802-1551\jre\bin"/>
-    <property name="sun.java.command" value="C:\Users\Berat\AppData\Local\Temp\surefire7170844912589457086\surefirebooter-20250810051834634_3.jar C:\Users\Berat\AppData\Local\Temp\surefire7170844912589457086 2025-08-10T05-18-34_511-jvmRun1 surefire-20250810051834634_1tmp surefire_0-20250810051834634_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\Berat\AppData\Local\Temp\surefire8752549412338751688\surefirebooter-20250810053423652_3.jar C:\Users\Berat\AppData\Local\Temp\surefire8752549412338751688 2025-08-10T05-34-23_536-jvmRun1 surefire-20250810053423652_1tmp surefire_0-20250810053423652_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\Berat\Documents\GitHub\gym-crm\target\test-classes;C:\Users\Berat\Documents\GitHub\gym-crm\target\classes;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.2\spring-boot-starter-web-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.2\spring-boot-starter-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.2\spring-boot-starter-logging-3.3.2.jar;C:\Users\Berat\.m2\repository\ch\qos\logback\logback-classic\1.5.6\logback-classic-1.5.6.jar;C:\Users\Berat\.m2\repository\ch\qos\logback\logback-core\1.5.6\logback-core-1.5.6.jar;C:\Users\Berat\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\Berat\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\Berat\.m2\repository\org\slf4j\jul-to-slf4j\2.0.13\jul-to-slf4j-2.0.13.jar;C:\Users\Berat\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\Berat\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.2\spring-boot-starter-json-3.3.2.jar;C:\Users\Berat\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\Berat\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\Berat\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.2\spring-boot-starter-tomcat-3.3.2.jar;C:\Users\Berat\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.26\tomcat-embed-core-10.1.26.jar;C:\Users\Berat\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.26\tomcat-embed-websocket-10.1.26.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-web\6.1.11\spring-web-6.1.11.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-beans\6.1.11\spring-beans-6.1.11.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-webmvc\6.1.11\spring-webmvc-6.1.11.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-context\6.1.11\spring-context-6.1.11.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-expression\6.1.11\spring-expression-6.1.11.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\3.3.2\spring-boot-starter-data-jpa-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.2\spring-boot-starter-jdbc-3.3.2.jar;C:\Users\Berat\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-jdbc\6.1.11\spring-jdbc-6.1.11.jar;C:\Users\Berat\.m2\repository\org\hibernate\orm\hibernate-core\6.5.2.Final\hibernate-core-6.5.2.Final.jar;C:\Users\Berat\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\Berat\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\Berat\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\Berat\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\Berat\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\Berat\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\Berat\.m2\repository\net\bytebuddy\byte-buddy\1.14.18\byte-buddy-1.14.18.jar;C:\Users\Berat\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.5\jaxb-runtime-4.0.5.jar;C:\Users\Berat\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.5\jaxb-core-4.0.5.jar;C:\Users\Berat\.m2\repository\org\eclipse\angus\angus-activation\2.0.2\angus-activation-2.0.2.jar;C:\Users\Berat\.m2\repository\org\glassfish\jaxb\txw2\4.0.5\txw2-4.0.5.jar;C:\Users\Berat\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.2\istack-commons-runtime-4.1.2.jar;C:\Users\Berat\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\Berat\.m2\repository\org\antlr\antlr4-runtime\4.13.0\antlr4-runtime-4.13.0.jar;C:\Users\Berat\.m2\repository\org\springframework\data\spring-data-jpa\3.3.2\spring-data-jpa-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\data\spring-data-commons\3.3.2\spring-data-commons-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-orm\6.1.11\spring-orm-6.1.11.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-tx\6.1.11\spring-tx-6.1.11.jar;C:\Users\Berat\.m2\repository\org\slf4j\slf4j-api\2.0.13\slf4j-api-2.0.13.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-aspects\6.1.11\spring-aspects-6.1.11.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-aop\3.3.2\spring-boot-starter-aop-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-aop\6.1.11\spring-aop-6.1.11.jar;C:\Users\Berat\.m2\repository\org\aspectj\aspectjweaver\1.9.22.1\aspectjweaver-1.9.22.1.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.2\spring-boot-starter-validation-3.3.2.jar;C:\Users\Berat\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.26\tomcat-embed-el-10.1.26.jar;C:\Users\Berat\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\Berat\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.2\spring-boot-starter-actuator-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.2\spring-boot-actuator-autoconfigure-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.2\spring-boot-actuator-3.3.2.jar;C:\Users\Berat\.m2\repository\io\micrometer\micrometer-observation\1.13.2\micrometer-observation-1.13.2.jar;C:\Users\Berat\.m2\repository\io\micrometer\micrometer-commons\1.13.2\micrometer-commons-1.13.2.jar;C:\Users\Berat\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.2\micrometer-jakarta9-1.13.2.jar;C:\Users\Berat\.m2\repository\io\micrometer\micrometer-registry-prometheus\1.13.2\micrometer-registry-prometheus-1.13.2.jar;C:\Users\Berat\.m2\repository\io\micrometer\micrometer-core\1.13.2\micrometer-core-1.13.2.jar;C:\Users\Berat\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\Berat\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\Berat\.m2\repository\io\prometheus\prometheus-metrics-core\1.2.1\prometheus-metrics-core-1.2.1.jar;C:\Users\Berat\.m2\repository\io\prometheus\prometheus-metrics-model\1.2.1\prometheus-metrics-model-1.2.1.jar;C:\Users\Berat\.m2\repository\io\prometheus\prometheus-metrics-config\1.2.1\prometheus-metrics-config-1.2.1.jar;C:\Users\Berat\.m2\repository\io\prometheus\prometheus-metrics-tracer-common\1.2.1\prometheus-metrics-tracer-common-1.2.1.jar;C:\Users\Berat\.m2\repository\io\prometheus\prometheus-metrics-exposition-formats\1.2.1\prometheus-metrics-exposition-formats-1.2.1.jar;C:\Users\Berat\.m2\repository\io\prometheus\prometheus-metrics-shaded-protobuf\1.2.1\prometheus-metrics-shaded-protobuf-1.2.1.jar;C:\Users\Berat\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\Berat\.m2\repository\org\postgresql\postgresql\42.7.3\postgresql-42.7.3.jar;C:\Users\Berat\.m2\repository\org\checkerframework\checker-qual\3.42.0\checker-qual-3.42.0.jar;C:\Users\Berat\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.5.0\springdoc-openapi-starter-webmvc-ui-2.5.0.jar;C:\Users\Berat\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.5.0\springdoc-openapi-starter-webmvc-api-2.5.0.jar;C:\Users\Berat\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.5.0\springdoc-openapi-starter-common-2.5.0.jar;C:\Users\Berat\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.21\swagger-core-jakarta-2.2.21.jar;C:\Users\Berat\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\Berat\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.21\swagger-annotations-jakarta-2.2.21.jar;C:\Users\Berat\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.21\swagger-models-jakarta-2.2.21.jar;C:\Users\Berat\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\Berat\.m2\repository\org\webjars\swagger-ui\5.13.0\swagger-ui-5.13.0.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-devtools\3.3.2\spring-boot-devtools-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot\3.3.2\spring-boot-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.2\spring-boot-autoconfigure-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.2\spring-boot-starter-test-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-test\3.3.2\spring-boot-test-3.3.2.jar;C:\Users\Berat\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.2\spring-boot-test-autoconfigure-3.3.2.jar;C:\Users\Berat\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\Berat\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\Berat\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\Berat\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\Berat\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\Berat\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\Berat\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\Berat\.m2\repository\org\awaitility\awaitility\4.2.1\awaitility-4.2.1.jar;C:\Users\Berat\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\Berat\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\Berat\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\Berat\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\Berat\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\Berat\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Berat\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\Berat\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\Berat\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\Berat\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\Berat\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.18\byte-buddy-agent-1.14.18.jar;C:\Users\Berat\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\Berat\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\Berat\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\Berat\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-core\6.1.11\spring-core-6.1.11.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-jcl\6.1.11\spring-jcl-6.1.11.jar;C:\Users\Berat\.m2\repository\org\springframework\spring-test\6.1.11\spring-test-6.1.11.jar;C:\Users\Berat\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\Berat\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\Berat\.m2\repository\org\springframework\security\spring-security-test\6.3.1\spring-security-test-6.3.1.jar;C:\Users\Berat\.m2\repository\org\springframework\security\spring-security-core\6.3.1\spring-security-core-6.3.1.jar;C:\Users\Berat\.m2\repository\org\springframework\security\spring-security-crypto\6.3.1\spring-security-crypto-6.3.1.jar;C:\Users\Berat\.m2\repository\org\springframework\security\spring-security-web\6.3.1\spring-security-web-6.3.1.jar;C:\Users\Berat\.m2\repository\io\jsonwebtoken\jjwt-api\0.11.5\jjwt-api-0.11.5.jar;C:\Users\Berat\.m2\repository\io\jsonwebtoken\jjwt-impl\0.11.5\jjwt-impl-0.11.5.jar;C:\Users\Berat\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.11.5\jjwt-jackson-0.11.5.jar;C:\Users\Berat\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\Berat\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\Berat\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -30,7 +30,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\Berat\AppData\Local\Temp\surefire7170844912589457086\surefirebooter-20250810051834634_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\Berat\AppData\Local\Temp\surefire8752549412338751688\surefirebooter-20250810053423652_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.4+7-LTS"/>
@@ -60,167 +60,167 @@
     <property name="java.class.version" value="65.0"/>
   </properties>
   <testcase name="shouldCreateTraineeSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.096">
-    <system-out><![CDATA[05:18:38.115 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Received new transient User object for Trainee: Username = New.Trainee
-05:18:38.116 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee profile created successfully for user: New.Trainee
+    <system-out><![CDATA[05:34:27.044 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Received new transient User object for Trainee: Username = New.Trainee
+05:34:27.044 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee profile created successfully for user: New.Trainee
 ]]></system-out>
   </testcase>
   <testcase name="shouldUpdateTraineeSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
-    <system-out><![CDATA[05:18:38.120 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee profile updated successfully for user: Test.Trainee
+    <system-out><![CDATA[05:34:27.049 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee profile updated successfully for user: Test.Trainee
 ]]></system-out>
   </testcase>
-  <testcase name="shouldFindTraineeByUsernameSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.124 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile for username 'test.user'.
-05:18:38.124 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Finding Trainee by username='test.user' -> Found: true
+  <testcase name="shouldFindTraineeByUsernameSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
+    <system-out><![CDATA[05:34:27.053 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile for username 'test.user'.
+05:34:27.053 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Finding Trainee by username='test.user' -> Found: true
 ]]></system-out>
   </testcase>
-  <testcase name="shouldPropagateExceptionWhenUserCreationFails" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004"/>
-  <testcase name="shouldThrowExceptionWhenTraineeForActivationNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
-    <system-out><![CDATA[05:18:38.132 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to change activation status for Trainee 'Test.Trainee' to 'false'.
-05:18:38.132 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - Trainee profile not found for activation status change with username: Test.Trainee
+  <testcase name="shouldPropagateExceptionWhenUserCreationFails" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003"/>
+  <testcase name="shouldThrowExceptionWhenTraineeForActivationNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
+    <system-out><![CDATA[05:34:27.060 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to change activation status for Trainee 'Test.Trainee' to 'false'.
+05:34:27.060 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - Trainee profile not found for activation status change with username: Test.Trainee
 ]]></system-out>
   </testcase>
-  <testcase name="shouldDeactivateTraineeSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.136 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to change activation status for Trainee 'Test.Trainee' to 'false'.
-05:18:38.136 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee 'test.user' activation status changed to false by user 'test.user'.
+  <testcase name="shouldDeactivateTraineeSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
+    <system-out><![CDATA[05:34:27.065 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to change activation status for Trainee 'Test.Trainee' to 'false'.
+05:34:27.065 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee 'test.user' activation status changed to false by user 'test.user'.
 ]]></system-out>
   </testcase>
-  <testcase name="shouldUpdateTraineeTrainersListSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.006">
-    <system-out><![CDATA[05:18:38.140 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [Trainer.One, Trainer.Two].
-05:18:38.141 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Successfully updated trainee_trainer join table for trainee 'test.user'.
-05:18:38.141 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Deleted all old training records for trainee 'test.user' to synchronize with new trainers list.
-05:18:38.141 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Created a new training record for trainee 'test.user' with trainer 'Trainer.Two'.
-05:18:38.141 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Created a new training record for trainee 'test.user' with trainer 'Trainer.One'.
+  <testcase name="shouldUpdateTraineeTrainersListSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.007">
+    <system-out><![CDATA[05:34:27.070 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [Trainer.One, Trainer.Two].
+05:34:27.071 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Successfully updated trainee_trainer join table for trainee 'test.user'.
+05:34:27.071 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Deleted all old training records for trainee 'test.user' to synchronize with new trainers list.
+05:34:27.071 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Created a new training record for trainee 'test.user' with trainer 'Trainer.Two'.
+05:34:27.072 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Created a new training record for trainee 'test.user' with trainer 'Trainer.One'.
 ]]></system-out>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenUpdateRequestIsNull" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
-    <system-out><![CDATA[05:18:38.146 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Update request or username cannot be null/empty for Trainee profile.
+  <testcase name="shouldThrowExceptionWhenUpdateRequestIsNull" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.005">
+    <system-out><![CDATA[05:34:27.077 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Update request or username cannot be null/empty for Trainee profile.
 ]]></system-out>
   </testcase>
   <testcase name="shouldClearTraineeTrainersListSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
-    <system-out><![CDATA[05:18:38.150 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [].
-05:18:38.151 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Successfully updated trainee_trainer join table for trainee 'test.user'.
-05:18:38.151 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Deleted all old training records for trainee 'test.user' to synchronize with new trainers list.
+    <system-out><![CDATA[05:34:27.082 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [].
+05:34:27.082 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Successfully updated trainee_trainer join table for trainee 'test.user'.
+05:34:27.082 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Deleted all old training records for trainee 'test.user' to synchronize with new trainers list.
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenFindByIdWithNullId" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.155 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile by ID 'null'.
-05:18:38.155 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee ID for lookup cannot be null or non-positive: null
+    <system-out><![CDATA[05:34:27.086 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile by ID 'null'.
+05:34:27.086 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee ID for lookup cannot be null or non-positive: null
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenActivationRequestIsNull" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003"/>
-  <testcase name="shouldThrowExceptionWhenDeleteTraineeByUsernameNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.002">
-    <system-out><![CDATA[05:18:38.162 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to delete Trainee profile for username 'Another.Trainee'.
-05:18:38.162 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Unauthorized attempt to delete Trainee profile for user 'Another.Trainee' by current user 'test.user'.
+  <testcase name="shouldThrowExceptionWhenDeleteTraineeByUsernameNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
+    <system-out><![CDATA[05:34:27.093 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to delete Trainee profile for username 'Another.Trainee'.
+05:34:27.093 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Unauthorized attempt to delete Trainee profile for user 'Another.Trainee' by current user 'test.user'.
 ]]></system-out>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenDeleteTraineeByIdNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.166 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - No trainee found to delete with ID=999
+  <testcase name="shouldThrowExceptionWhenDeleteTraineeByIdNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
+    <system-out><![CDATA[05:34:27.097 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - No trainee found to delete with ID=999
 ]]></system-out>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenDeleteTraineeByIdUnauthorized" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.169 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Unauthorized attempt to delete Trainee profile with ID '10' by current user 'Unauthorized.User'.
+  <testcase name="shouldThrowExceptionWhenDeleteTraineeByIdUnauthorized" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.005">
+    <system-out><![CDATA[05:34:27.102 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Unauthorized attempt to delete Trainee profile with ID '10' by current user 'Unauthorized.User'.
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenDeleteTraineeByUsernameUnauthorized" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.172 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'Unauthorized.User' attempting to delete Trainee profile for username 'test.user'.
-05:18:38.173 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Unauthorized attempt to delete Trainee profile for user 'test.user' by current user 'Unauthorized.User'.
+    <system-out><![CDATA[05:34:27.105 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'Unauthorized.User' attempting to delete Trainee profile for username 'test.user'.
+05:34:27.106 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Unauthorized attempt to delete Trainee profile for user 'test.user' by current user 'Unauthorized.User'.
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenUpdateUnauthorized" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.176 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Unauthorized attempt to update Trainee profile for user 'test.user' by current user 'Unauthorized.User'.
+    <system-out><![CDATA[05:34:27.109 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Unauthorized attempt to update Trainee profile for user 'test.user' by current user 'Unauthorized.User'.
 ]]></system-out>
   </testcase>
-  <testcase name="shouldDeleteTraineeByIdSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.180 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Complete deletion of Trainee profile for ID '10' (username: 'test.user') and all associated data (User, Trainings) performed successfully by user 'test.user'.
+  <testcase name="shouldDeleteTraineeByIdSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
+    <system-out><![CDATA[05:34:27.113 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Complete deletion of Trainee profile for ID '10' (username: 'test.user') and all associated data (User, Trainings) performed successfully by user 'test.user'.
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenFindByIdNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.183 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile by ID '999'.
-05:18:38.183 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - Trainee not found with ID=999
+    <system-out><![CDATA[05:34:27.117 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile by ID '999'.
+05:34:27.117 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - Trainee not found with ID=999
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenTraineeForUpdateTrainersIsInactive" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.186 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [Trainer.One].
+    <system-out><![CDATA[05:34:27.120 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [Trainer.One].
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenCreateRequestIsNull" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.002">
-    <system-out><![CDATA[05:18:38.189 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee can not be null
+    <system-out><![CDATA[05:34:27.123 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee can not be null
 ]]></system-out>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenTrainerInListInactive" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.192 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [Inactive.Trainer].
+  <testcase name="shouldThrowExceptionWhenTrainerInListInactive" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
+    <system-out><![CDATA[05:34:27.128 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [Inactive.Trainer].
 ]]></system-out>
   </testcase>
-  <testcase name="shouldReturnEmptyListWhenNoTraineesExist" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.002">
-    <system-out><![CDATA[05:18:38.195 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to retrieve all Trainees.
-05:18:38.196 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Retrieving all trainees -> Count: 0
-05:18:38.196 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Converted 0 Trainee entities to TraineeResponse DTOs.
+  <testcase name="shouldReturnEmptyListWhenNoTraineesExist" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
+    <system-out><![CDATA[05:34:27.132 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to retrieve all Trainees.
+05:34:27.132 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Retrieving all trainees -> Count: 0
+05:34:27.133 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Converted 0 Trainee entities to TraineeResponse DTOs.
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenUpdateTraineeNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.199 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - Trainee profile not found for update with username: test.user
+    <system-out><![CDATA[05:34:27.137 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - Trainee profile not found for update with username: test.user
 ]]></system-out>
   </testcase>
   <testcase name="shouldDeleteTraineeByUsernameSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.202 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to delete Trainee profile for username 'test.user'.
-05:18:38.202 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Complete deletion of Trainee profile for username 'test.user' and all associated data (User, Trainings) performed successfully by user 'test.user'.
+    <system-out><![CDATA[05:34:27.140 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to delete Trainee profile for username 'test.user'.
+05:34:27.141 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Complete deletion of Trainee profile for username 'test.user' and all associated data (User, Trainings) performed successfully by user 'test.user'.
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenDeleteTraineeByIdWithNullId" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.002">
-    <system-out><![CDATA[05:18:38.205 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee ID for deletion cannot be null or non-positive: null
+    <system-out><![CDATA[05:34:27.144 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee ID for deletion cannot be null or non-positive: null
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenUpdateTrainersUnauthorized" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.208 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'Unauthorized.User' attempting to update trainers list for trainee 'test.user'. Requested trainers: null.
+    <system-out><![CDATA[05:34:27.147 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'Unauthorized.User' attempting to update trainers list for trainee 'test.user'. Requested trainers: null.
 ]]></system-out>
   </testcase>
   <testcase name="shouldNotChangeActivationStatusIfAlreadyInRequestedState" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.211 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to change activation status for Trainee 'Test.Trainee' to 'true'.
-05:18:38.211 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee 'Test.Trainee' is already in the requested state (isActive: true). No change needed.
+    <system-out><![CDATA[05:34:27.150 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to change activation status for Trainee 'Test.Trainee' to 'true'.
+05:34:27.150 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee 'Test.Trainee' is already in the requested state (isActive: true). No change needed.
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenUpdateTrainersRequestIsNull" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003"/>
   <testcase name="shouldGetAllTraineesSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.002">
-    <system-out><![CDATA[05:18:38.217 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to retrieve all Trainees.
-05:18:38.217 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Retrieving all trainees -> Count: 2
-05:18:38.217 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Converted 2 Trainee entities to TraineeResponse DTOs.
+    <system-out><![CDATA[05:34:27.157 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to retrieve all Trainees.
+05:34:27.157 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Retrieving all trainees -> Count: 2
+05:34:27.157 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Converted 2 Trainee entities to TraineeResponse DTOs.
 ]]></system-out>
   </testcase>
-  <testcase name="shouldFindTraineeByIdSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.002">
-    <system-out><![CDATA[05:18:38.220 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile by ID '10'.
-05:18:38.220 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Finding Trainee by ID=10 -> Found: true
+  <testcase name="shouldFindTraineeByIdSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
+    <system-out><![CDATA[05:34:27.161 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile by ID '10'.
+05:34:27.161 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Finding Trainee by ID=10 -> Found: true
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenFindByUsernameNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.223 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile for username 'NonExistent.User'.
-05:18:38.223 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - Trainee not found with username:NonExistent.User
+    <system-out><![CDATA[05:34:27.165 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to find Trainee profile for username 'NonExistent.User'.
+05:34:27.165 [main] [NO-TX] WARN  c.e.g.s.impl.TraineeServiceImpl - Trainee not found with username:NonExistent.User
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenTraineeForUpdateTrainersNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.227 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'NonExistent.Trainee' attempting to update trainers list for trainee 'NonExistent.Trainee'. Requested trainers: [Trainer.One].
+    <system-out><![CDATA[05:34:27.168 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'NonExistent.Trainee' attempting to update trainers list for trainee 'NonExistent.Trainee'. Requested trainers: [Trainer.One].
 ]]></system-out>
   </testcase>
-  <testcase name="shouldActivateTraineeSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.004">
-    <system-out><![CDATA[05:18:38.231 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to change activation status for Trainee 'Test.Trainee' to 'true'.
-05:18:38.231 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee 'test.user' activation status changed to true by user 'test.user'.
+  <testcase name="shouldActivateTraineeSuccessfully" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
+    <system-out><![CDATA[05:34:27.172 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to change activation status for Trainee 'Test.Trainee' to 'true'.
+05:34:27.173 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - Trainee 'test.user' activation status changed to true by user 'test.user'.
 ]]></system-out>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenFindByUsernameWithNullOrEmpty" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.235 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'null' attempting to find Trainee profile for username 'null'.
-05:18:38.235 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee username for lookup cannot be null or empty.
-05:18:38.235 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'null' attempting to find Trainee profile for username ''.
-05:18:38.235 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee username for lookup cannot be null or empty.
+  <testcase name="shouldThrowExceptionWhenFindByUsernameWithNullOrEmpty" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.002">
+    <system-out><![CDATA[05:34:27.176 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'null' attempting to find Trainee profile for username 'null'.
+05:34:27.176 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee username for lookup cannot be null or empty.
+05:34:27.176 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'null' attempting to find Trainee profile for username ''.
+05:34:27.176 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Trainee username for lookup cannot be null or empty.
 ]]></system-out>
   </testcase>
-  <testcase name="shouldThrowExceptionWhenDeleteTraineeByUsernameWithNullOrEmpty" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.002">
-    <system-out><![CDATA[05:18:38.238 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'null' attempting to delete Trainee profile for username 'null'.
-05:18:38.238 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Username cannot be null or empty for Trainee deletion.
-05:18:38.238 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'null' attempting to delete Trainee profile for username ''.
-05:18:38.238 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Username cannot be null or empty for Trainee deletion.
+  <testcase name="shouldThrowExceptionWhenDeleteTraineeByUsernameWithNullOrEmpty" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
+    <system-out><![CDATA[05:34:27.179 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'null' attempting to delete Trainee profile for username 'null'.
+05:34:27.179 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Username cannot be null or empty for Trainee deletion.
+05:34:27.179 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'null' attempting to delete Trainee profile for username ''.
+05:34:27.179 [main] [NO-TX] ERROR c.e.g.s.impl.TraineeServiceImpl - Username cannot be null or empty for Trainee deletion.
 ]]></system-out>
   </testcase>
   <testcase name="shouldThrowExceptionWhenTrainerInListNotFound" classname="com.epam.gym_crm.service.impl.TraineeServiceImplTest" time="0.003">
-    <system-out><![CDATA[05:18:38.241 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [Trainer.One, NonExistent.Trainer].
+    <system-out><![CDATA[05:34:27.182 [main] [NO-TX] INFO  c.e.g.s.impl.TraineeServiceImpl - User 'test.user' attempting to update trainers list for trainee 'test.user'. Requested trainers: [Trainer.One, NonExistent.Trainer].
 ]]></system-out>
   </testcase>
 </testsuite>

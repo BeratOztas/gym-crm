@@ -21,19 +21,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.epam.gym_crm.controller.RestTrainerController;
-import com.epam.gym_crm.dto.request.UserActivationRequest;
-import com.epam.gym_crm.dto.request.trainer.TrainerCreateRequest;
-import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
-import com.epam.gym_crm.dto.request.trainer.TrainerUpdateRequest;
-import com.epam.gym_crm.dto.response.TrainerProfileResponse;
-import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
-import com.epam.gym_crm.dto.response.UserRegistrationResponse;
-import com.epam.gym_crm.exception.BaseException;
-import com.epam.gym_crm.exception.ErrorMessage;
-import com.epam.gym_crm.exception.MessageType;
-import com.epam.gym_crm.service.ITrainerService;
-import com.epam.gym_crm.service.ITrainingService;
+import com.epam.gym_crm.api.controller.RestTrainerController;
+import com.epam.gym_crm.api.dto.request.UserActivationRequest;
+import com.epam.gym_crm.api.dto.request.trainer.TrainerCreateRequest;
+import com.epam.gym_crm.api.dto.request.trainer.TrainerTrainingListRequest;
+import com.epam.gym_crm.api.dto.request.trainer.TrainerUpdateRequest;
+import com.epam.gym_crm.api.dto.response.TrainerProfileResponse;
+import com.epam.gym_crm.api.dto.response.TrainerTrainingInfoResponse;
+import com.epam.gym_crm.api.dto.response.UserRegistrationResponse;
+import com.epam.gym_crm.domain.exception.BaseException;
+import com.epam.gym_crm.domain.exception.ErrorMessage;
+import com.epam.gym_crm.domain.exception.MessageType;
+import com.epam.gym_crm.domain.service.ITrainerService;
+import com.epam.gym_crm.domain.service.ITrainingService;
 
 @ExtendWith(MockitoExtension.class)
 class RestTrainerControllerTest {

@@ -19,9 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.epam.gym_crm.controller.RestTrainingTypeController;
+import com.epam.gym_crm.api.controller.RestTrainingTypeController;
 import com.epam.gym_crm.db.entity.TrainingType;
-import com.epam.gym_crm.service.ITrainingTypeService;
+import com.epam.gym_crm.domain.service.ITrainingTypeService;
 
 @ExtendWith(MockitoExtension.class)
 class RestTrainingTypeControllerTest {

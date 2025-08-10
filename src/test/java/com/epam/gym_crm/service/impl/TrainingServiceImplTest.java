@@ -25,6 +25,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.epam.gym_crm.api.dto.request.trainee.TraineeTrainingListRequest;
+import com.epam.gym_crm.api.dto.request.trainer.TrainerTrainingListRequest;
+import com.epam.gym_crm.api.dto.request.training.TrainingCreateRequest;
+import com.epam.gym_crm.api.dto.request.training.TrainingUpdateRequest;
+import com.epam.gym_crm.api.dto.response.TraineeTrainingInfoProjection;
+import com.epam.gym_crm.api.dto.response.TraineeTrainingInfoResponse;
+import com.epam.gym_crm.api.dto.response.TrainerTrainingInfoProjection;
+import com.epam.gym_crm.api.dto.response.TrainerTrainingInfoResponse;
+import com.epam.gym_crm.api.dto.response.TrainingResponse;
 import com.epam.gym_crm.auth.AuthManager;
 import com.epam.gym_crm.db.entity.Trainee;
 import com.epam.gym_crm.db.entity.Trainer;
@@ -36,16 +45,8 @@ import com.epam.gym_crm.db.repository.TrainerRepository;
 import com.epam.gym_crm.db.repository.TrainingRepository;
 import com.epam.gym_crm.db.repository.TrainingTypeRepository;
 import com.epam.gym_crm.db.repository.UserRepository;
-import com.epam.gym_crm.dto.request.trainee.TraineeTrainingListRequest;
-import com.epam.gym_crm.dto.request.trainer.TrainerTrainingListRequest;
-import com.epam.gym_crm.dto.request.training.TrainingCreateRequest;
-import com.epam.gym_crm.dto.request.training.TrainingUpdateRequest;
-import com.epam.gym_crm.dto.response.TraineeTrainingInfoProjection;
-import com.epam.gym_crm.dto.response.TraineeTrainingInfoResponse;
-import com.epam.gym_crm.dto.response.TrainerTrainingInfoProjection;
-import com.epam.gym_crm.dto.response.TrainerTrainingInfoResponse;
-import com.epam.gym_crm.dto.response.TrainingResponse;
-import com.epam.gym_crm.exception.BaseException;
+import com.epam.gym_crm.domain.exception.BaseException;
+import com.epam.gym_crm.domain.service.impl.TrainingServiceImpl;
 import com.epam.gym_crm.monitoring.metric.AppMetrics;
 
 @ExtendWith(MockitoExtension.class)

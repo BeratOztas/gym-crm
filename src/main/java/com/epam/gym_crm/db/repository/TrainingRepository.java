@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.epam.gym_crm.api.dto.response.TraineeTrainingInfoProjection;
+import com.epam.gym_crm.api.dto.response.TrainerTrainingInfoProjection;
 import com.epam.gym_crm.db.entity.Training;
-import com.epam.gym_crm.dto.response.TraineeTrainingInfoProjection;
-import com.epam.gym_crm.dto.response.TrainerTrainingInfoProjection;
 
 @Repository
 public interface TrainingRepository extends JpaRepository<Training, Long> {
