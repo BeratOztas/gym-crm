@@ -791,7 +791,7 @@ class TraineeServiceImplTest {
 				() -> traineeService.activateDeactivateTrainee(null));
 
 		assertTrue(exception.getMessage().contains(
-				"Cannot invoke \"com.epam.gym_crm.dto.request.UserActivationRequest.getUsername()\" because \"request\" is null"));
+				"Cannot invoke \"com.epam.gym_crm.api.dto.request.UserActivationRequest.getUsername()\" because \"request\" is null"));
 
 		// authManager.getCurrentUser() çağrısının yapıldığını doğruluyoruz.
 		verify(authManager).getCurrentUser();

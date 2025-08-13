@@ -674,7 +674,7 @@ class TrainerServiceImplTest {
 				() -> trainerService.activateDeactivateTrainer(nullRequest));
 
 		assertEquals(
-				"Cannot invoke \"com.epam.gym_crm.dto.request.UserActivationRequest.getUsername()\" because \"request\" is null",
+				"Cannot invoke \"com.epam.gym_crm.api.dto.request.UserActivationRequest.getUsername()\" because \"request\" is null",
 				exception.getMessage());
 
 		verify(authManager).getCurrentUser(); // Eskiden verifyNoInteractions idi, şimdi verify(authManager)
