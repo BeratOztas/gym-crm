@@ -12,10 +12,10 @@ import com.epam.gym_crm.domain.exception.MessageType;
 public class AuthenticationInfoService {
 
 	public String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-        	throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED, "User is not authenticated."));
-        }
-        return authentication.getName();
-    }
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED, "User is not authenticated."));
+		}
+		return authentication.getName();
+	}
 }

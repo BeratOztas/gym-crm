@@ -117,7 +117,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 			} else if (e instanceof BadCredentialsException) {
 				throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED, "Invalid username or password."));
 			} else {
-				// Hiçbiri değilse, genel bir hata fırlat.
+				
 				throw new BaseException(
 						new ErrorMessage(MessageType.GENERAL_EXCEPTION, "An unexpected error occurred during login."));
 			}

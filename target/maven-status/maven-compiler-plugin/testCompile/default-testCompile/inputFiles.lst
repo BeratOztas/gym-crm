@@ -7,7 +7,16 @@ C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\monitorin
 C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\monitoring\health\DiskSpaceHealthIndicatorTest.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\monitoring\health\InitialDataHealthIndicatorTest.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\monitoring\metric\AppMetricsTest.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\security\JwtAuthenticationEntryPointTest.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\security\JwtAuthenticationFilterTest.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\security\JwtTokenExtractorTest.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\security\JwtTokenProviderTest.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\security\JwtUserDetailsTest.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\service\impl\AuthenticationInfoServiceTest.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\service\impl\AuthenticationServiceImplTest.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\service\impl\JwtTokenBlacklistServiceTest.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\service\impl\LoginAttemptServiceTest.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\service\impl\TraineeServiceImplTest.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\service\impl\TrainerServiceImplTest.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\service\impl\TrainingServiceImplTest.java
+C:\Users\Berat\Documents\GitHub\gym-crm\src\test\java\com\epam\gym_crm\service\impl\UserDetailsServiceImplTest.java

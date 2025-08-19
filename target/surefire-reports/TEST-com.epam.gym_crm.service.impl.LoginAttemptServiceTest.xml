@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.controller.RestTrainerControllerTest" time="0.034" tests="8" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.gym_crm.service.impl.LoginAttemptServiceTest" time="0.062" tests="7" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -59,36 +59,56 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="testFindTrainerByUsername_Failure_NotFound" classname="com.epam.gym_crm.controller.RestTrainerControllerTest" time="0.003">
-    <system-out><![CDATA[08:59:15.191 [main] [NO-TX] INFO  c.e.g.a.c.RestTrainerController - Request to find trainer by username: non.existent
+  <testcase name="shouldResetAttemptsAndUnblockAfterSuccessfulLogin" classname="com.epam.gym_crm.service.impl.LoginAttemptServiceTest" time="0.047">
+    <system-out><![CDATA[08:59:16.577 [main] [NO-TX] INFO  c.e.g.d.s.impl.LoginAttemptService - LoginAttemptService initialized. Users will be locked for 5 minutes after 3 failed attempts.
+08:59:16.589 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 1 of 3.
+08:59:16.589 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 2 of 3.
+08:59:16.590 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - User 'test.user' has been locked out. Failed attempts: 3/3.
+08:59:16.590 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Access attempt rejected for user 'test.user' because the account is currently locked.
+08:59:16.590 [main] [NO-TX] INFO  c.e.g.d.s.impl.LoginAttemptService - Successful login for user 'test.user'. Resetting failed login attempt counter.
 ]]></system-out>
   </testcase>
-  <testcase name="testCreateTrainer_Success" classname="com.epam.gym_crm.controller.RestTrainerControllerTest" time="0.003">
-    <system-out><![CDATA[08:59:15.195 [main] [NO-TX] INFO  c.e.g.a.c.RestTrainerController - Request to create new trainer: Peter.Jones
+  <testcase name="shouldNotBeBlockedWhenAttemptsAreBelowMax" classname="com.epam.gym_crm.service.impl.LoginAttemptServiceTest" time="0.003">
+    <system-out><![CDATA[08:59:16.601 [main] [NO-TX] INFO  c.e.g.d.s.impl.LoginAttemptService - LoginAttemptService initialized. Users will be locked for 5 minutes after 3 failed attempts.
+08:59:16.601 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 1 of 3.
+08:59:16.601 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 2 of 3.
 ]]></system-out>
   </testcase>
-  <testcase name="testActivateDeactivateTrainer_Success" classname="com.epam.gym_crm.controller.RestTrainerControllerTest" time="0.004">
-    <system-out><![CDATA[08:59:15.200 [main] [NO-TX] INFO  c.e.g.a.c.RestTrainerController - Request to update status for trainer: Peter.Jones
+  <testcase name="shouldRemainBlockedWhenAttemptsExceedMax" classname="com.epam.gym_crm.service.impl.LoginAttemptServiceTest" time="0.002">
+    <system-out><![CDATA[08:59:16.603 [main] [NO-TX] INFO  c.e.g.d.s.impl.LoginAttemptService - LoginAttemptService initialized. Users will be locked for 5 minutes after 3 failed attempts.
+08:59:16.603 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 1 of 3.
+08:59:16.604 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 2 of 3.
+08:59:16.604 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - User 'test.user' has been locked out. Failed attempts: 3/3.
+08:59:16.604 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - User 'test.user' has been locked out. Failed attempts: 4/3.
+08:59:16.604 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Access attempt rejected for user 'test.user' because the account is currently locked.
 ]]></system-out>
   </testcase>
-  <testcase name="testUpdateTrainer_Failure_PathBodyMismatch" classname="com.epam.gym_crm.controller.RestTrainerControllerTest" time="0.004">
-    <system-out><![CDATA[08:59:15.204 [main] [NO-TX] WARN  c.e.g.a.c.RestTrainerController - Path-Body Mismatch: URL username 'Peter.Jones' does not match request body username 'Different.User'.
+  <testcase name="shouldResetAttemptsOnSuccessfulLogin" classname="com.epam.gym_crm.service.impl.LoginAttemptServiceTest" time="0.002">
+    <system-out><![CDATA[08:59:16.606 [main] [NO-TX] INFO  c.e.g.d.s.impl.LoginAttemptService - LoginAttemptService initialized. Users will be locked for 5 minutes after 3 failed attempts.
+08:59:16.606 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 1 of 3.
+08:59:16.606 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 2 of 3.
+08:59:16.606 [main] [NO-TX] INFO  c.e.g.d.s.impl.LoginAttemptService - Successful login for user 'test.user'. Resetting failed login attempt counter.
 ]]></system-out>
   </testcase>
-  <testcase name="testUpdateTrainer_Success" classname="com.epam.gym_crm.controller.RestTrainerControllerTest" time="0.003">
-    <system-out><![CDATA[08:59:15.208 [main] [NO-TX] INFO  c.e.g.a.c.RestTrainerController - Request to update profile for trainer: Peter.Jones
+  <testcase name="shouldBeBlockedWhenAttemptsReachMax" classname="com.epam.gym_crm.service.impl.LoginAttemptServiceTest" time="0.002">
+    <system-out><![CDATA[08:59:16.608 [main] [NO-TX] INFO  c.e.g.d.s.impl.LoginAttemptService - LoginAttemptService initialized. Users will be locked for 5 minutes after 3 failed attempts.
+08:59:16.608 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 1 of 3.
+08:59:16.609 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'test.user'. Attempt 2 of 3.
+08:59:16.609 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - User 'test.user' has been locked out. Failed attempts: 3/3.
+08:59:16.609 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Access attempt rejected for user 'test.user' because the account is currently locked.
 ]]></system-out>
   </testcase>
-  <testcase name="testGetTrainerTrainingsList_Success" classname="com.epam.gym_crm.controller.RestTrainerControllerTest" time="0.003">
-    <system-out><![CDATA[08:59:15.211 [main] [NO-TX] INFO  c.e.g.a.c.RestTrainerController - Request to get trainings for trainer: Peter.Jones with filters
+  <testcase name="shouldAllowLoginForUserWithNoPreviousAttempts" classname="com.epam.gym_crm.service.impl.LoginAttemptServiceTest" time="0.002">
+    <system-out><![CDATA[08:59:16.610 [main] [NO-TX] INFO  c.e.g.d.s.impl.LoginAttemptService - LoginAttemptService initialized. Users will be locked for 5 minutes after 3 failed attempts.
 ]]></system-out>
   </testcase>
-  <testcase name="testFindTrainerByUsername_Success" classname="com.epam.gym_crm.controller.RestTrainerControllerTest" time="0.003">
-    <system-out><![CDATA[08:59:15.215 [main] [NO-TX] INFO  c.e.g.a.c.RestTrainerController - Request to find trainer by username: Peter.Jones
-]]></system-out>
-  </testcase>
-  <testcase name="testDeleteTrainerByUsername_Success" classname="com.epam.gym_crm.controller.RestTrainerControllerTest" time="0.004">
-    <system-out><![CDATA[08:59:15.220 [main] [NO-TX] INFO  c.e.g.a.c.RestTrainerController - Request to delete trainer: Peter.Jones
+  <testcase name="shouldHandleDifferentUsersIndependently" classname="com.epam.gym_crm.service.impl.LoginAttemptServiceTest" time="0.003">
+    <system-out><![CDATA[08:59:16.612 [main] [NO-TX] INFO  c.e.g.d.s.impl.LoginAttemptService - LoginAttemptService initialized. Users will be locked for 5 minutes after 3 failed attempts.
+08:59:16.613 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'user.one'. Attempt 1 of 3.
+08:59:16.613 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'user.one'. Attempt 2 of 3.
+08:59:16.613 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Failed login attempt for user 'user.two'. Attempt 1 of 3.
+08:59:16.613 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - User 'user.one' has been locked out. Failed attempts: 3/3.
+08:59:16.613 [main] [NO-TX] WARN  c.e.g.d.s.impl.LoginAttemptService - Access attempt rejected for user 'user.one' because the account is currently locked.
 ]]></system-out>
   </testcase>
 </testsuite>
