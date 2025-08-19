@@ -46,87 +46,80 @@ class RestTrainerControllerTest {
     @InjectMocks
     private RestTrainerController trainerController;
 
-    // --- createTrainer Testleri ---
+    // --- createTrainer Tests ---
 
     @Test
     void testCreateTrainer_Success() {
         // Arrange
         TrainerCreateRequest request = new TrainerCreateRequest("Peter", "Jones", "FITNESS");
-        UserRegistrationResponse registrationResponse = new UserRegistrationResponse("Peter.Jones", "password");
+        
+        UserRegistrationResponse registrationResponse = new UserRegistrationResponse("Peter.Jones", "password", "mock_access_token");
         
         when(trainerService.createTrainer(request)).thenReturn(registrationResponse);
 
-        // Act
         ResponseEntity<UserRegistrationResponse> response = trainerController.createTrainer(request);
 
-        // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        // Doğrudan DTO'yu kontrol et
         assertEquals(registrationResponse, response.getBody());
         verify(trainerService, times(1)).createTrainer(request);
-    }
+    } 
 
-    // --- findTrainerByUsername Testleri ---
+    // --- findTrainerByUsername Tests ---
     
     @Test
     void testFindTrainerByUsername_Success() {
-        // Arrange
+    	
         String username = "Peter.Jones";
         TrainerProfileResponse profileResponse = new TrainerProfileResponse();
         when(trainerService.findTrainerByUsername(username)).thenReturn(profileResponse);
 
-        // Act
         ResponseEntity<TrainerProfileResponse> response = trainerController.findTrainerByUsername(username);
 
-        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan DTO'yu kontrol et
+        
         assertEquals(profileResponse, response.getBody());
         verify(trainerService, times(1)).findTrainerByUsername(username);
     }
 
     @Test
     void testFindTrainerByUsername_Failure_NotFound() {
-        // Arrange
+    	
         String username = "non.existent";
+        
         ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainer not found");
         when(trainerService.findTrainerByUsername(username)).thenThrow(new BaseException(expectedErrorMessage));
 
-        // Act & Assert
         BaseException exception = assertThrows(BaseException.class, () -> {
             trainerController.findTrainerByUsername(username);
         });
         assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
     }
 
-    // --- updateTrainer Testleri ---
+    // --- updateTrainer Tests ---
     
     @Test
     void testUpdateTrainer_Success() {
-        // Arrange
+    	
         String username = "Peter.Jones";
         TrainerUpdateRequest request = new TrainerUpdateRequest(username, "Pete", "Jones", "FITNESS", true);
         TrainerProfileResponse profileResponse = new TrainerProfileResponse();
         when(trainerService.updateTrainer(request)).thenReturn(profileResponse);
 
-        // Act
         ResponseEntity<TrainerProfileResponse> response = trainerController.updateTrainer(username, request);
 
-        // Assert
+        
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan DTO'yu kontrol et
+        
         assertEquals(profileResponse, response.getBody());
         verify(trainerService, times(1)).updateTrainer(request);
     }
 
     @Test
     void testUpdateTrainer_Failure_PathBodyMismatch() {
-        // Arrange
         String urlUsername = "Peter.Jones";
         TrainerUpdateRequest request = new TrainerUpdateRequest("Different.User", "Pete", "Jones", "FITNESS", true);
         ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.PATH_BODY_MISMATCH, "URL username and request body username must match.");
 
-        // Act & Assert
         BaseException exception = assertThrows(BaseException.class, () -> {
             trainerController.updateTrainer(urlUsername, request);
         });
@@ -135,60 +128,56 @@ class RestTrainerControllerTest {
         verify(trainerService, never()).updateTrainer(any());
     }
 
-    // --- activateDeactivateTrainer Testleri ---
+    // --- activateDeactivateTrainer Tests ---
 
     @Test
     void testActivateDeactivateTrainer_Success() {
-        // Arrange
+    	
         String username = "Peter.Jones";
         UserActivationRequest request = new UserActivationRequest(username, false);
         doNothing().when(trainerService).activateDeactivateTrainer(request);
 
-        // Act
         ResponseEntity<?> response = trainerController.activateDeactivateTrainer(username, request);
         
-        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan String yanıtını kontrol et
+        
         assertEquals("Trainer status updated successfully.", response.getBody());
         verify(trainerService, times(1)).activateDeactivateTrainer(request);
     }
     
-    // --- deleteTrainerByUsername Testleri ---
+    // --- deleteTrainerByUsername Tests---
 
     @Test
     void testDeleteTrainerByUsername_Success() {
-        // Arrange
+    	
         String username = "Peter.Jones";
         doNothing().when(trainerService).deleteTrainerByUsername(username);
 
-        // Act
         ResponseEntity<?> response = trainerController.deleteTrainerByUsername(username);
 
-        // Assert
+        
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
         
         verify(trainerService, times(1)).deleteTrainerByUsername(username);
     }
 
-    // --- getTrainerTrainingsList Testleri ---
+    // --- getTrainerTrainingsList Tests ---
 
     @Test
     void testGetTrainerTrainingsList_Success() {
-        // Arrange
+    	
         String username = "Peter.Jones";
         TrainerTrainingListRequest request = new TrainerTrainingListRequest(); 
         List<TrainerTrainingInfoResponse> trainingList = Collections.singletonList(new TrainerTrainingInfoResponse());
         
         when(trainingService.getTrainerTrainingsList(username, request)).thenReturn(trainingList);
 
-        // Act
+        
         ResponseEntity<List<TrainerTrainingInfoResponse>> response = trainerController.getTrainerTrainingsList(username, request);
 
-        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan DTO listesini kontrol et
+        
         assertEquals(trainingList, response.getBody());
         verify(trainingService, times(1)).getTrainerTrainingsList(username, request);
     }

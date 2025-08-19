@@ -38,156 +38,145 @@ import com.epam.gym_crm.domain.service.ITrainingService;
 @ExtendWith(MockitoExtension.class)
 class RestTraineeControllerTest {
 
-    @Mock
-    private ITraineeService traineeService;
-    @Mock
-    private ITrainerService trainerService;
-    @Mock
-    private ITrainingService trainingService;
+	@Mock
+	private ITraineeService traineeService;
+	@Mock
+	private ITrainerService trainerService;
+	@Mock
+	private ITrainingService trainingService;
 
-    @InjectMocks
-    private RestTraineeController traineeController;
+	@InjectMocks
+	private RestTraineeController traineeController;
 
-    // --- createTrainee Testleri ---
+	// --- createTrainee Tests---
 
-    @Test
-    void testCreateTrainee_Success() {
-        // Arrange
-        TraineeCreateRequest request = new TraineeCreateRequest("John", "Doe", LocalDate.now(), "123 Street");
-        UserRegistrationResponse registrationResponse = new UserRegistrationResponse("John.Doe", "password");
-        
-        when(traineeService.createTrainee(request)).thenReturn(registrationResponse);
+	@Test
+	void testCreateTrainee_Success() {
+		TraineeCreateRequest request = new TraineeCreateRequest("John", "Doe", LocalDate.now(), "123 Street");
+		
+		UserRegistrationResponse registrationResponse = new UserRegistrationResponse("John.Doe", "password",
+				"mock_access_token");
 
-        // Act
-        ResponseEntity<UserRegistrationResponse> response = traineeController.createTrainee(request);
+		when(traineeService.createTrainee(request)).thenReturn(registrationResponse);
 
-        // Assert
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        // Doğrudan DTO'yu kontrol et
-        assertEquals(registrationResponse, response.getBody());
-        verify(traineeService, times(1)).createTrainee(request);
-    }
+		ResponseEntity<UserRegistrationResponse> response = traineeController.createTrainee(request);
 
-    // --- findTraineeByUsername Testleri ---
-    
-    @Test
-    void testFindTraineeByUsername_Success() {
-        // Arrange
-        String username = "John.Doe";
-        TraineeProfileResponse profileResponse = new TraineeProfileResponse();
-        when(traineeService.findTraineeByUsername(username)).thenReturn(profileResponse);
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		assertEquals(registrationResponse, response.getBody());
+		verify(traineeService, times(1)).createTrainee(request);
+	}
 
-        // Act
-        ResponseEntity<TraineeProfileResponse> response = traineeController.findTraineeByUsername(username);
+	// --- findTraineeByUsername Tests ---
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan DTO'yu kontrol et
-        assertEquals(profileResponse, response.getBody());
-        verify(traineeService, times(1)).findTraineeByUsername(username);
-    }
+	@Test
+	void testFindTraineeByUsername_Success() {
+		
+		String username = "John.Doe";
+		TraineeProfileResponse profileResponse = new TraineeProfileResponse();
+		when(traineeService.findTraineeByUsername(username)).thenReturn(profileResponse);
 
-    @Test
-    void testFindTraineeByUsername_Failure_NotFound() {
-        // Arrange
-        String username = "non.existent";
-        ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee not found");
-        when(traineeService.findTraineeByUsername(username)).thenThrow(new BaseException(expectedErrorMessage));
+		ResponseEntity<TraineeProfileResponse> response = traineeController.findTraineeByUsername(username);
 
-        // Act & Assert
-        BaseException exception = assertThrows(BaseException.class, () -> {
-            traineeController.findTraineeByUsername(username);
-        });
-        assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
-    }
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		
+		assertEquals(profileResponse, response.getBody());
+		verify(traineeService, times(1)).findTraineeByUsername(username);
+	}
 
-    // --- updateTrainee Testleri ---
-    
-    @Test
-    void testUpdateTrainee_Success() {
-        // Arrange
-        String username = "John.Doe";
-        TraineeUpdateRequest request = new TraineeUpdateRequest(username, "Johnny", "Doe", null, "456 Avenue", true);
-        TraineeProfileResponse profileResponse = new TraineeProfileResponse();
-        when(traineeService.updateTrainee(request)).thenReturn(profileResponse);
+	@Test
+	void testFindTraineeByUsername_Failure_NotFound() {
+		// Arrange
+		String username = "non.existent";
+		ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Trainee not found");
+		when(traineeService.findTraineeByUsername(username)).thenThrow(new BaseException(expectedErrorMessage));
 
-        // Act
-        ResponseEntity<TraineeProfileResponse> response = traineeController.updateTrainee(username, request);
+		// Act & Assert
+		BaseException exception = assertThrows(BaseException.class, () -> {
+			traineeController.findTraineeByUsername(username);
+		});
+		assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
+	}
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan DTO'yu kontrol et
-        assertEquals(profileResponse, response.getBody());
-        verify(traineeService, times(1)).updateTrainee(request);
-    }
+	// --- updateTrainee Tests ---
 
-    @Test
-    void testUpdateTrainee_Failure_PathBodyMismatch() {
-        // Arrange
-        String urlUsername = "John.Doe";
-        TraineeUpdateRequest request = new TraineeUpdateRequest("Jane.Doe", "Jane", "Doe", null, "456 Avenue", true);
-        ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.PATH_BODY_MISMATCH, "URL username and request body username must match.");
+	@Test
+	void testUpdateTrainee_Success() {
+		// Arrange
+		String username = "John.Doe";
+		TraineeUpdateRequest request = new TraineeUpdateRequest(username, "Johnny", "Doe", null, "456 Avenue", true);
+		TraineeProfileResponse profileResponse = new TraineeProfileResponse();
+		when(traineeService.updateTrainee(request)).thenReturn(profileResponse);
 
-        // Act & Assert
-        BaseException exception = assertThrows(BaseException.class, () -> {
-            traineeController.updateTrainee(urlUsername, request);
-        });
-        assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
-        verify(traineeService, never()).updateTrainee(any());
-    }
+		ResponseEntity<TraineeProfileResponse> response = traineeController.updateTrainee(username, request);
 
-    // --- deleteTraineeByUsername Testleri ---
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(profileResponse, response.getBody());
+		verify(traineeService, times(1)).updateTrainee(request);
+	}
 
-    @Test
-    void testDeleteTraineeByUsername_Success() {
-        // Arrange
-        String username = "John.Doe";
-        doNothing().when(traineeService).deleteTraineeByUsername(username);
+	@Test
+	void testUpdateTrainee_Failure_PathBodyMismatch() {
+		// Arrange
+		String urlUsername = "John.Doe";
+		TraineeUpdateRequest request = new TraineeUpdateRequest("Jane.Doe", "Jane", "Doe", null, "456 Avenue", true);
+		ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.PATH_BODY_MISMATCH,
+				"URL username and request body username must match.");
 
-        // Act
-        ResponseEntity<?> response = traineeController.deleteTraineeByUsername(username);
+		// Act & Assert
+		BaseException exception = assertThrows(BaseException.class, () -> {
+			traineeController.updateTrainee(urlUsername, request);
+		});
+		assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
+		verify(traineeService, never()).updateTrainee(any());
+	}
 
-        // Assert
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        
-        assertEquals(null, response.getBody());
-        verify(traineeService, times(1)).deleteTraineeByUsername(username);
-    }
+	// --- deleteTraineeByUsername Tests ---
 
-    // --- Diğer Önemli Metotlar için Örnekler ---
-    
-    @Test
-    void testGetUnassignedTrainersForTrainee_Success() {
-        // Arrange
-        String username = "John.Doe";
-        List<TrainerInfoResponse> trainerList = Collections.singletonList(new TrainerInfoResponse());
-        when(trainerService.getUnassignedTrainersForTrainee(username)).thenReturn(trainerList);
+	@Test
+	void testDeleteTraineeByUsername_Success() {
+		String username = "John.Doe";
+		doNothing().when(traineeService).deleteTraineeByUsername(username);
 
-        // Act
-        ResponseEntity<List<TrainerInfoResponse>> response = traineeController.getUnassignedTrainersForTrainee(username);
+		ResponseEntity<?> response = traineeController.deleteTraineeByUsername(username);
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan liste kontrolü
-        assertEquals(trainerList, response.getBody());
-        verify(trainerService, times(1)).getUnassignedTrainersForTrainee(username);
-    }
-    
-    @Test
-    void testUpdateTraineeTrainersList_Success() {
-        // Arrange
-        String username = "John.Doe";
-        TraineeUpdateTrainersRequest request = new TraineeUpdateTrainersRequest(username, List.of("Trainer.One"));
-        List<TrainerInfoResponse> trainerList = Collections.singletonList(new TrainerInfoResponse());
-        when(traineeService.updateTraineeTrainersList(request)).thenReturn(trainerList);
-        
-        // Act
-        ResponseEntity<List<TrainerInfoResponse>> response = traineeController.updateTraineeTrainersList(username, request);
-        
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan liste kontrolü
-        assertEquals(trainerList, response.getBody());
-        verify(traineeService, times(1)).updateTraineeTrainersList(request);
-    }
+		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+
+		assertEquals(null, response.getBody());
+		verify(traineeService, times(1)).deleteTraineeByUsername(username);
+	}
+
+
+	@Test
+	void testGetUnassignedTrainersForTrainee_Success() {
+		
+		String username = "John.Doe";
+		List<TrainerInfoResponse> trainerList = Collections.singletonList(new TrainerInfoResponse());
+		when(trainerService.getUnassignedTrainersForTrainee(username)).thenReturn(trainerList);
+
+		ResponseEntity<List<TrainerInfoResponse>> response = traineeController
+				.getUnassignedTrainersForTrainee(username);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		
+		assertEquals(trainerList, response.getBody());
+		verify(trainerService, times(1)).getUnassignedTrainersForTrainee(username);
+	}
+
+	@Test
+	void testUpdateTraineeTrainersList_Success() {
+		
+		String username = "John.Doe";
+		TraineeUpdateTrainersRequest request = new TraineeUpdateTrainersRequest(username, List.of("Trainer.One"));
+		List<TrainerInfoResponse> trainerList = Collections.singletonList(new TrainerInfoResponse());
+		when(traineeService.updateTraineeTrainersList(request)).thenReturn(trainerList);
+
+		ResponseEntity<List<TrainerInfoResponse>> response = traineeController.updateTraineeTrainersList(username,
+				request);
+
+		
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		
+		assertEquals(trainerList, response.getBody());
+		verify(traineeService, times(1)).updateTraineeTrainersList(request);
+	}
 }

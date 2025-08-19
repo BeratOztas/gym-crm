@@ -3,11 +3,15 @@ package com.epam.gym_crm.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,10 +23,14 @@ import org.springframework.http.ResponseEntity;
 import com.epam.gym_crm.api.controller.RestAuthenticationController;
 import com.epam.gym_crm.api.dto.request.ChangePasswordRequest;
 import com.epam.gym_crm.api.dto.request.LoginRequest;
+import com.epam.gym_crm.api.dto.response.LoginResponse;
 import com.epam.gym_crm.domain.exception.BaseException;
 import com.epam.gym_crm.domain.exception.ErrorMessage;
 import com.epam.gym_crm.domain.exception.MessageType;
 import com.epam.gym_crm.domain.service.IAuthenticationService;
+import com.epam.gym_crm.security.JwtTokenExtractor;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @ExtendWith(MockitoExtension.class)
 class RestAuthenticationControllerTest {
@@ -30,62 +38,61 @@ class RestAuthenticationControllerTest {
     @Mock
     private IAuthenticationService authenticationService;
 
+    @Mock
+    private JwtTokenExtractor jwtTokenExtractor;
+
     @InjectMocks
     private RestAuthenticationController authController;
 
-    // --- Login Testleri ---
+    private HttpServletRequest request;
+
+    @BeforeEach
+    void setUp() {
+        request = mock(HttpServletRequest.class);
+    }
+    // --- Login Tests ---
 
     @Test
     void testLogin_Success() {
-        String username = "test.user";
-        String password = "password123";
-        doNothing().when(authenticationService).login(any(LoginRequest.class));
+        LoginRequest loginRequest = new LoginRequest("test.user", "password123");
+        LoginResponse loginResponse = new LoginResponse("test.user", "mock_jwt_token");
 
-        ResponseEntity<String> response = authController.login(username, password);
+        when(authenticationService.login(any(LoginRequest.class))).thenReturn(loginResponse);
+
+        ResponseEntity<LoginResponse> response = authController.login(loginRequest);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        
-        // Beklenen mesajı, controller'ın döndürdüğü dinamik mesajla eşleştir
-        String expectedMessage = "Login successful for user: " + username;
-        assertEquals(expectedMessage, response.getBody());
-        
+        assertEquals(loginResponse, response.getBody());
         verify(authenticationService, times(1)).login(any(LoginRequest.class));
     }
 
     @Test
     void testLogin_Failure_ServiceThrowsException() {
-        String username = "wrong.user";
-        String password = "wrongpassword";
+        LoginRequest loginRequest = new LoginRequest("wrong.user", "wrongpassword");
         ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.UNAUTHORIZED, "Invalid credentials");
-        
-        doThrow(new BaseException(expectedErrorMessage))
-            .when(authenticationService).login(any(LoginRequest.class));
+
+        when(authenticationService.login(any(LoginRequest.class)))
+                .thenThrow(new BaseException(expectedErrorMessage));
 
         BaseException exception = assertThrows(BaseException.class, () -> {
-            authController.login(username, password);
+            authController.login(loginRequest);
         });
 
         assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
     }
 
-    // --- Change Password Testleri ---
+    // --- Change Password Tests ---
 
     @Test
     void testChangePassword_Success() {
-        // Arrange
-        String username = "test.user"; 
-        ChangePasswordRequest request = new ChangePasswordRequest(username, "oldPass", "newPass");
+        ChangePasswordRequest request = new ChangePasswordRequest("test.user", "oldPass", "newPass");
         doNothing().when(authenticationService).changePassword(request);
-        
-        // Act
+
         ResponseEntity<String> response = authController.changePassword(request);
-        
-        // Assert
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        
-        String expectedMessage = "Password changed successfully for user: " + username;
+        String expectedMessage = "Password changed successfully for user: " + request.getUsername();
         assertEquals(expectedMessage, response.getBody());
-        
         verify(authenticationService, times(1)).changePassword(request);
     }
 
@@ -95,8 +102,8 @@ class RestAuthenticationControllerTest {
         ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.UNAUTHORIZED, "Invalid old password.");
 
         doThrow(new BaseException(expectedErrorMessage))
-            .when(authenticationService).changePassword(request);
-            
+                .when(authenticationService).changePassword(request);
+
         BaseException exception = assertThrows(BaseException.class, () -> {
             authController.changePassword(request);
         });
@@ -104,16 +111,17 @@ class RestAuthenticationControllerTest {
         assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
     }
 
-    // --- Logout Testleri ---
+    // --- Logout Tests ---
     @Test
     void testLogout_Success() {
-        doNothing().when(authenticationService).logout();
-        
-        ResponseEntity<String> response = authController.logout();
-        
+        String mockToken = "mock_jwt_token";
+        when(jwtTokenExtractor.extractJwtFromRequest(any(HttpServletRequest.class))).thenReturn(mockToken);
+        doNothing().when(authenticationService).logout(eq(mockToken));
+
+        ResponseEntity<String> response = authController.logout(request);
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Doğrudan String yanıtını kontrol et
         assertEquals("Logout successful", response.getBody());
-        verify(authenticationService, times(1)).logout();
+        verify(authenticationService, times(1)).logout(eq(mockToken));
     }
 }

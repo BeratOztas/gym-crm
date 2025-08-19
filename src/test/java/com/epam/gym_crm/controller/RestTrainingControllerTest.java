@@ -38,64 +38,61 @@ class RestTrainingControllerTest {
 	@InjectMocks
 	private RestTrainingController trainingController;
 
-	// --- createTraining Testleri ---
+	// --- createTraining Tests ---
 
 	@Test
 	void testCreateTraining_Success() {
-	    // Arrange
+		
 	    TrainingCreateRequest request = new TrainingCreateRequest("Trainee.User", "Trainer.User", "Cardio", LocalDate.now(), 60);
 	    TrainingResponse trainingResponse = new TrainingResponse(); 
 	    
 	    when(trainingService.createTraining(request)).thenReturn(trainingResponse);
 
-	    // Act
+	    
 	    ResponseEntity<?> response = trainingController.createTraining(request);
 
-	    // Assert
+	    
 	    assertEquals(HttpStatus.CREATED, response.getStatusCode());
-	    // Doğrudan String yanıtını kontrol et
+	    
 	    assertEquals("Training created successfully.", response.getBody());
 	    verify(trainingService, times(1)).createTraining(request);
 	}
 
-	// --- getTrainingById Testleri ---
+	// --- getTrainingById Tests ---
 
 	@Test
 	void testGetTrainingById_Success() {
-		// Arrange
+		
 		Long trainingId = 1L;
 		TrainingResponse trainingResponse = new TrainingResponse();
 		when(trainingService.getTrainingById(trainingId)).thenReturn(trainingResponse);
 
-		// Act
+		
 		ResponseEntity<TrainingResponse> response = trainingController.getTrainingById(trainingId);
 
-		// Assert
+		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		// Doğrudan DTO'yu kontrol et
+		
 		assertEquals(trainingResponse, response.getBody());
 		verify(trainingService, times(1)).getTrainingById(trainingId);
 	}
 
 	@Test
 	void testGetTrainingById_Failure_NotFound() {
-		// Arrange
 		Long trainingId = 99L;
 		ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.RESOURCE_NOT_FOUND, "Training not found");
 		when(trainingService.getTrainingById(trainingId)).thenThrow(new BaseException(expectedErrorMessage));
 
-		// Act & Assert
 		BaseException exception = assertThrows(BaseException.class, () -> {
 			trainingController.getTrainingById(trainingId);
 		});
 		assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
 	}
 
-	// --- updateTraining Testleri ---
+	// --- updateTraining Tests---
 
 	@Test
 	void testUpdateTraining_Success() {
-		// Arrange
 		Long trainingId = 1L;
 		TrainingUpdateRequest request = new TrainingUpdateRequest();
 		request.setId(trainingId);
@@ -103,19 +100,16 @@ class RestTrainingControllerTest {
 		TrainingResponse trainingResponse = new TrainingResponse();
 		when(trainingService.updateTraining(request)).thenReturn(trainingResponse);
 
-		// Act
 		ResponseEntity<TrainingResponse> response = trainingController.updateTraining(trainingId, request);
 
-		// Assert
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		// Doğrudan DTO'yu kontrol et
+		
 		assertEquals(trainingResponse, response.getBody());
 		verify(trainingService, times(1)).updateTraining(request);
 	}
 
 	@Test
 	void testUpdateTraining_Failure_PathBodyMismatch() {
-		// Arrange
 		Long urlId = 1L;
 		TrainingUpdateRequest request = new TrainingUpdateRequest();
 		request.setId(2L);
@@ -123,27 +117,24 @@ class RestTrainingControllerTest {
 		ErrorMessage expectedErrorMessage = new ErrorMessage(MessageType.PATH_BODY_MISMATCH,
 				"URL ID and request body ID must match.");
 
-		// Act & Assert
 		BaseException exception = assertThrows(BaseException.class, () -> {
 			trainingController.updateTraining(urlId, request);
 		});
 		assertEquals(expectedErrorMessage.prepareErrorMessage(), exception.getMessage());
-		// Servisin hiç çağrılmadığını doğrula
+		
 		verify(trainingService, never()).updateTraining(any());
 	}
 
-	// --- deleteTrainingById Testleri ---
+	// --- deleteTrainingById Tests ---
 
 	@Test
 	void testDeleteTrainingById_Success() {
-		// Arrange
+		
 		Long trainingId = 1L;
 		doNothing().when(trainingService).deleteTrainingById(trainingId);
 
-		// Act
 		ResponseEntity<?> response = trainingController.deleteTrainingById(trainingId);
 
-		// Assert
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 		assertNull(response.getBody());
 		verify(trainingService, times(1)).deleteTrainingById(trainingId);
