@@ -28,7 +28,7 @@ public class LoginAttemptService {
 				.expireAfterWrite(loginSecurityConfig.getLockoutDurationMinutes(), TimeUnit.MINUTES)
 				.build(new CacheLoader<String, Integer>() {
 					public Integer load(String key) {
-						return 0; // İlk denemede sayaç 0 olur.
+						return 0; // İlk denemede counter 0
 					}
 				});
 		logger.info("LoginAttemptService initialized. Users will be locked for {} minutes after {} failed attempts.",
