@@ -7,6 +7,7 @@ import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,7 +42,7 @@ public class Trainee  {
 	@Column(name = "address")
 	private String address;
 
-	@OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id",nullable = false,unique = true)
 	private User user;
 	
@@ -51,7 +52,7 @@ public class Trainee  {
 	inverseJoinColumns = @JoinColumn(name ="trainer_id"))
 	private Set<Trainer> trainers =new HashSet<>();
 	
-	@OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
 	private Set<Training> trainings = new HashSet<>();
 
 }

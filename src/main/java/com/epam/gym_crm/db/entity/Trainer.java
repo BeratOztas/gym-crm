@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,11 +34,11 @@ public class Trainer {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "training_type_id",nullable = false)
+	@ManyToOne(optional = false, fetch=FetchType.LAZY)
+	@JoinColumn(name = "training_type_id",nullable = false )
 	private TrainingType specialization;
 	
-	@OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true  ,fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id",nullable = false,unique = true)
 	private User user;
 	
