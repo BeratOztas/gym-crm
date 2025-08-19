@@ -36,6 +36,9 @@ public class JwtTokenBlacklistService {
 	}
 
 	public boolean isBlacklisted(String token) {
+        if (token == null) {
+            return false;
+        }
 		return tokenBlacklist.getIfPresent(token) != null;
 	}
 }
