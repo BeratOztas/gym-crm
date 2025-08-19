@@ -6,7 +6,10 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class AppMetricsTest {
 
@@ -16,13 +19,12 @@ class AppMetricsTest {
     @BeforeEach
     void setUp() {
         meterRegistry = new SimpleMeterRegistry();
-        
         appMetrics = new AppMetrics(meterRegistry);
     }
 
     @Test
     void testTraineeCreationCounter_incrementsCorrectly() {
-
+        
         appMetrics.incrementTraineeCreation();
         appMetrics.incrementTraineeCreation(); 
 
@@ -33,12 +35,9 @@ class AppMetricsTest {
 
     @Test
     void testTrainerCreationCounter_incrementsCorrectly() {
-        // Arrange
         
-        // Act
         appMetrics.incrementTrainerCreation();
 
-        // Assert
         Counter counter = meterRegistry.get("gym_crm_creations_total").tag("type", "trainer").counter();
         assertNotNull(counter);
         assertEquals(1.0, counter.count(), "Trainer creation counter should be incremented to 1.");
@@ -46,10 +45,10 @@ class AppMetricsTest {
 
     @Test
     void testTrainingCreationCounter_incrementsCorrectly() {
-        // Act
+    	
         appMetrics.incrementTrainingCreation();
 
-        // Assert
+        
         Counter counter = meterRegistry.get("gym_crm_creations_total").tag("type", "training").counter();
         assertNotNull(counter);
         assertEquals(1.0, counter.count(), "Training creation counter should be incremented to 1.");
@@ -57,44 +56,78 @@ class AppMetricsTest {
 
     @Test
     void testLoginSuccessCounter_incrementsCorrectly() {
-        // Act
-        appMetrics.incrementLoginSuccess();
+        String username = "testuser_success";
 
-        // Assert
-        Counter counter = meterRegistry.get("gym_crm_login_attempts_total").tag("status", "success").counter();
+        appMetrics.incrementLoginSuccess(username);
+
+        Counter counter = meterRegistry.get("gym_crm_login_attempts_total")
+                .tag("status", "success")
+                .tag("username", username)
+                .counter();
         assertNotNull(counter);
-        assertEquals(1.0, counter.count(), "Login success counter should be incremented to 1.");
+        assertEquals(1.0, counter.count(), "Login success counter for a specific user should be incremented to 1.");
     }
 
     @Test
     void testLoginFailureCounter_incrementsCorrectly() {
-        // Act
-        appMetrics.incrementLoginFailure();
-        appMetrics.incrementLoginFailure();
-        appMetrics.incrementLoginFailure(); 
+        String username = "testuser_failure";
+        
+        appMetrics.incrementLoginFailure(username);
+        appMetrics.incrementLoginFailure(username);
+        appMetrics.incrementLoginFailure(username);
 
-        // Assert
-        Counter counter = meterRegistry.get("gym_crm_login_attempts_total").tag("status", "failure").counter();
+        Counter counter = meterRegistry.get("gym_crm_login_attempts_total")
+                .tag("status", "failure")
+                .tag("username", username)
+                .counter();
         assertNotNull(counter);
-        assertEquals(3.0, counter.count(), "Login failure counter should be incremented to 3.");
+        assertEquals(3.0, counter.count(), "Login failure counter for a specific user should be incremented to 3.");
     }
 
     @Test
     void testCounters_areIndependent() {
-        
-        // Act
+    	
         appMetrics.incrementTraineeCreation();
-        appMetrics.incrementLoginFailure();
+        appMetrics.incrementLoginFailure("user1");
 
-        // Assert
         Counter traineeCounter = meterRegistry.get("gym_crm_creations_total").tag("type", "trainee").counter();
         Counter trainerCounter = meterRegistry.get("gym_crm_creations_total").tag("type", "trainer").counter();
-        Counter loginFailureCounter = meterRegistry.get("gym_crm_login_attempts_total").tag("status", "failure").counter();
-        Counter loginSuccessCounter = meterRegistry.get("gym_crm_login_attempts_total").tag("status", "success").counter();
+        Counter loginFailureCounter = meterRegistry.get("gym_crm_login_attempts_total").tag("status", "failure").tag("username", "user1").counter();
+        
+        assertThrows(io.micrometer.core.instrument.search.MeterNotFoundException.class, () -> {
+            meterRegistry.get("gym_crm_login_attempts_total").tag("status", "success").counter();
+        }, "Login success counter should not exist and throw an exception.");
+        
 
         assertEquals(1.0, traineeCounter.count());
         assertEquals(0.0, trainerCounter.count(), "Trainer counter should remain 0.");
         assertEquals(1.0, loginFailureCounter.count());
-        assertEquals(0.0, loginSuccessCounter.count(), "Login success counter should remain 0.");
+    }
+
+    @Test
+    void testLoginCounters_withDifferentUsers_areIndependent() {
+    	
+        appMetrics.incrementLoginSuccess("userA");
+        appMetrics.incrementLoginFailure("userB");
+
+        Counter userASuccessCounter = meterRegistry.get("gym_crm_login_attempts_total")
+                .tag("status", "success")
+                .tag("username", "userA")
+                .counter();
+        assertNotNull(userASuccessCounter);
+        assertEquals(1.0, userASuccessCounter.count());
+
+        Counter userBSuccessCounter = meterRegistry.find("gym_crm_login_attempts_total")
+                .tag("status", "success")
+                .tag("username", "userB")
+                .counter();
+        assertNull(userBSuccessCounter, "User B's success counter should not exist.");
+
+        Counter userBFailureCounter = meterRegistry.get("gym_crm_login_attempts_total")
+                .tag("status", "failure")
+                .tag("username", "userB")
+                .counter();
+        assertNotNull(userBFailureCounter);
+        assertEquals(1.0, userBFailureCounter.count());
     }
 }
