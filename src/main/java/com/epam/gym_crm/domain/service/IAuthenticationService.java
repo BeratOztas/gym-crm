@@ -1,17 +1,21 @@
 package com.epam.gym_crm.domain.service;
 
+import com.epam.gym_crm.api.dto.UserCreationResult;
 import com.epam.gym_crm.api.dto.request.ChangePasswordRequest;
 import com.epam.gym_crm.api.dto.request.LoginRequest;
+import com.epam.gym_crm.api.dto.response.LoginResponse;
 import com.epam.gym_crm.db.entity.User;
 
 public interface IAuthenticationService {
 
-	void login(LoginRequest request);
+	LoginResponse login(LoginRequest request);
 
 	void changePassword(ChangePasswordRequest request);
 
-	void logout();
-
-	User createAndSaveUser(String firstName, String lastName);
+	void logout(String token);
+	
+	UserCreationResult prepareUserWithCredentials(String firstName, String lastName);
+	
+	String createAccessToken(User user);
 
 }
