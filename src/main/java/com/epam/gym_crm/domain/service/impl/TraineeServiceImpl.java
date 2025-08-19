@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.epam.gym_crm.api.dto.UserCreationResult;
 import com.epam.gym_crm.api.dto.request.UserActivationRequest;
 import com.epam.gym_crm.api.dto.request.trainee.TraineeCreateRequest;
 import com.epam.gym_crm.api.dto.request.trainee.TraineeUpdateRequest;
@@ -20,7 +21,6 @@ import com.epam.gym_crm.api.dto.request.trainee.TraineeUpdateTrainersRequest;
 import com.epam.gym_crm.api.dto.response.TraineeProfileResponse;
 import com.epam.gym_crm.api.dto.response.TrainerInfoResponse;
 import com.epam.gym_crm.api.dto.response.UserRegistrationResponse;
-import com.epam.gym_crm.auth.AuthManager;
 import com.epam.gym_crm.db.entity.Trainee;
 import com.epam.gym_crm.db.entity.Trainer;
 import com.epam.gym_crm.db.entity.Training;
@@ -48,29 +48,29 @@ public class TraineeServiceImpl implements ITraineeService {
 	private final TrainerRepository trainerRepository;
 	private final TrainingRepository trainingRepository;
 	private final IAuthenticationService authenticationService;
+	private final AuthenticationInfoService authenticationInfoService;
 	private final UserRepository userRepository;
-	private final AuthManager authManager;
 	private final AppMetrics appMetrics;
 
 	public TraineeServiceImpl(TraineeRepository traineeRepository, IAuthenticationService authenticationService,
-			AuthManager authManager, UserRepository userRepository, TrainerRepository trainerRepository,
-			TrainingRepository trainingRepository,AppMetrics appMetrics) {
+			AuthenticationInfoService authenticationInfoService, UserRepository userRepository,
+			TrainerRepository trainerRepository, TrainingRepository trainingRepository, AppMetrics appMetrics) {
 		this.traineeRepository = traineeRepository;
 		this.trainerRepository = trainerRepository;
 		this.trainingRepository = trainingRepository;
+		this.authenticationInfoService = authenticationInfoService;
 		this.authenticationService = authenticationService;
-		this.authManager = authManager;
 		this.userRepository = userRepository;
-		this.appMetrics=appMetrics;
+		this.appMetrics = appMetrics;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public TraineeProfileResponse findTraineeById(Long id) {
 
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername = authenticationInfoService.getCurrentUsername();
 
-		logger.info("User '{}' attempting to find Trainee profile by ID '{}'.", currentUser.getUsername(), id);
+		logger.info("User '{}' attempting to find Trainee profile by ID '{}'.", currentUsername, id);
 
 		if (id == null || id <= 0) {
 			logger.error("Trainee ID for lookup cannot be null or non-positive: {}", id);
@@ -95,9 +95,9 @@ public class TraineeServiceImpl implements ITraineeService {
 	@Transactional(readOnly = true)
 	public TraineeProfileResponse findTraineeByUsername(String username) {
 
-		User currentUser = authManager.getCurrentUser();
-		logger.info("User '{}' attempting to find Trainee profile for username '{}'.", currentUser.getUsername(),
-				username);
+		String currentUsername = authenticationInfoService.getCurrentUsername();
+
+		logger.info("User '{}' attempting to find Trainee profile for username '{}'.", currentUsername, username);
 
 		if (username == null || username.isBlank()) {
 			logger.error("Trainee username for lookup cannot be null or empty.");
@@ -122,8 +122,10 @@ public class TraineeServiceImpl implements ITraineeService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<TraineeProfileResponse> getAllTrainees() {
-		User currentUser = authManager.getCurrentUser();
-		logger.info("User '{}' attempting to retrieve all Trainees.", currentUser.getUsername());
+
+		String currentUsername = authenticationInfoService.getCurrentUsername();
+
+		logger.info("User '{}' attempting to retrieve all Trainees.", currentUsername);
 
 		List<Trainee> trainees = traineeRepository.findAll();
 		logger.info("Retrieving all trainees -> Count: {}", trainees.size());
@@ -143,8 +145,12 @@ public class TraineeServiceImpl implements ITraineeService {
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainee can not be null"));
 		}
 
-		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName());
+		UserCreationResult creationResult  = authenticationService.prepareUserWithCredentials(request.getFirstName(), request.getLastName());
 
+		User newUser =creationResult.userToPersist();
+		
+		String rawPassword =creationResult.rawPassword();
+		
 		logger.info("Received new transient User object for Trainee: Username = {}", newUser.getUsername());
 
 		Trainee trainee = new Trainee();
@@ -160,11 +166,13 @@ public class TraineeServiceImpl implements ITraineeService {
 					new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Failed to create trainee profile."));
 		}
 
+		String accessToken =authenticationService.createAccessToken(newUser);
+
 		logger.info("Trainee profile created successfully for user: {}", newUser.getUsername());
-		
+
 		appMetrics.incrementTraineeCreation();
 
-		return new UserRegistrationResponse(newUser.getUsername(), newUser.getPassword());
+		return new UserRegistrationResponse(newUser.getUsername(), rawPassword, accessToken);
 
 	}
 
@@ -172,7 +180,7 @@ public class TraineeServiceImpl implements ITraineeService {
 	@Transactional()
 	public TraineeProfileResponse updateTrainee(TraineeUpdateRequest request) {
 
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername = authenticationInfoService.getCurrentUsername();
 
 		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
 			logger.error("Update request or username cannot be null/empty for Trainee profile.");
@@ -180,9 +188,9 @@ public class TraineeServiceImpl implements ITraineeService {
 					"Update request or username must not be null/empty."));
 		}
 
-		if (!currentUser.getUsername().equals(request.getUsername())) {
+		if (!currentUsername.equals(request.getUsername())) {
 			logger.error("Unauthorized attempt to update Trainee profile for user '{}' by current user '{}'.",
-					request.getUsername(), currentUser.getUsername());
+					request.getUsername(), currentUsername);
 			throw new BaseException(
 					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to update this Trainee profile."));
 		}
@@ -227,16 +235,17 @@ public class TraineeServiceImpl implements ITraineeService {
 	@Override
 	@Transactional
 	public List<TrainerInfoResponse> updateTraineeTrainersList(TraineeUpdateTrainersRequest request) {
-		User currentUser = authManager.getCurrentUser();
+
+		String currentUsername = authenticationInfoService.getCurrentUsername();
 
 		logger.info("User '{}' attempting to update trainers list for trainee '{}'. Requested trainers: {}.",
-				currentUser.getUsername(), request.getTraineeUsername(), request.getTrainerUsernames());
+				currentUsername, request.getTraineeUsername(), request.getTrainerUsernames());
 
 		if (request == null || request.getTraineeUsername() == null || request.getTraineeUsername().isBlank()) {
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
 					"Trainee username must not be null or empty in the update trainers list request."));
 		}
-		if (!currentUser.getUsername().equals(request.getTraineeUsername())) {
+		if (!currentUsername.equals(request.getTraineeUsername())) {
 			throw new BaseException(new ErrorMessage(MessageType.FORBIDDEN,
 					"You are not authorized to update trainers list for other trainees."));
 		}
@@ -308,10 +317,10 @@ public class TraineeServiceImpl implements ITraineeService {
 	@Transactional()
 	public void activateDeactivateTrainee(UserActivationRequest request) {
 
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername = authenticationInfoService.getCurrentUsername();
 
-		logger.info("User '{}' attempting to change activation status for Trainee '{}' to '{}'.",
-				currentUser.getUsername(), request.getUsername(), request.getIsActive());
+		logger.info("User '{}' attempting to change activation status for Trainee '{}' to '{}'.", currentUsername,
+				request.getUsername(), request.getIsActive());
 
 		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
 			logger.error("Activation request or username must not be null/empty.");
@@ -347,7 +356,7 @@ public class TraineeServiceImpl implements ITraineeService {
 		traineeRepository.save(traineeToUpdate);
 
 		logger.info("Trainee '{}' activation status changed to {} by user '{}'.", userToUpdate.getUsername(),
-				userToUpdate.isActive(), currentUser.getUsername());
+				userToUpdate.isActive(), currentUsername);
 
 	}
 
@@ -355,7 +364,8 @@ public class TraineeServiceImpl implements ITraineeService {
 	@Transactional()
 	public void deleteTraineeById(Long id) {
 
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername = authenticationInfoService.getCurrentUsername();
+
 		if (id == null || id <= 0) {
 			logger.error("Trainee ID for deletion cannot be null or non-positive: {}", id);
 			// Throw BaseException for invalid argument
@@ -373,9 +383,9 @@ public class TraineeServiceImpl implements ITraineeService {
 
 		Trainee traineeToDelete = optTrainee.get();
 
-		if (!currentUser.getUsername().equals(traineeToDelete.getUser().getUsername())) {
+		if (!currentUsername.equals(traineeToDelete.getUser().getUsername())) {
 			logger.error("Unauthorized attempt to delete Trainee profile with ID '{}' by current user '{}'.", id,
-					currentUser.getUsername());
+					currentUsername);
 			throw new BaseException(
 					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to delete this Trainee profile."));
 		}
@@ -384,16 +394,17 @@ public class TraineeServiceImpl implements ITraineeService {
 
 		logger.info(
 				"Complete deletion of Trainee profile for ID '{}' (username: '{}') and all associated data (User, Trainings) performed successfully by user '{}'.",
-				id, traineeToDelete.getUser().getUsername(), currentUser.getUsername());
+				id, traineeToDelete.getUser().getUsername(), currentUsername);
 
 	}
 
 	@Override
 	@Transactional()
 	public void deleteTraineeByUsername(String username) {
-		User currentUser = authManager.getCurrentUser();
-		logger.info("User '{}' attempting to delete Trainee profile for username '{}'.", currentUser.getUsername(),
-				username);
+
+		String currentUsername = authenticationInfoService.getCurrentUsername();
+
+		logger.info("User '{}' attempting to delete Trainee profile for username '{}'.", currentUsername, username);
 
 		if (username == null || username.isBlank()) {
 			logger.error("Username cannot be null or empty for Trainee deletion.");
@@ -401,9 +412,9 @@ public class TraineeServiceImpl implements ITraineeService {
 					new ErrorMessage(MessageType.INVALID_ARGUMENT, "Username must not be null or empty."));
 		}
 
-		if (!currentUser.getUsername().equals(username)) {
+		if (!currentUsername.equals(username)) {
 			logger.error("Unauthorized attempt to delete Trainee profile for user '{}' by current user '{}'.", username,
-					currentUser.getUsername());
+					currentUsername);
 			throw new BaseException(
 					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to delete this Trainee profile."));
 		}
@@ -420,7 +431,7 @@ public class TraineeServiceImpl implements ITraineeService {
 
 		logger.info(
 				"Complete deletion of Trainee profile for username '{}' and all associated data (User, Trainings) performed successfully by user '{}'.",
-				username, currentUser.getUsername());
+				username, currentUsername);
 
 	}
 

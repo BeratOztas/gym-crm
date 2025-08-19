@@ -10,13 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.epam.gym_crm.api.dto.UserCreationResult;
 import com.epam.gym_crm.api.dto.request.UserActivationRequest;
 import com.epam.gym_crm.api.dto.request.trainer.TrainerCreateRequest;
 import com.epam.gym_crm.api.dto.request.trainer.TrainerUpdateRequest;
 import com.epam.gym_crm.api.dto.response.TrainerInfoResponse;
 import com.epam.gym_crm.api.dto.response.TrainerProfileResponse;
 import com.epam.gym_crm.api.dto.response.UserRegistrationResponse;
-import com.epam.gym_crm.auth.AuthManager;
 import com.epam.gym_crm.db.entity.Trainee;
 import com.epam.gym_crm.db.entity.Trainer;
 import com.epam.gym_crm.db.entity.Training;
@@ -46,18 +46,19 @@ public class TrainerServiceImpl implements ITrainerService {
 	private final TrainingTypeRepository trainingTypeRepository;
 	private final TrainingRepository trainingRepository;
 	private final TraineeRepository traineeRepository;
-	private final AuthManager authManager;
 	private final UserRepository userRepository;
+	private final AuthenticationInfoService authenticationInfoService;
 	private final AppMetrics appMetrics;
 
+	
 	public TrainerServiceImpl(IAuthenticationService authenticationService, TrainerRepository trainerRepository,
-			TrainingTypeRepository trainingTypeRepository, AuthManager authManager, UserRepository userRepository,
+			TrainingTypeRepository trainingTypeRepository,  UserRepository userRepository,AuthenticationInfoService authenticationInfoService,
 			TrainingRepository trainingRepository, TraineeRepository traineeRepository,AppMetrics appMetrics) {
 		this.authenticationService = authenticationService;
 		this.trainerRepository = trainerRepository;
 		this.trainingTypeRepository = trainingTypeRepository;
-		this.authManager = authManager;
 		this.userRepository = userRepository;
+		this.authenticationInfoService=authenticationInfoService;
 		this.trainingRepository = trainingRepository;
 		this.traineeRepository = traineeRepository;
 		this.appMetrics=appMetrics;
@@ -66,8 +67,8 @@ public class TrainerServiceImpl implements ITrainerService {
 	@Override
 	@Transactional(readOnly = true)
 	public TrainerProfileResponse findTrainerById(Long id) {
-		User currentUser = authManager.getCurrentUser();
-		logger.info("User '{}' attempting to find Trainer profile by ID '{}'.", currentUser.getUsername(), id);
+		String currentUsername =authenticationInfoService.getCurrentUsername();
+		logger.info("User '{}' attempting to find Trainer profile by ID '{}'.", currentUsername, id);
 
 		if (id == null || id <= 0) {
 			logger.error("Trainer ID for lookup cannot be null or non-positive: {}", id);
@@ -90,9 +91,9 @@ public class TrainerServiceImpl implements ITrainerService {
 	@Transactional(readOnly = true)
 	public TrainerProfileResponse findTrainerByUsername(String username) {
 
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername =authenticationInfoService.getCurrentUsername();
 
-		logger.info("User '{}' attempting to find Trainer profile for username '{}'.", currentUser.getUsername(),
+		logger.info("User '{}' attempting to find Trainer profile for username '{}'.", currentUsername,
 				username);
 
 		if (username == null || username.isBlank()) {
@@ -116,8 +117,8 @@ public class TrainerServiceImpl implements ITrainerService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<TrainerProfileResponse> getAllTrainers() {
-		User currentUser = authManager.getCurrentUser();
-		logger.info("User '{}' attempting to retrieve all Trainers.", currentUser.getUsername());
+		String currentUsername =authenticationInfoService.getCurrentUsername();
+		logger.info("User '{}' attempting to retrieve all Trainers.", currentUsername);
 
 		List<Trainer> trainers = trainerRepository.findAll();
 		logger.info("Retrieved {} trainers from the database.", trainers.size());
@@ -132,13 +133,13 @@ public class TrainerServiceImpl implements ITrainerService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<TrainerInfoResponse> getUnassignedTrainersForTrainee(String traineeUsername) {
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername =authenticationInfoService.getCurrentUsername();
 		logger.info("User '{}' attempting to retrieve unassigned and active trainers for trainee '{}'.",
-				currentUser.getUsername(), traineeUsername);
+				currentUsername, traineeUsername);
 
-		if (!currentUser.getUsername().equals(traineeUsername)) {
+		if (!currentUsername.equals(traineeUsername)) {
 			logger.warn("Access Denied: User '{}' attempted to get unassigned trainers for trainee '{}'.",
-					currentUser.getUsername(), traineeUsername);
+					currentUsername, traineeUsername);
 			throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED,
 					"You are not authorized to view unassigned trainers for other trainees."));
 		}
@@ -167,7 +168,7 @@ public class TrainerServiceImpl implements ITrainerService {
 				.collect(Collectors.toList());
 
 		logger.info("Successfully retrieved {} unassigned and active trainers for trainee '{}' for user '{}'.",
-				unassignedTrainerList.size(), traineeUsername, currentUser.getUsername());
+				unassignedTrainerList.size(), traineeUsername, currentUsername);
 
 		return unassignedTrainerList;
 	}
@@ -181,8 +182,12 @@ public class TrainerServiceImpl implements ITrainerService {
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT, "Trainer must not be null"));
 		}
 
-		User newUser = authenticationService.createAndSaveUser(request.getFirstName(), request.getLastName());
+		UserCreationResult creationResult = authenticationService.prepareUserWithCredentials(request.getFirstName(), request.getLastName());
 
+		User newUser =creationResult.userToPersist();
+		
+		String rawPassword =creationResult.rawPassword();
+		
 		TrainingType specialization = trainingTypeRepository
 				.findByTrainingTypeNameIgnoreCase(request.getSpecialization()).orElseThrow(() -> {
 					logger.error("Training type not found: {}", request.getSpecialization());
@@ -201,28 +206,31 @@ public class TrainerServiceImpl implements ITrainerService {
 			throw new BaseException(
 					new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Failed to create trainer profile."));
 		}
+		
+		String accessToken =authenticationService.createAccessToken(newUser);
+		
 
 		logger.info("Trainer profile created successfully for user: {}", newUser.getUsername());
 		
 		appMetrics.incrementTrainerCreation();
 
-		return new UserRegistrationResponse(newUser.getUsername(), newUser.getPassword());
+		return new UserRegistrationResponse(newUser.getUsername(), rawPassword,accessToken);
 
 	}
 
 	@Override
 	@Transactional()
 	public TrainerProfileResponse updateTrainer(TrainerUpdateRequest request) {
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername =authenticationInfoService.getCurrentUsername();
 
 		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
 			logger.error("Update request or username cannot be null/empty for Trainer profile.");
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
 					"Update request or username must not be null/empty."));
 		}
-		if (!currentUser.getUsername().equals(request.getUsername())) {
+		if (!currentUsername.equals(request.getUsername())) {
 			logger.error("Unauthorized attempt to update Trainer profile for user '{}' by current user '{}'.",
-					request.getUsername(), currentUser.getUsername());
+					request.getUsername(), currentUsername);
 			throw new BaseException(
 					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to update this Trainer profile."));
 		}
@@ -265,10 +273,10 @@ public class TrainerServiceImpl implements ITrainerService {
 	@Override
 	@Transactional()
 	public void activateDeactivateTrainer(UserActivationRequest request) {
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername =authenticationInfoService.getCurrentUsername();
 
 		logger.info("User '{}' attempting to change activation status for Trainer '{}' to '{}'.",
-				currentUser.getUsername(), request.getUsername(), request.getIsActive());
+				currentUsername, request.getUsername(), request.getIsActive());
 
 		if (request == null || request.getUsername() == null || request.getUsername().isBlank()) {
 			logger.error("Activation request or username cannot be null/empty.");
@@ -300,14 +308,14 @@ public class TrainerServiceImpl implements ITrainerService {
 		trainerRepository.save(trainerToUpdate);
 
 		logger.info("Trainer '{}' activation status changed to {} by user '{}'.", userToUpdate.getUsername(),
-				userToUpdate.isActive(), currentUser.getUsername());
+				userToUpdate.isActive(), currentUsername);
 
 	}
 
 	@Override
 	@Transactional()
 	public void deleteTrainerById(Long id) {
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername =authenticationInfoService.getCurrentUsername();
 		if (id == null || id <= 0) {
 			logger.error("Trainer ID for deletion cannot be null or non-positive: {}", id);
 			throw new BaseException(new ErrorMessage(MessageType.INVALID_ARGUMENT,
@@ -324,9 +332,9 @@ public class TrainerServiceImpl implements ITrainerService {
 
 		Trainer trainerToDelete = optTrainer.get();
 
-		if (!currentUser.getUsername().equals(trainerToDelete.getUser().getUsername())) {
+		if (!currentUsername.equals(trainerToDelete.getUser().getUsername())) {
 			logger.error("Unauthorized attempt to delete Trainer profile with ID '{}' by current user '{}'.", id,
-					currentUser.getUsername());
+					currentUsername);
 			throw new BaseException(
 					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to delete this Trainer profile."));
 		}
@@ -344,16 +352,16 @@ public class TrainerServiceImpl implements ITrainerService {
 		trainerRepository.delete(trainerToDelete);
 		logger.info(
 				"Complete deletion of Trainer profile for ID '{}' (username: '{}') and associated User data performed successfully by user '{}'. Trainings disassociated.",
-				id, trainerToDelete.getUser().getUsername(), currentUser.getUsername());
+				id, trainerToDelete.getUser().getUsername(), currentUsername);
 
 	}
 
 	@Override
 	@Transactional()
 	public void deleteTrainerByUsername(String username) {
-		User currentUser = authManager.getCurrentUser();
+		String currentUsername =authenticationInfoService.getCurrentUsername();
 
-		logger.info("User '{}' attempting to delete Trainer profile for username '{}'.", currentUser.getUsername(),
+		logger.info("User '{}' attempting to delete Trainer profile for username '{}'.", currentUsername,
 				username);
 
 		if (username == null || username.isBlank()) {
@@ -362,9 +370,9 @@ public class TrainerServiceImpl implements ITrainerService {
 					new ErrorMessage(MessageType.INVALID_ARGUMENT, "Username must not be null or empty."));
 		}
 
-		if (!currentUser.getUsername().equals(username)) {
+		if (!currentUsername.equals(username)) {
 			logger.error("Unauthorized attempt to delete Trainer profile for user '{}' by current user '{}'.", username,
-					currentUser.getUsername());
+					currentUsername);
 			throw new BaseException(
 					new ErrorMessage(MessageType.FORBIDDEN, "You are not authorized to delete this Trainer profile."));
 		}
@@ -390,7 +398,7 @@ public class TrainerServiceImpl implements ITrainerService {
 		trainerRepository.delete(trainerToDelete);
 		logger.info(
 				"Complete deletion of Trainer profile for username '{}' and associated User data performed successfully by user '{}'. Trainings disassociated.",
-				username, currentUser.getUsername());
+				username, currentUsername);
 	}
 
 }
