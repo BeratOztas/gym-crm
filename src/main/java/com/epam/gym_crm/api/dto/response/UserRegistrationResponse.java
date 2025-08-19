@@ -11,4 +11,5 @@ public class UserRegistrationResponse {
 
 	private String username;
 	private String password;
+	private String accessToken;
 }
