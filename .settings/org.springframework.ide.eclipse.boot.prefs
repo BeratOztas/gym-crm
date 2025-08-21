@@ -1,2 +1,2 @@
 eclipse.preferences.version=1
-spring.boot.launch.profile.history=local;dev;
+spring.boot.launch.profile.history=stg;local;dev;

@@ -1,14 +1,22 @@
 spring:
-  config:
-    activate:
-      on-profile: local
   datasource:
+    driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gym_local
+    username: postgres
+    password: 1
+  
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: gym_local
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-local.sql
+      defer-datasource-initialization: false
