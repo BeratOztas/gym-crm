@@ -1,20 +1,20 @@
-package com.epam.gym_crm.config; 
+
+package com.epam.gym_crm.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.boot.CommandLineRunner; 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.epam.gym_crm.db.entity.TrainingType;
 import com.epam.gym_crm.db.repository.TrainingTypeRepository;
 
-@Component 
-public class TrainingTypeDataLoader implements ApplicationListener<ContextRefreshedEvent> {
+@Component
+public class TrainingTypeDataLoader implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainingTypeDataLoader.class);
 
@@ -26,9 +26,9 @@ public class TrainingTypeDataLoader implements ApplicationListener<ContextRefres
 
     @Override
     @Transactional
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void run(String... args) throws Exception {
 
-        if (trainingTypeRepository.count() == 0) { 
+        if (trainingTypeRepository.count() == 0) {
             logger.info("Initializing TrainingType data with predefined IDs...");
 
             Map<Long, String> predefinedTrainingTypes = new LinkedHashMap<>();
