@@ -69,6 +69,9 @@ class TrainingServiceImplTest {
     private Trainer testTrainer;
     private TrainingType testTrainingType;
     private Training testTraining;
+    
+    // Constant for the mock token
+    private static final String MOCK_TOKEN = "mock_jwt_token";
 
     @BeforeEach
     void setUp() {
@@ -223,7 +226,8 @@ class TrainingServiceImplTest {
         when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(anyString())).thenReturn(Optional.of(testTrainingType));
         when(trainingRepository.save(any(Training.class))).thenReturn(testTraining);
 
-        TrainingResponse response = trainingService.createTraining(request);
+        // Updated method call to include the token parameter
+        TrainingResponse response = trainingService.createTraining(request, MOCK_TOKEN);
         
         assertNotNull(response);
         verify(appMetrics).incrementTrainingCreation();
@@ -234,7 +238,8 @@ class TrainingServiceImplTest {
         TrainingCreateRequest request = new TrainingCreateRequest(null, "non.existent", null, null, 0);
         when(authenticationInfoService.getCurrentUsername()).thenReturn("any.user");
         when(trainerRepository.findByUserUsername("non.existent")).thenReturn(Optional.empty());
-        assertThrows(BaseException.class, () -> trainingService.createTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.createTraining(request, MOCK_TOKEN));
     }
 
     @Test
@@ -243,7 +248,8 @@ class TrainingServiceImplTest {
         TrainingCreateRequest request = new TrainingCreateRequest(null, testTrainerUser.getUsername(), null, null, 0);
         when(authenticationInfoService.getCurrentUsername()).thenReturn("any.user");
         when(trainerRepository.findByUserUsername(testTrainerUser.getUsername())).thenReturn(Optional.of(testTrainer));
-        assertThrows(BaseException.class, () -> trainingService.createTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.createTraining(request, MOCK_TOKEN));
     }
 
     @Test
@@ -252,7 +258,8 @@ class TrainingServiceImplTest {
         when(authenticationInfoService.getCurrentUsername()).thenReturn("any.user");
         when(trainerRepository.findByUserUsername(anyString())).thenReturn(Optional.of(testTrainer));
         when(traineeRepository.findByUserUsername("non.existent")).thenReturn(Optional.empty());
-        assertThrows(BaseException.class, () -> trainingService.createTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.createTraining(request, MOCK_TOKEN));
     }
     
     @Test
@@ -262,7 +269,8 @@ class TrainingServiceImplTest {
         when(authenticationInfoService.getCurrentUsername()).thenReturn("any.user");
         when(trainerRepository.findByUserUsername(anyString())).thenReturn(Optional.of(testTrainer));
         when(traineeRepository.findByUserUsername(anyString())).thenReturn(Optional.of(testTrainee));
-        assertThrows(BaseException.class, () -> trainingService.createTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.createTraining(request, MOCK_TOKEN));
     }
 
     @Test
@@ -272,7 +280,8 @@ class TrainingServiceImplTest {
         when(trainerRepository.findByUserUsername(anyString())).thenReturn(Optional.of(testTrainer));
         when(traineeRepository.findByUserUsername(anyString())).thenReturn(Optional.of(testTrainee));
         when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase("NonExistent")).thenReturn(Optional.empty());
-        assertThrows(BaseException.class, () -> trainingService.createTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.createTraining(request, MOCK_TOKEN));
     }
 
     // --- updateTraining Tests ---
@@ -283,7 +292,8 @@ class TrainingServiceImplTest {
         when(trainingRepository.findById(1L)).thenReturn(Optional.of(testTraining));
         when(trainingRepository.save(any(Training.class))).thenReturn(testTraining);
 
-        TrainingResponse response = trainingService.updateTraining(request);
+        // Updated method call to include the token parameter
+        TrainingResponse response = trainingService.updateTraining(request, MOCK_TOKEN);
         
         assertEquals("New Name", response.getTrainingName());
     }
@@ -291,21 +301,24 @@ class TrainingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenUpdateTrainingWithNullOrInvalidId() {
         when(authenticationInfoService.getCurrentUsername()).thenReturn("any.user");
-        assertThrows(BaseException.class, () -> trainingService.updateTraining(new TrainingUpdateRequest(null, null, null, 0, null, null, null)));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.updateTraining(new TrainingUpdateRequest(null, null, null, 0, null, null, null), MOCK_TOKEN));
     }
 
     @Test
     void shouldThrowExceptionWhenUpdateTrainingNotFound() {
         when(authenticationInfoService.getCurrentUsername()).thenReturn("any.user");
         when(trainingRepository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(BaseException.class, () -> trainingService.updateTraining(new TrainingUpdateRequest(99L, null, null, 0, null, null, null)));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.updateTraining(new TrainingUpdateRequest(99L, null, null, 0, null, null, null), MOCK_TOKEN));
     }
     
     @Test
     void shouldThrowExceptionWhenUpdateTrainingUnauthorized() {
         when(authenticationInfoService.getCurrentUsername()).thenReturn("unauthorized.user");
         when(trainingRepository.findById(1L)).thenReturn(Optional.of(testTraining));
-        assertThrows(BaseException.class, () -> trainingService.updateTraining(new TrainingUpdateRequest(1L, null, null, 0, null, null, null)));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.updateTraining(new TrainingUpdateRequest(1L, null, null, 0, null, null, null), MOCK_TOKEN));
     }
     
     @Test
@@ -314,7 +327,8 @@ class TrainingServiceImplTest {
         when(authenticationInfoService.getCurrentUsername()).thenReturn(testTraineeUser.getUsername());
         when(trainingRepository.findById(1L)).thenReturn(Optional.of(testTraining));
         when(trainerRepository.findByUserUsername("non.existent")).thenReturn(Optional.empty());
-        assertThrows(BaseException.class, () -> trainingService.updateTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.updateTraining(request, MOCK_TOKEN));
     }
     
     @Test
@@ -324,7 +338,8 @@ class TrainingServiceImplTest {
         when(authenticationInfoService.getCurrentUsername()).thenReturn(testTraineeUser.getUsername());
         when(trainingRepository.findById(1L)).thenReturn(Optional.of(testTraining));
         when(trainerRepository.findByUserUsername(testTrainerUser.getUsername())).thenReturn(Optional.of(testTrainer));
-        assertThrows(BaseException.class, () -> trainingService.updateTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.updateTraining(request, MOCK_TOKEN));
     }
     
     @Test
@@ -333,7 +348,8 @@ class TrainingServiceImplTest {
         when(authenticationInfoService.getCurrentUsername()).thenReturn(testTrainerUser.getUsername());
         when(trainingRepository.findById(1L)).thenReturn(Optional.of(testTraining));
         when(traineeRepository.findByUserUsername("non.existent")).thenReturn(Optional.empty());
-        assertThrows(BaseException.class, () -> trainingService.updateTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.updateTraining(request, MOCK_TOKEN));
     }
     
     @Test
@@ -343,7 +359,8 @@ class TrainingServiceImplTest {
         when(authenticationInfoService.getCurrentUsername()).thenReturn(testTrainerUser.getUsername());
         when(trainingRepository.findById(1L)).thenReturn(Optional.of(testTraining));
         when(traineeRepository.findByUserUsername(testTraineeUser.getUsername())).thenReturn(Optional.of(testTrainee));
-        assertThrows(BaseException.class, () -> trainingService.updateTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.updateTraining(request, MOCK_TOKEN));
     }
 
     @Test
@@ -352,7 +369,8 @@ class TrainingServiceImplTest {
         when(authenticationInfoService.getCurrentUsername()).thenReturn(testTraineeUser.getUsername());
         when(trainingRepository.findById(1L)).thenReturn(Optional.of(testTraining));
         when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase("NonExistent")).thenReturn(Optional.empty());
-        assertThrows(BaseException.class, () -> trainingService.updateTraining(request));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.updateTraining(request, MOCK_TOKEN));
     }
 
     // --- deleteTrainingById Tests ---
@@ -361,7 +379,8 @@ class TrainingServiceImplTest {
         when(authenticationInfoService.getCurrentUsername()).thenReturn(testTraineeUser.getUsername());
         when(trainingRepository.findById(1L)).thenReturn(Optional.of(testTraining));
         
-        trainingService.deleteTrainingById(1L);
+        // Updated method call to include the token parameter
+        trainingService.deleteTrainingById(1L, MOCK_TOKEN);
         
         verify(trainingRepository).delete(testTraining);
     }
@@ -369,21 +388,24 @@ class TrainingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenDeleteTrainingByIdWithNullOrInvalidId() {
         when(authenticationInfoService.getCurrentUsername()).thenReturn("any.user");
-        assertThrows(BaseException.class, () -> trainingService.deleteTrainingById(null));
-        assertThrows(BaseException.class, () -> trainingService.deleteTrainingById(0L));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.deleteTrainingById(null, MOCK_TOKEN));
+        assertThrows(BaseException.class, () -> trainingService.deleteTrainingById(0L, MOCK_TOKEN));
     }
     
     @Test
     void shouldThrowExceptionWhenDeleteTrainingByIdNotFound() {
         when(authenticationInfoService.getCurrentUsername()).thenReturn("any.user");
         when(trainingRepository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(BaseException.class, () -> trainingService.deleteTrainingById(99L));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.deleteTrainingById(99L, MOCK_TOKEN));
     }
     
     @Test
     void shouldThrowExceptionWhenDeleteTrainingByIdUnauthorized() {
         when(authenticationInfoService.getCurrentUsername()).thenReturn("unauthorized.user");
         when(trainingRepository.findById(1L)).thenReturn(Optional.of(testTraining));
-        assertThrows(BaseException.class, () -> trainingService.deleteTrainingById(1L));
+        // Updated method call to include the token parameter
+        assertThrows(BaseException.class, () -> trainingService.deleteTrainingById(1L, MOCK_TOKEN));
     }
 }
