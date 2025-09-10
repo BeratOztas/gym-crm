@@ -1,7 +1,6 @@
 spring:
   application:
     name: gym-crm
-  
   # Db Settings
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -26,8 +25,36 @@ spring:
       mode: always
       platform: postgresql
       defer-datasource-initialization: false
+  cloud:
+    discovery:
+      enabled: true
+    # Resilience4j Circuit Breaker configuration
+    circuitbreaker:
+      resilience4j:
+        circuit-breakers:
+          trainerHoursService:
+            register-health-indicator: true
+            failure-rate-threshold: 50
+            sliding-window-size: 10
+            minimum-number-of-calls: 5
+            permitted-number-of-calls-in-half-open-state: 3
+            wait-duration-in-open-state: 10s
+            automatic-transition-from-open-to-half-open-enabled: true
+            record-exception:
+            - org.springframework.web.client.ResourceAccessException
+            - java.io.IOException
 
+  config:
+    import:
+    - "optional:configserver:"
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+      
 app:
   # --- JWT Settings (JwtConfig) ---
   jwt:
