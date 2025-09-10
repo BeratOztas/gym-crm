@@ -20,10 +20,10 @@ public interface ITrainingService {
 
     List<TrainerTrainingInfoResponse> getTrainerTrainingsList(String username,TrainerTrainingListRequest request);
     
-    TrainingResponse createTraining(TrainingCreateRequest request);
+    TrainingResponse createTraining(TrainingCreateRequest request,String token);
 
-    TrainingResponse updateTraining(TrainingUpdateRequest request);
+    TrainingResponse updateTraining(TrainingUpdateRequest request,String token);
 	
-	void deleteTrainingById(Long id);
+	void deleteTrainingById(Long id,String token);
 }
 	
