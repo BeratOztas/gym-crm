@@ -52,7 +52,7 @@ public class Trainee  {
 	inverseJoinColumns = @JoinColumn(name ="trainer_id"))
 	private Set<Trainer> trainers =new HashSet<>();
 	
-	@OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY) //CascadeType.Remove 
 	private Set<Training> trainings = new HashSet<>();
 
 }

@@ -45,6 +45,6 @@ public class Trainer {
 	@ManyToMany(mappedBy = "trainers")
     private Set<Trainee> trainees = new HashSet<>();
 
-	@OneToMany(mappedBy = "trainer") 
+	@OneToMany(mappedBy = "trainer") //CascadeType.Remove
 	private Set<Training> trainings = new HashSet<>();
 }
