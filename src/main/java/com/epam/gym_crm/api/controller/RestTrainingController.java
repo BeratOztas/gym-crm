@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
 
 import com.epam.gym_crm.api.dto.request.training.TrainingCreateRequest;
 import com.epam.gym_crm.api.dto.request.training.TrainingUpdateRequest;
@@ -61,9 +62,9 @@ public class RestTrainingController {
 	@PostMapping
 	public ResponseEntity<?> createTraining(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Training creation details", required = true)
-			@RequestBody @Valid TrainingCreateRequest request) {
+			@RequestBody @Valid TrainingCreateRequest request,@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
 		logger.info("Request to create a new training for trainee: {}", request.getTraineeUsername());
-		trainingService.createTraining(request);
+		trainingService.createTraining(request,token);
 		return ResponseEntity.status(HttpStatus.CREATED).body("Training created successfully.");
 	}
 
@@ -80,14 +81,14 @@ public class RestTrainingController {
 			@Parameter(description = "The unique ID of the training to update", required = true)
 			@PathVariable Long id,
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Updated training details", required = true)
-			@RequestBody @Valid TrainingUpdateRequest request) {
+			@RequestBody @Valid TrainingUpdateRequest request,@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
 		if (!id.equals(request.getId())) {
 			logger.warn("Path-Body Mismatch: URL ID '{}' does not match request body ID '{}'.", id, request.getId());
 			throw new BaseException(
 					new ErrorMessage(MessageType.PATH_BODY_MISMATCH, "URL ID and request body ID must match."));
 		}
 		logger.info("Request to update training with ID: {}", id);
-		return ResponseEntity.ok(trainingService.updateTraining(request));
+		return ResponseEntity.ok(trainingService.updateTraining(request,token));
 	}
 
 	@Operation(
@@ -99,9 +100,9 @@ public class RestTrainingController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteTrainingById(
 			@Parameter(description = "The unique ID of the training to delete", required = true)
-			@PathVariable Long id) {
+			@PathVariable Long id,@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
 		logger.info("Request to delete training with ID: {}", id);
-		trainingService.deleteTrainingById(id);
+		trainingService.deleteTrainingById(id,token);
 		return ResponseEntity.noContent().build();
 	}
 }
