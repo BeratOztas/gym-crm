@@ -33,7 +33,6 @@ C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\api\filte
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\client\model\ActionType.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\client\model\TrainerWorkloadRequest.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\client\TrainerWorkloadClient.java
-C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\client\TrainerWorkloadClientFallback.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\config\AppConfig.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\config\JwtConfig.java
 C:\Users\Berat\Documents\GitHub\gym-crm\src\main\java\com\epam\gym_crm\config\LoginSecurityConfig.java

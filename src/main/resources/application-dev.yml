@@ -1,6 +1,7 @@
 spring:
   application:
     name: gym-crm
+
   # Db Settings
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -36,14 +37,20 @@ spring:
           trainerHoursService:
             register-health-indicator: true
             failure-rate-threshold: 50
-            sliding-window-size: 10
-            minimum-number-of-calls: 5
-            permitted-number-of-calls-in-half-open-state: 3
+            sliding-window-size: 4
+            minimum-number-of-calls: 2
+            permitted-number-of-calls-in-half-open-state: 2
             wait-duration-in-open-state: 10s
             automatic-transition-from-open-to-half-open-enabled: true
             record-exception:
-            - org.springframework.web.client.ResourceAccessException
-            - java.io.IOException
+              - org.springframework.web.client.ResourceAccessException
+              - java.io.IOException
+              - org.springframework.web.client.HttpServerErrorException
+              - io.github.resilience4j.feign.FeignException
+
+  config:
+    import:
+      - "optional:configserver:"
 
 eureka:
   client:
@@ -51,3 +58,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     fetch-registry: true
     register-with-eureka: true
+
+feign:
+  circuitbreaker:
+    enabled: true
