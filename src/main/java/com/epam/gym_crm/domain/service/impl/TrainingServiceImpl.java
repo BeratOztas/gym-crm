@@ -52,14 +52,15 @@ public class TrainingServiceImpl implements ITrainingService {
 
 	public TrainingServiceImpl(TrainingRepository trainingRepository, TraineeRepository traineeRepository,
 			TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository,
-			AuthenticationInfoService authenticationInfoService, AppMetrics appMetrics,TrainerWorkloadClient trainerWorkloadClient) {
+			AuthenticationInfoService authenticationInfoService, AppMetrics appMetrics,
+			TrainerWorkloadClient trainerWorkloadClient) {
 		this.trainingRepository = trainingRepository;
 		this.traineeRepository = traineeRepository;
 		this.trainerRepository = trainerRepository;
 		this.trainingTypeRepository = trainingTypeRepository;
 		this.authenticationInfoService = authenticationInfoService;
 		this.appMetrics = appMetrics;
-		this.trainerWorkloadClient=trainerWorkloadClient;
+		this.trainerWorkloadClient = trainerWorkloadClient;
 	}
 
 	@Override
@@ -210,7 +211,7 @@ public class TrainingServiceImpl implements ITrainingService {
 	@Override
 	@Transactional
 	@Timed(value = "gym_crm_api_duration_seconds", extraTags = { "endpoint", "create_training" })
-	public TrainingResponse createTraining(TrainingCreateRequest request,String token) {
+	public TrainingResponse createTraining(TrainingCreateRequest request, String token) {
 		String currentUsername = authenticationInfoService.getCurrentUsername();
 		logger.info("User '{}' attempting to create a new training, Training creation request: {}", currentUsername,
 				request);
@@ -267,27 +268,21 @@ public class TrainingServiceImpl implements ITrainingService {
 			logger.info("Assigned Trainer '{}' to Trainee '{}' as part of training creation.",
 					foundTrainer.getUser().getUsername(), foundTrainee.getUser().getUsername());
 		}
-		
+
 		// Client to trainer-hours-service
 		try {
-			TrainerWorkloadRequest workloadRequest = new TrainerWorkloadRequest(
-					foundTrainer.getUser().getUsername(),
-					foundTrainer.getUser().getFirstName(),
-					foundTrainer.getUser().getLastName(),
-					foundTrainer.getUser().isActive(),
-					savedTraining.getTrainingDate(),
-					savedTraining.getTrainingDuration(),
-					ActionType.ADD
-			);
+			TrainerWorkloadRequest workloadRequest = new TrainerWorkloadRequest(foundTrainer.getUser().getUsername(),
+					foundTrainer.getUser().getFirstName(), foundTrainer.getUser().getLastName(),
+					foundTrainer.getUser().isActive(), savedTraining.getTrainingDate(),
+					savedTraining.getTrainingDuration(), ActionType.ADD);
 			logger.info("Sending workload update request for trainer '{}'", foundTrainer.getUser().getUsername());
-	
+
 			trainerWorkloadClient.updateTrainerWorkload(workloadRequest, token);
 			logger.info("Successfully sent workload update for trainer '{}'.", foundTrainer.getUser().getUsername());
 		} catch (Exception e) {
 			logger.error("Failed to send workload update for trainer '{}'. Error: {}",
 					foundTrainer.getUser().getUsername(), e.getMessage());
 		}
-		
 
 		logger.info("Training '{}' created successfully with ID: {} by user '{}'.", savedTraining.getTrainingName(),
 				savedTraining.getId(), currentUsername);
@@ -299,7 +294,7 @@ public class TrainingServiceImpl implements ITrainingService {
 
 	@Override
 	@Transactional
-	public TrainingResponse updateTraining(TrainingUpdateRequest request,String token) {
+	public TrainingResponse updateTraining(TrainingUpdateRequest request, String token) {
 		String currentUsername = authenticationInfoService.getCurrentUsername();
 		logger.info("User '{}' attempting to update training with ID: {}. Update request: {}", currentUsername,
 				request.getId(), request);
@@ -326,7 +321,7 @@ public class TrainingServiceImpl implements ITrainingService {
 			throw new BaseException(
 					new ErrorMessage(MessageType.UNAUTHORIZED, "You are not authorized to update this training."));
 		}
-		
+
 		Trainer originalTrainer = existingTraining.getTrainer();
 		long originalDuration = existingTraining.getTrainingDuration();
 
@@ -337,7 +332,7 @@ public class TrainingServiceImpl implements ITrainingService {
 								"New Trainer with username '{}' not found for updating training ID {} by user '{}'.",
 								request.getTrainerUsername(), request.getId(), currentUsername);
 						return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-								"New Trainer with username '" + request.getTrainerUsername() + "' not found.")); 
+								"New Trainer with username '" + request.getTrainerUsername() + "' not found."));
 					});
 			if (!updatedTrainer.getUser().isActive()) {
 				logger.warn("New Trainer '{}' is not active. Cannot update training.", request.getTrainerUsername());
@@ -354,9 +349,8 @@ public class TrainingServiceImpl implements ITrainingService {
 								"New Trainee with username '{}' not found for updating training ID {} by user '{}'.",
 								request.getTraineeUsername(), request.getId(), currentUsername);
 						return new BaseException(new ErrorMessage(MessageType.RESOURCE_NOT_FOUND,
-								"New Trainee with username '" + request.getTraineeUsername() + "' not found.")); 
-																													
-																													
+								"New Trainee with username '" + request.getTraineeUsername() + "' not found."));
+
 					});
 			if (!updatedTrainee.getUser().isActive()) {
 				logger.warn("New Trainee '{}' is not active. Cannot update training.", request.getTraineeUsername());
@@ -389,45 +383,38 @@ public class TrainingServiceImpl implements ITrainingService {
 		}
 
 		Training updatedTraining = trainingRepository.save(existingTraining);
-		
+
 		// TrainerWorkloadClient ile iş yükünü güncelleme
-				try {
-					if (updatedTraining.getTrainingDuration() != originalDuration ||
-						!updatedTraining.getTrainer().getUser().getUsername().equals(originalTrainer.getUser().getUsername())) {
+		try {
+			if (updatedTraining.getTrainingDuration() != originalDuration || !updatedTraining.getTrainer().getUser()
+					.getUsername().equals(originalTrainer.getUser().getUsername())) {
 
-						// Önceki iş yükünü sil
-						TrainerWorkloadRequest deleteRequest = new TrainerWorkloadRequest(
-								originalTrainer.getUser().getUsername(),
-								originalTrainer.getUser().getFirstName(),
-								originalTrainer.getUser().getLastName(),
-								originalTrainer.getUser().isActive(),
-								existingTraining.getTrainingDate(),
-								originalDuration,
-								ActionType.DELETE
-						);
-						trainerWorkloadClient.updateTrainerWorkload(deleteRequest, token);
+				TrainerWorkloadRequest deleteRequest = new TrainerWorkloadRequest(
+						originalTrainer.getUser().getUsername(), originalTrainer.getUser().getFirstName(),
+						originalTrainer.getUser().getLastName(), originalTrainer.getUser().isActive(),
+						existingTraining.getTrainingDate(), originalDuration, ActionType.DELETE);
+				trainerWorkloadClient.updateTrainerWorkload(deleteRequest, token);
 
-						// Yeni iş yükünü ekle
-						TrainerWorkloadRequest addRequest = new TrainerWorkloadRequest(
-								updatedTraining.getTrainer().getUser().getUsername(),
-								updatedTraining.getTrainer().getUser().getFirstName(),
-								updatedTraining.getTrainer().getUser().getLastName(),
-								updatedTraining.getTrainer().getUser().isActive(),
-								updatedTraining.getTrainingDate(),
-								updatedTraining.getTrainingDuration(),
-								ActionType.ADD
-						);
-						trainerWorkloadClient.updateTrainerWorkload(addRequest, token);
+				TrainerWorkloadRequest addRequest = new TrainerWorkloadRequest(
+						updatedTraining.getTrainer().getUser().getUsername(),
+						updatedTraining.getTrainer().getUser().getFirstName(),
+						updatedTraining.getTrainer().getUser().getLastName(),
+						updatedTraining.getTrainer().getUser().isActive(), updatedTraining.getTrainingDate(),
+						updatedTraining.getTrainingDuration(), ActionType.ADD);
+				trainerWorkloadClient.updateTrainerWorkload(addRequest, token);
 
-						logger.info("Successfully updated workload for trainer '{}' from duration {} to {}. Trainer updated from {} to {}.",
-								updatedTraining.getTrainer().getUser().getUsername(), originalDuration, updatedTraining.getTrainingDuration(),
-								originalTrainer.getUser().getUsername(), updatedTraining.getTrainer().getUser().getUsername());
-					} else {
-						logger.info("Training duration and trainer did not change. No workload update sent for training ID {}.", request.getId());
-					}
-				} catch (Exception e) {
-					logger.error("Failed to update workload for trainers. Error: {}", e.getMessage());
-				}
+				logger.info(
+						"Successfully updated workload for trainer '{}' from duration {} to {}. Trainer updated from {} to {}.",
+						updatedTraining.getTrainer().getUser().getUsername(), originalDuration,
+						updatedTraining.getTrainingDuration(), originalTrainer.getUser().getUsername(),
+						updatedTraining.getTrainer().getUser().getUsername());
+			} else {
+				logger.info("Training duration and trainer did not change. No workload update sent for training ID {}.",
+						request.getId());
+			}
+		} catch (Exception e) {
+			logger.error("Failed to update workload for trainers. Error: {}", e.getMessage());
+		}
 
 		logger.info("Training with ID: {} updated successfully by user '{}'.", updatedTraining.getId(),
 				currentUsername);
@@ -437,7 +424,7 @@ public class TrainingServiceImpl implements ITrainingService {
 
 	@Override
 	@Transactional
-	public void deleteTrainingById(Long id,String token) {
+	public void deleteTrainingById(Long id, String token) {
 		String currentUsername = authenticationInfoService.getCurrentUsername();
 		logger.info("User '{}' attempting to delete training with ID: {}.", currentUsername, id);
 
@@ -462,21 +449,20 @@ public class TrainingServiceImpl implements ITrainingService {
 			throw new BaseException(
 					new ErrorMessage(MessageType.UNAUTHORIZED, "You are not authorized to delete this training."));
 		}
-		
-		//Client 
+
+		// Client
 		try {
 			TrainerWorkloadRequest workloadRequest = new TrainerWorkloadRequest(
 					trainingToDelete.getTrainer().getUser().getUsername(),
 					trainingToDelete.getTrainer().getUser().getFirstName(),
 					trainingToDelete.getTrainer().getUser().getLastName(),
-					trainingToDelete.getTrainer().getUser().isActive(),
-					trainingToDelete.getTrainingDate(),
-					trainingToDelete.getTrainingDuration(),
-					ActionType.DELETE
-			);
-			logger.info("Sending workload delete request for trainer '{}'", trainingToDelete.getTrainer().getUser().getUsername());
+					trainingToDelete.getTrainer().getUser().isActive(), trainingToDelete.getTrainingDate(),
+					trainingToDelete.getTrainingDuration(), ActionType.DELETE);
+			logger.info("Sending workload delete request for trainer '{}'",
+					trainingToDelete.getTrainer().getUser().getUsername());
 			trainerWorkloadClient.updateTrainerWorkload(workloadRequest, token);
-			logger.info("Successfully sent workload delete for trainer '{}'.", trainingToDelete.getTrainer().getUser().getUsername());
+			logger.info("Successfully sent workload delete for trainer '{}'.",
+					trainingToDelete.getTrainer().getUser().getUsername());
 		} catch (Exception e) {
 			logger.error("Failed to send workload delete for trainer '{}'. Error: {}",
 					trainingToDelete.getTrainer().getUser().getUsername(), e.getMessage());
