@@ -15,14 +15,12 @@
     {
       "name": "app.jwt.blacklist-retention-hours",
       "type": "java.lang.Long",
-      "sourceType": "com.epam.gym_crm.config.JwtConfig",
-      "defaultValue": 0
+      "sourceType": "com.epam.gym_crm.config.JwtConfig"
     },
     {
       "name": "app.jwt.expiration-ms",
       "type": "java.lang.Long",
-      "sourceType": "com.epam.gym_crm.config.JwtConfig",
-      "defaultValue": 0
+      "sourceType": "com.epam.gym_crm.config.JwtConfig"
     },
     {
       "name": "app.jwt.secret",
@@ -32,14 +30,12 @@
     {
       "name": "app.security.login.lockout-duration-minutes",
       "type": "java.lang.Long",
-      "sourceType": "com.epam.gym_crm.config.LoginSecurityConfig",
-      "defaultValue": 0
+      "sourceType": "com.epam.gym_crm.config.LoginSecurityConfig"
     },
     {
       "name": "app.security.login.max-attempts",
       "type": "java.lang.Integer",
-      "sourceType": "com.epam.gym_crm.config.LoginSecurityConfig",
-      "defaultValue": 0
+      "sourceType": "com.epam.gym_crm.config.LoginSecurityConfig"
     }
   ],
   "hints": []

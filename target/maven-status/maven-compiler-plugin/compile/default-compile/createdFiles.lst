@@ -19,11 +19,9 @@ com\epam\gym_crm\domain\exception\ErrorMessage.class
 com\epam\gym_crm\api\dto\response\TraineeTrainingInfoProjection.class
 com\epam\gym_crm\domain\service\ITraineeService.class
 com\epam\gym_crm\monitoring\health\InitialDataHealthIndicator.class
-META-INF\MANIFEST.MF
 com\epam\gym_crm\GymCrmApplication.class
 com\epam\gym_crm\api\controller\RestTrainerController.class
 com\epam\gym_crm\api\dto\request\trainee\TraineeTrainingListRequest.class
-META-INF\maven\com.epam\gym-crm\pom.xml
 com\epam\gym_crm\db\repository\TraineeRepository.class
 com\epam\gym_crm\security\JwtTokenProvider.class
 com\epam\gym_crm\api\dto\UserCreationResult.class
@@ -78,7 +76,6 @@ com\epam\gym_crm\api\dto\request\ChangePasswordRequest.class
 com\epam\gym_crm\db\repository\TrainingRepository.class
 com\epam\gym_crm\domain\service\impl\LoginAttemptService.class
 com\epam\gym_crm\api\dto\request\training\TrainingCreateRequest.class
-META-INF\maven\com.epam\gym-crm\pom.properties
 com\epam\gym_crm\domain\service\impl\AuthenticationInfoService.class
 com\epam\gym_crm\api\dto\request\training\TrainingUpdateRequest.class
 com\epam\gym_crm\api\dto\response\TraineeTrainingInfoResponse.class
