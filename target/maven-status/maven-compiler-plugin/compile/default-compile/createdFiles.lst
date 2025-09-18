@@ -6,7 +6,6 @@ com\epam\gym_crm\config\TrainingTypeDataLoader.class
 com\epam\gym_crm\api\dto\request\trainer\TrainerCreateRequest.class
 com\epam\gym_crm\domain\service\impl\TrainingTypeServiceImpl.class
 META-INF\spring-configuration-metadata.json
-com\epam\gym_crm\client\model\TrainerWorkloadRequest.class
 com\epam\gym_crm\api\controller\RestTrainingController.class
 com\epam\gym_crm\api\filter\RequestLoggingFilter.class
 com\epam\gym_crm\db\repository\TrainingTypeRepository.class
@@ -14,6 +13,7 @@ com\epam\gym_crm\domain\handler\GlobalExceptionHandler.class
 com\epam\gym_crm\domain\service\ITrainingService.class
 com\epam\gym_crm\domain\service\impl\UserDetailsServiceImpl.class
 com\epam\gym_crm\domain\service\ITrainingTypeService.class
+com\epam\gym_crm\mq\config\KafkaTopicConfig.class
 com\epam\gym_crm\security\JwtAuthenticationFilter.class
 com\epam\gym_crm\domain\exception\ErrorMessage.class
 com\epam\gym_crm\api\dto\response\TraineeTrainingInfoProjection.class
@@ -39,9 +39,9 @@ com\epam\gym_crm\db\entity\Trainer.class
 com\epam\gym_crm\api\dto\request\trainee\TraineeRequest.class
 com\epam\gym_crm\api\dto\request\trainee\TraineeUpdateTrainersRequest.class
 com\epam\gym_crm\domain\handler\GlobalExceptionHandler$1.class
-com\epam\gym_crm\client\TrainerWorkloadClient.class
 com\epam\gym_crm\db\repository\UserRepository.class
 com\epam\gym_crm\api\dto\response\TrainingResponse.class
+com\epam\gym_crm\mq\TrainingProducer.class
 com\epam\gym_crm\domain\service\IAuthenticationService.class
 com\epam\gym_crm\domain\service\impl\TrainingServiceImpl.class
 com\epam\gym_crm\domain\handler\Exception.class
@@ -51,7 +51,6 @@ com\epam\gym_crm\config\AppConfig.class
 com\epam\gym_crm\monitoring\health\DiskSpaceHealthIndicator.class
 com\epam\gym_crm\api\controller\RestTrainingTypeController.class
 com\epam\gym_crm\security\JwtTokenExtractor.class
-com\epam\gym_crm\client\model\ActionType.class
 com\epam\gym_crm\api\dto\request\trainee\TraineeCreateRequest.class
 com\epam\gym_crm\monitoring\health\DatabaseHealthIndicator.class
 com\epam\gym_crm\api\dto\request\trainee\TraineeUpdateRequest.class

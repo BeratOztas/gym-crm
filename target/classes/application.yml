@@ -1,3 +1,4 @@
+# producer'ın application.yaml dosyası
 spring:
   application:
     name: gym-crm
@@ -25,33 +26,16 @@ spring:
       mode: always
       platform: postgresql
       defer-datasource-initialization: false
-  cloud:
-    discovery:
-      enabled: true
-    # Resilience4j Circuit Breaker configuration
-    circuitbreaker:
-      resilience4j:
-        circuit-breakers:
-          trainerHoursService:
-            register-health-indicator: true
-            failure-rate-threshold: 50
-            sliding-window-size: 10
-            minimum-number-of-calls: 6
-            permitted-number-of-calls-in-half-open-state: 5
-            wait-duration-in-open-state: 30s
-            automatic-transition-from-open-to-half-open-enabled: true
-            record-exception:
-            - org.springframework.web.client.ResourceAccessException
-            - java.io.IOException
-            - org.springframework.web.client.HttpServerErrorException 
-            - io.github.resilience4j.feign.FeignException
-  feign:
-    circuitbreaker:
-      enabled: true
-
   config:
     import:
     - "optional:configserver:"
+
+  # --- Kafka Producer Settings ---
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 eureka:
   client:
@@ -91,3 +75,9 @@ management:
   endpoint:
     health:
       show-details: "always"
+      
+# --- Topic and Partitions Settings ---
+topic:
+  trainer-workload: trainer-workload-topic
+  partitions: 1
+  replicas: 1

@@ -27,31 +27,6 @@ spring:
       schema-locations: classpath:schema-dev.sql
       defer-datasource-initialization: false
 
-  cloud:
-    discovery:
-      enabled: true
-    # Resilience4j Circuit Breaker configuration
-    circuitbreaker:
-      resilience4j:
-        circuit-breakers:
-          trainerHoursService:
-            register-health-indicator: true
-            failure-rate-threshold: 50
-            sliding-window-size: 4
-            minimum-number-of-calls: 2
-            permitted-number-of-calls-in-half-open-state: 2
-            wait-duration-in-open-state: 10s
-            automatic-transition-from-open-to-half-open-enabled: true
-            record-exception:
-              - org.springframework.web.client.ResourceAccessException
-              - java.io.IOException
-              - org.springframework.web.client.HttpServerErrorException
-              - io.github.resilience4j.feign.FeignException
-
-  config:
-    import:
-      - "optional:configserver:"
-
 eureka:
   client:
     serviceUrl:
@@ -59,6 +34,4 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
 
-feign:
-  circuitbreaker:
-    enabled: true
+

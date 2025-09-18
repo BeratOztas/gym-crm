@@ -2,6 +2,7 @@ package com.epam.gym_crm.domain.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -18,9 +19,6 @@ import com.epam.gym_crm.api.dto.response.TraineeTrainingInfoResponse;
 import com.epam.gym_crm.api.dto.response.TrainerTrainingInfoProjection;
 import com.epam.gym_crm.api.dto.response.TrainerTrainingInfoResponse;
 import com.epam.gym_crm.api.dto.response.TrainingResponse;
-import com.epam.gym_crm.client.TrainerWorkloadClient;
-import com.epam.gym_crm.client.model.ActionType;
-import com.epam.gym_crm.client.model.TrainerWorkloadRequest;
 import com.epam.gym_crm.db.entity.Trainee;
 import com.epam.gym_crm.db.entity.Trainer;
 import com.epam.gym_crm.db.entity.Training;
@@ -34,6 +32,9 @@ import com.epam.gym_crm.domain.exception.ErrorMessage;
 import com.epam.gym_crm.domain.exception.MessageType;
 import com.epam.gym_crm.domain.service.ITrainingService;
 import com.epam.gym_crm.monitoring.metric.AppMetrics;
+import com.epam.gym_crm.mq.TrainingProducer;
+import com.epam.trainingcommons.dto.TrainerWorkloadRequest;
+import com.epam.trainingcommons.utils.ActionType;
 
 import io.micrometer.core.annotation.Timed;
 
@@ -48,19 +49,19 @@ public class TrainingServiceImpl implements ITrainingService {
 	private final TrainingTypeRepository trainingTypeRepository;
 	private final AuthenticationInfoService authenticationInfoService;
 	private final AppMetrics appMetrics;
-	private final TrainerWorkloadClient trainerWorkloadClient;
-
+	private final TrainingProducer trainingProducer;
+	
 	public TrainingServiceImpl(TrainingRepository trainingRepository, TraineeRepository traineeRepository,
 			TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository,
-			AuthenticationInfoService authenticationInfoService, AppMetrics appMetrics,
-			TrainerWorkloadClient trainerWorkloadClient) {
+			AuthenticationInfoService authenticationInfoService, AppMetrics appMetrics,TrainingProducer trainingProducer
+			) {
 		this.trainingRepository = trainingRepository;
 		this.traineeRepository = traineeRepository;
 		this.trainerRepository = trainerRepository;
 		this.trainingTypeRepository = trainingTypeRepository;
 		this.authenticationInfoService = authenticationInfoService;
 		this.appMetrics = appMetrics;
-		this.trainerWorkloadClient = trainerWorkloadClient;
+		this.trainingProducer=trainingProducer;
 	}
 
 	@Override
@@ -274,10 +275,10 @@ public class TrainingServiceImpl implements ITrainingService {
 			TrainerWorkloadRequest workloadRequest = new TrainerWorkloadRequest(foundTrainer.getUser().getUsername(),
 					foundTrainer.getUser().getFirstName(), foundTrainer.getUser().getLastName(),
 					foundTrainer.getUser().isActive(), savedTraining.getTrainingDate(),
-					savedTraining.getTrainingDuration(), ActionType.ADD);
+					savedTraining.getTrainingDuration(), ActionType.ADD,UUID.randomUUID().toString());
 			logger.info("Sending workload update request for trainer '{}'", foundTrainer.getUser().getUsername());
-
-			trainerWorkloadClient.updateTrainerWorkload(workloadRequest, token);
+			
+			trainingProducer.sendWorkloadUpdate(workloadRequest);
 			logger.info("Successfully sent workload update for trainer '{}'.", foundTrainer.getUser().getUsername());
 		} catch (Exception e) {
 			logger.error("Failed to send workload update for trainer '{}'. Error: {}",
@@ -392,17 +393,15 @@ public class TrainingServiceImpl implements ITrainingService {
 				TrainerWorkloadRequest deleteRequest = new TrainerWorkloadRequest(
 						originalTrainer.getUser().getUsername(), originalTrainer.getUser().getFirstName(),
 						originalTrainer.getUser().getLastName(), originalTrainer.getUser().isActive(),
-						existingTraining.getTrainingDate(), originalDuration, ActionType.DELETE);
-				trainerWorkloadClient.updateTrainerWorkload(deleteRequest, token);
-
+						existingTraining.getTrainingDate(), originalDuration, ActionType.DELETE,UUID.randomUUID().toString());
+				trainingProducer.sendWorkloadUpdate(deleteRequest);
 				TrainerWorkloadRequest addRequest = new TrainerWorkloadRequest(
 						updatedTraining.getTrainer().getUser().getUsername(),
 						updatedTraining.getTrainer().getUser().getFirstName(),
 						updatedTraining.getTrainer().getUser().getLastName(),
 						updatedTraining.getTrainer().getUser().isActive(), updatedTraining.getTrainingDate(),
-						updatedTraining.getTrainingDuration(), ActionType.ADD);
-				trainerWorkloadClient.updateTrainerWorkload(addRequest, token);
-
+						updatedTraining.getTrainingDuration(), ActionType.ADD,UUID.randomUUID().toString());
+				trainingProducer.sendWorkloadUpdate(addRequest);
 				logger.info(
 						"Successfully updated workload for trainer '{}' from duration {} to {}. Trainer updated from {} to {}.",
 						updatedTraining.getTrainer().getUser().getUsername(), originalDuration,
@@ -457,10 +456,10 @@ public class TrainingServiceImpl implements ITrainingService {
 					trainingToDelete.getTrainer().getUser().getFirstName(),
 					trainingToDelete.getTrainer().getUser().getLastName(),
 					trainingToDelete.getTrainer().getUser().isActive(), trainingToDelete.getTrainingDate(),
-					trainingToDelete.getTrainingDuration(), ActionType.DELETE);
+					trainingToDelete.getTrainingDuration(), ActionType.DELETE,UUID.randomUUID().toString());
 			logger.info("Sending workload delete request for trainer '{}'",
 					trainingToDelete.getTrainer().getUser().getUsername());
-			trainerWorkloadClient.updateTrainerWorkload(workloadRequest, token);
+			trainingProducer.sendWorkloadUpdate(workloadRequest);
 			logger.info("Successfully sent workload delete for trainer '{}'.",
 					trainingToDelete.getTrainer().getUser().getUsername());
 		} catch (Exception e) {
